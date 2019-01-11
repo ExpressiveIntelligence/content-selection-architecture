@@ -1,0 +1,1 @@
+﻿Will this WordWrap when I finish typing. need I don't want to have to manually take care of that.
