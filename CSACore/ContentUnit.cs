@@ -1,22 +1,21 @@
-﻿using System.Dynamic;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CSACore
 {
     public class ContentUnit
     {
-        public ExpandoObject Metadata { get; }
+        public IDictionary<string, object> Metadata { get; }
 
-        public ExpandoObject Content { get; }
+        public IDictionary<string, object> Content { get; }
 
-        public bool HasContentSlot(string slotName) => ((IDictionary<string, object>)Content).ContainsKey(slotName);
+        public bool HasContentSlot(string slotName) => Content.ContainsKey(slotName);
 
-        public bool HasMetadataSlot(string slotName) => ((IDictionary<string, object>)Metadata).ContainsKey(slotName);
+        public bool HasMetadataSlot(string slotName) => Metadata.ContainsKey(slotName);
 
         public ContentUnit()
         {
-            Metadata = new ExpandoObject();
-            Content = new ExpandoObject(); 
+            Metadata = new Dictionary<string, object>();
+            Content = new Dictionary<string, object>(); 
         }
 
     }
