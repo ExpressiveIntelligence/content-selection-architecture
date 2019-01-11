@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Dynamic;
 using KnowledgeUnits;
 using System.Collections.Generic;
 using CSACore;
@@ -9,7 +8,7 @@ namespace KnowledgeSources
     public class KS_IDSelector : KnowledgeSource
     {
         // Name of the bound context variable
-        // private const string IDQuery = "IDQuery";
+        private const string IDQuery = "IDQuery";
 
         public override void EvaluatePrecondition()
         {
@@ -20,8 +19,10 @@ namespace KnowledgeSources
             // Iterate through each of the queries, creating context entries
             foreach (var query in queries)
             {
-                dynamic boundVars = new ExpandoObject();
-                boundVars.IDQuery = query;
+                var boundVars = new Dictionary<string, object>
+                {
+                    [IDQuery] = query
+                };
                 m_contexts.Add(boundVars);
             }
 
@@ -29,7 +30,7 @@ namespace KnowledgeSources
 
         public override bool EvaluateObviationCondition()
         {
-            return m_blackboard.ContainsUnit((IUnit)m_boundVars.IDQuery);
+            return m_blackboard.ContainsUnit((IUnit)m_boundVars[IDQuery]);
         }
 
         public override void Execute()
@@ -37,12 +38,12 @@ namespace KnowledgeSources
             throw new System.NotImplementedException();
         }
 
-        protected override KnowledgeSource Factory(IBlackboard blackboard, ExpandoObject boundVars)
+        protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars)
         {
             return new KS_IDSelector(blackboard, boundVars);
         }
 
-        private KS_IDSelector(IBlackboard blackboard, ExpandoObject boundVars) : base(blackboard, boundVars)
+        private KS_IDSelector(IBlackboard blackboard, IDictionary<string, object> boundVars) : base(blackboard, boundVars)
         {
         }
     }

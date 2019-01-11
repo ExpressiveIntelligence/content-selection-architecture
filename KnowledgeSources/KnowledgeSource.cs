@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Dynamic;
 using CSACore;
 
 namespace KnowledgeSources
@@ -9,10 +8,10 @@ namespace KnowledgeSources
         protected readonly IBlackboard m_blackboard; 
 
         // A list of variable bindings (stored as string/object pairs) for each unique match of the precondition. 
-        protected readonly List<ExpandoObject> m_contexts;
+        protected readonly List<IDictionary<string, object>> m_contexts;
 
         // Variable bindings for a particular instantiation of the knowledge source. 
-        protected dynamic m_boundVars;
+        protected IDictionary<string, object> m_boundVars;
 
         // The precondition for this knolwedge source to be executable. The precondition can bind variables. 
         // For each unique pair of variable bindings, a unique copy of the knowledge source is added to the agenda. 
@@ -28,9 +27,9 @@ namespace KnowledgeSources
             m_contexts.RemoveRange(0, m_contexts.Count);
             EvaluatePrecondition();
             var executableList = new List<KnowledgeSource>(); 
-            foreach (ExpandoObject o in m_contexts)
+            foreach (IDictionary<string, object> dict in m_contexts)
             {
-                executableList.Add(Factory(m_blackboard, o));
+                executableList.Add(Factory(m_blackboard, dict));
             }
             return executableList;
         }
@@ -45,16 +44,16 @@ namespace KnowledgeSources
         // True if this knowledge source is executable (has boundVars defined), false otherwise. The Executable KSs form the agenda.
         public bool Executable => m_boundVars != null;
 
-        protected abstract KnowledgeSource Factory(IBlackboard blackboard, ExpandoObject boundVars);
+        protected abstract KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars);
 
         protected KnowledgeSource(IBlackboard blackboard)
         {
             m_boundVars = null; // When a knowledge source is first created, it is not executable. 
-            m_contexts = new List<ExpandoObject>();
+            m_contexts = new List<IDictionary<string, object>>();
             m_blackboard = blackboard;
         }
 
-        protected KnowledgeSource(IBlackboard blackboard, ExpandoObject boundVars)
+        protected KnowledgeSource(IBlackboard blackboard, IDictionary<string, object> boundVars)
         {
             m_boundVars = boundVars;
             m_contexts = null;
