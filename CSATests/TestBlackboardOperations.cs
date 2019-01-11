@@ -201,24 +201,5 @@ namespace CSATests
             Assert.Equal(1, set3.Count);
         }
 
-        [Fact]
-        public void Temp()
-        {
-            /* 
-            dynamic o = new System.Dynamic.ExpandoObject();
-            o.Foo = 3;
-            int baz = o.Baz;
-            Assert.NotNull(o.Bar); 
-            */
-
-             var dict = new Dictionary<string, int>();
-            dict["foo"] = 1;
-            dict["bar"] = 2;
-
-            Assert.Equal(1, dict["foo"]);
-            Assert.Equal(2, dict["bar"]);
-            Assert.Equal(3, dict["baz"]);
-
-        }
     }
 }
