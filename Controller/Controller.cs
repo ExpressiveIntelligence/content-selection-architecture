@@ -46,16 +46,15 @@ namespace Controllers
 
         // fixme: Not sure yet how to handle real-time issues. Don't want this loop to spin endlessly, will need it to yield so other processes
         // can run. For a simple lexeme-based CSA, the presenter could be where the yield lives. Another option is to not have Execute() be a loop.
-        // Instead use an event-based architecture where changes to the blackboard trigger the controller. For now, just do a loop. 
+        // Instead use an event-based architecture where changes to the blackboard trigger the controller. For now, just select a single KS and 
+        // execute it. Punt looping to the enclosing application.  
         public void Execute()
-        {
-            while (true)
-            {
-                UpdateAgenda();
-                KnowledgeSource selectedKS = SelectKSForExecution();
-                Debug.Assert(selectedKS.Executable);
-                selectedKS.Execute();
-            }
+        { 
+            UpdateAgenda();
+            KnowledgeSource selectedKS = SelectKSForExecution();
+            Debug.Assert(selectedKS.Executable);
+            selectedKS.Execute();
+
         }
 
         protected Controller()
