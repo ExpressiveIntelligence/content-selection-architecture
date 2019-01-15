@@ -1,4 +1,6 @@
-﻿
+﻿using KnowledgeSources;
+using System.Collections.Generic;
+
 namespace Controllers
 {
     // fixme: stub. Fill in once I've figured out more general patterns for controllers.
@@ -8,6 +10,14 @@ namespace Controllers
         void Initialize();
 
         // Starts the controller executing. 
-        void Execute(); 
+        void Execute();
+
+        void AddKnowledgeSource(KnowledgeSource ksToAdd);
+
+        void RemoveKnowledgeSource(KnowledgeSource ksToRemove);
+
+        ISet<KnowledgeSource> ActiveKSs { get; }
+
+        ISet<KnowledgeSource> Agenda { get; }
     }
 }

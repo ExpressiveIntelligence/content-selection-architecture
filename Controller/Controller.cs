@@ -38,6 +38,10 @@ namespace Controllers
 
         public void RemoveKnowledgeSource(KnowledgeSource ks) => m_ActiveKSs.Remove(ks);
 
+        public ISet<KnowledgeSource> ActiveKSs => new HashSet<KnowledgeSource>(m_ActiveKSs);
+
+        public ISet<KnowledgeSource> Agenda => new HashSet<KnowledgeSource>(m_Agenda);
+
         protected abstract KnowledgeSource SelectKSForExecution();
 
         // Any initialization of the controller that needs to happen when it is constructed. 
