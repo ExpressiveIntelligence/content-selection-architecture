@@ -5,6 +5,8 @@ namespace KnowledgeSources
 {
     public abstract class KnowledgeSource
     {
+        public IDictionary<string, object> Properties { get; }
+
         protected readonly IBlackboard m_blackboard; 
 
         // A list of variable bindings (stored as string/object pairs) for each unique match of the precondition. 
@@ -19,7 +21,7 @@ namespace KnowledgeSources
         // at all, the list of bindings will be empty.
         // fixme: consider creating a separate, weaker trigger condition as an optimization.
         // fixme: consider making this non-abstract to add assert condition !Executable.  
-        public abstract void EvaluatePrecondition();
+        protected abstract void EvaluatePrecondition();
 
         // First evaluates the precondition. Then returns true if the precondition was satisfied at least once, false otherwise. 
         public IList<KnowledgeSource> Precondition()
@@ -29,7 +31,7 @@ namespace KnowledgeSources
             var executableList = new List<KnowledgeSource>(); 
             foreach (IDictionary<string, object> dict in m_contexts)
             {
-                executableList.Add(Factory(m_blackboard, dict));
+                executableList.Add(Factory(m_blackboard, dict, this));
             }
             return executableList;
         }
@@ -44,20 +46,22 @@ namespace KnowledgeSources
         // True if this knowledge source is executable (has boundVars defined), false otherwise. The Executable KSs form the agenda.
         public bool Executable => m_boundVars != null;
 
-        protected abstract KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars);
+        protected abstract KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks);
 
-        protected KnowledgeSource(IBlackboard blackboard)
+        public KnowledgeSource(IBlackboard blackboard)
         {
             m_boundVars = null; // When a knowledge source is first created, it is not executable. 
             m_contexts = new List<IDictionary<string, object>>();
             m_blackboard = blackboard;
+            Properties = new Dictionary<string, object>();
         }
 
-        protected KnowledgeSource(IBlackboard blackboard, IDictionary<string, object> boundVars)
+        protected KnowledgeSource(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
         {
             m_boundVars = boundVars;
             m_contexts = null;
-            m_blackboard = blackboard; 
+            m_blackboard = blackboard;
+            Properties = new Dictionary<string, object>(ks.Properties);
         }
 
     }

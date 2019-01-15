@@ -5,9 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="EmptyTextFile.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="DynamicProperties.cs" />
+    <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
   </ItemGroup>
 </Project>

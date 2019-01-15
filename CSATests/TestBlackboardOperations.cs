@@ -117,7 +117,7 @@ namespace CSATests
         }
 
         [Fact]
-        public void TestLookupAfterDeleteIsNull()
+        public void TestLookupCountIsZeroAfterDelete()
         {
             IBlackboard blackboard = new Blackboard();
 
@@ -129,15 +129,16 @@ namespace CSATests
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
 
-            Assert.NotNull(blackboard.LookupUnits(type1));
-            Assert.NotNull(blackboard.LookupUnits(type2));
+            Assert.Equal(1, blackboard.LookupUnits(type1).Count);
+            Assert.Equal(1, blackboard.LookupUnits(type2).Count);
 
             blackboard.DeleteUnit(u1);
-            Assert.Null(blackboard.LookupUnits(type1));
-
+            Assert.Equal(0, blackboard.LookupUnits(type1).Count);
+            Assert.Equal(1, blackboard.LookupUnits(type2).Count);
+   
             blackboard.DeleteUnit(u2);
-            Assert.Null(blackboard.LookupUnits(type2));
-
+            Assert.Equal(0, blackboard.LookupUnits(type1).Count);
+            Assert.Equal(0, blackboard.LookupUnits(type2).Count);
         }
 
         [Fact]

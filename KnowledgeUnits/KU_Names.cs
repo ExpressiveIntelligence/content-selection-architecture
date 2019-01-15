@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace KnowledgeUnits
+﻿namespace KnowledgeUnits
 {
     public class KU_Names
     {

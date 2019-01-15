@@ -46,7 +46,7 @@ namespace CSACore
 
         public ISet<IUnit> LookupUnits(string unitType)
         {
-            return dict.TryGetValue(unitType, out ISet<IUnit> units) ?  new HashSet<IUnit>(units) : null;
+            return dict.TryGetValue(unitType, out ISet<IUnit> units) ?  new HashSet<IUnit>(units) : new HashSet<IUnit>();
         }
 
         public bool ContainsUnit(IUnit unit)
@@ -67,6 +67,6 @@ namespace CSACore
             return dict.TryGetValue(typeName, out units);
         }
 
-        // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by attributes rather than just class)
+        // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by properties rather than just class)
     }
 }

@@ -2,8 +2,10 @@
 
 namespace CSACore
 {
-    public class ContentUnit
+    public class ContentUnit : Unit
     {
+        public readonly static string CU_Name = new ContentUnit().GetType().FullName;
+
         public IDictionary<string, object> Metadata { get; }
 
         public IDictionary<string, object> Content { get; }
@@ -18,5 +20,20 @@ namespace CSACore
             Content = new Dictionary<string, object>(); 
         }
 
+        public ContentUnit(ContentUnit c) : base(c)
+        {
+            Metadata = new Dictionary<string, object>();
+            Content = new Dictionary<string, object>();
+
+            foreach(KeyValuePair<string, object> kvp in c.Metadata)
+            {
+                Metadata[kvp.Key] = kvp.Value;
+            }
+
+            foreach(KeyValuePair<string, object> kvp in c.Content)
+            {
+                Content[kvp.Key] = kvp.Value;
+            }
+        }
     }
 }

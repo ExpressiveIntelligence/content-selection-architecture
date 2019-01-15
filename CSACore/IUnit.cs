@@ -1,7 +1,8 @@
-﻿namespace CSACore
+﻿using System.Collections.Generic;
+
+namespace CSACore
 {
-    // Interface for Units. fixme: nothing defined here yet. 
-    public interface IUnit
-    {
+    public interface IUnit { 
+        IDictionary<string, object> Properties { get; }
     }
 }

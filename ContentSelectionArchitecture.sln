@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeUnits", "Knowledge
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSATests", "CSATests\CSATests.csproj", "{FD7D958B-EFEF-4678-A945-026E1CE7CA23}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controllers", "Controller\Controllers.csproj", "{3942EBD4-EB8B-410E-8729-85D8F8C51568}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,5 +33,9 @@ Global
 		{FD7D958B-EFEF-4678-A945-026E1CE7CA23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD7D958B-EFEF-4678-A945-026E1CE7CA23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD7D958B-EFEF-4678-A945-026E1CE7CA23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3942EBD4-EB8B-410E-8729-85D8F8C51568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3942EBD4-EB8B-410E-8729-85D8F8C51568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3942EBD4-EB8B-410E-8729-85D8F8C51568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3942EBD4-EB8B-410E-8729-85D8F8C51568}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
