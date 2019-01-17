@@ -24,8 +24,9 @@ namespace CSATests
         {
             IBlackboard blackboard = new Blackboard();
             KS_IDSelector ks = new KS_IDSelector(blackboard);
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(0, list.Count);
+            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(0, count);
         }
 
         [Fact]
@@ -34,8 +35,9 @@ namespace CSATests
             IBlackboard blackboard = new Blackboard();
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             blackboard.AddUnit(new TestUnit1("foo")); 
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(0, list.Count);
+            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(0, count);
         }
 
         [Fact]
@@ -44,10 +46,11 @@ namespace CSATests
             IBlackboard blackboard = new Blackboard();
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
-            ku.Properties[U_PropertyNames.KSPreconditionMatched] = null;
+            ku.Properties[U_PropertyNames.KSPreconditionMatched] = new HashSet<KnowledgeSource> { ks };
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(0, list.Count);
+            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(0, count);
         }
 
         [Fact]
@@ -57,8 +60,9 @@ namespace CSATests
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(1, list.Count);
+            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(1, count);
             Assert.True(ku.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched));
         }
 
@@ -69,9 +73,14 @@ namespace CSATests
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list1 = ks.Precondition();
-            IList<KnowledgeSource> list2 = ks.Precondition();
-            Assert.Equal(0, list2.Count);
+            var KSs1 = ks.Precondition();
+            int count = KSs1.Count();
+            Assert.Equal(1, count);
+
+
+            var KSs2 = ks.Precondition();
+            count = KSs2.Count();
+            Assert.Equal(0, count);
         }
 
         [Fact]
@@ -89,8 +98,8 @@ namespace CSATests
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.True(list[0].Executable);
+            var KSs = ks.Precondition();
+            Assert.True(KSs.ElementAt(0).Executable);
         }
 
         [Fact]
@@ -100,8 +109,8 @@ namespace CSATests
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.False(list[0].EvaluateObviationCondition());
+            var KSs = ks.Precondition();
+            Assert.False(KSs.ElementAt(0).EvaluateObviationCondition());
         }
 
         [Fact]
@@ -111,9 +120,9 @@ namespace CSATests
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             U_IDQuery ku = new U_IDQuery("foo");
             blackboard.AddUnit(ku);
-            IList<KnowledgeSource> list = ks.Precondition();
+            var KSs = ks.Precondition();
             blackboard.DeleteUnit(ku);
-            Assert.True(list[0].EvaluateObviationCondition());
+            Assert.True(KSs.ElementAt(0).EvaluateObviationCondition());
         }
 
         [Fact]
@@ -132,8 +141,9 @@ namespace CSATests
             {
                 blackboard.AddUnit(u);
             }
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(3, list.Count);
+            var KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(3, count);
             foreach(U_IDQuery u in kuList)
             {
                 Assert.True(u.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched));
@@ -170,9 +180,10 @@ namespace CSATests
                 blackboard.AddUnit(u);
             }
 
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(1, list.Count);
-            list[0].Execute();
+            var KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(1, count);
+            KSs.ElementAt(0).Execute();
             Assert.False(ks.Executable);
 
             // Four content units total (the original three plus a new selected one)
@@ -226,9 +237,10 @@ namespace CSATests
                 blackboard.AddUnit(u);
             }
 
-            IList<KnowledgeSource> list = ks.Precondition();
-            Assert.Equal(1, list.Count);
-            list[0].Execute();
+            var KSs = ks.Precondition();
+            int count = KSs.Count();
+            Assert.Equal(1, count);
+            KSs.ElementAt(0).Execute();
             Assert.False(ks.Executable);
 
             // Three content units total (no selected unit)

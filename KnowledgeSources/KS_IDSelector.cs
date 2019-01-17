@@ -19,7 +19,9 @@ namespace KnowledgeSources
         {
             // Use LINQ to create a collection of the requested U_IDQueries on the blackboard.
             var queries = from query in m_blackboard.LookupUnits(KU_Names.U_IDQuery)
-                          where !query.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched)
+                          where 
+                            (!query.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched)) ||
+                            (!((ISet<KnowledgeSource>)query.Properties[U_PropertyNames.KSPreconditionMatched]).Contains(this))
                           select query;
 
             // Iterate through each of the queries, creating context entries
@@ -30,7 +32,7 @@ namespace KnowledgeSources
                     [IDQuery] = query
                 };
                 m_contexts.Add(boundVars);
-                query.Properties[U_PropertyNames.KSPreconditionMatched] = null;
+                query.Properties[U_PropertyNames.KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
             }
         }
 

@@ -14,16 +14,22 @@ namespace Controllers
         // To update the agenda, execute obviation conditions to remove KSs from the agenda and execute preconditions to add KSs to the agenda.
         protected void UpdateAgenda()
         {
+            ICollection<KnowledgeSource> ksToRemoveFromAgenda = new HashSet<KnowledgeSource>(); 
             foreach(KnowledgeSource ks in m_Agenda)
             {
                 if (ks.EvaluateObviationCondition())
                 {
                     Debug.Assert(ks.Executable);
-                    m_Agenda.Remove(ks);
+                    ksToRemoveFromAgenda.Add(ks);
                 }
             }
 
-            foreach(KnowledgeSource ks in m_ActiveKSs)
+            foreach(KnowledgeSource ks in ksToRemoveFromAgenda)
+            {
+                m_Agenda.Remove(ks);
+            }
+
+            foreach (KnowledgeSource ks in m_ActiveKSs)
             {
                 Debug.Assert(!ks.Executable);
                 IEnumerable<KnowledgeSource> executableKSs = ks.Precondition();
@@ -38,15 +44,18 @@ namespace Controllers
 
         public void RemoveKnowledgeSource(KnowledgeSource ks) => m_ActiveKSs.Remove(ks);
 
+        // Return a copy of the ActiveKSs so that the caller can't directly modify the set. 
         public ISet<KnowledgeSource> ActiveKSs => new HashSet<KnowledgeSource>(m_ActiveKSs);
 
+        // Return a copy of the agenda so that the caller can't directly modify the set.
         public ISet<KnowledgeSource> Agenda => new HashSet<KnowledgeSource>(m_Agenda);
 
         protected abstract KnowledgeSource SelectKSForExecution();
 
         // Any initialization of the controller that needs to happen when it is constructed. 
         // fixme: if I don't find a use case for a controller that needs this, remove it. 
-        public abstract void Initialize();
+        // fixme: don't think that this needs to be public 
+        public virtual void Initialize() { }
 
         // fixme: Not sure yet how to handle real-time issues. Don't want this loop to spin endlessly, will need it to yield so other processes
         // can run. For a simple lexeme-based CSA, the presenter could be where the yield lives. Another option is to not have Execute() be a loop.

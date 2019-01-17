@@ -23,8 +23,9 @@ namespace KnowledgeSources
         // fixme: consider making this non-abstract to add assert condition !Executable.  
         protected abstract void EvaluatePrecondition();
 
-        // First evaluates the precondition. Then returns true if the precondition was satisfied at least once, false otherwise. 
-        public IList<KnowledgeSource> Precondition()
+        // First evaluates the precondition. Then returns an enumerable of instantiated knowledge sources (one for each unique combination of units
+        // the precondition is satisfied by). The list is empty if the precondition is not satisfied.  
+        public IEnumerable<KnowledgeSource> Precondition()
         {
             m_contexts.RemoveRange(0, m_contexts.Count);
             EvaluatePrecondition();

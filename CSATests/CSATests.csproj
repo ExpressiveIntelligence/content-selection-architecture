@@ -17,5 +17,6 @@
     <ProjectReference Include="..\CSACore\CSACore.csproj" />
     <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
     <ProjectReference Include="..\KnowledgeUnits\KnowledgeUnits.csproj" />
+    <ProjectReference Include="..\Controller\Controllers.csproj" />
   </ItemGroup>
 </Project>

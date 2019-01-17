@@ -3,15 +3,9 @@ using System.Diagnostics;
 
 namespace Controllers
 {
-    public class LexemeController : Controller
+    public class PriorityController : Controller
     {
  
-        // Don't need to do any initialization of a LexemeController when it is constructed. 
-        public override void Initialize()
-        {
-
-        }
-
         // fixme: selects the highest priority KS for execution. More generally, would want to select KSs probabilistically based on priority.
         // Consider implementing controllers with KSs on their own blackboard. There's a regress where the KSs that implement a controller need 
         // their own meta-controller to decide what to do. This regress can be broken by having "eager" KSs that execute immediately when their 
