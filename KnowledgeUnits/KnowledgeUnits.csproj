@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CSACore\CSACore.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="KU_Names.cs" />
+  </ItemGroup>
 </Project>

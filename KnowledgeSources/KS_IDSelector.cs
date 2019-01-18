@@ -18,7 +18,7 @@ namespace KnowledgeSources
         protected override void EvaluatePrecondition()
         {
             // Use LINQ to create a collection of the requested U_IDQueries on the blackboard.
-            var queries = from query in m_blackboard.LookupUnits(KU_Names.U_IDQuery)
+            var queries = from query in m_blackboard.LookupUnits(U_IDQuery.TypeName)
                           where 
                             (!query.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched)) ||
                             (!((ISet<KnowledgeSource>)query.Properties[U_PropertyNames.KSPreconditionMatched]).Contains(this))

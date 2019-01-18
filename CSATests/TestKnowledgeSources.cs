@@ -1,6 +1,7 @@
 ﻿using KnowledgeSources;
 using KnowledgeUnits;
 using Xunit;
+using Xunit.Abstractions;
 using CSACore;
 using System.Collections.Generic;
 using System.Linq;
@@ -203,7 +204,7 @@ namespace CSATests
             Assert.Equal("foo", ((ContentUnit)selectedList.ElementAt(0)).Metadata[CU_SlotNames.ContentUnitID]);
 
             // The query has been deleted. 
-            ISet<IUnit> querySet = blackboard.LookupUnits(KU_Names.U_IDQuery);
+            ISet<IUnit> querySet = blackboard.LookupUnits(U_IDQuery.TypeName);
             Assert.Equal(0, querySet.Count);
         }
 
@@ -257,7 +258,7 @@ namespace CSATests
             Assert.Equal(0, size);
 
             // The query has been deleted. 
-            ISet<IUnit> querySet = blackboard.LookupUnits(KU_Names.U_IDQuery);
+            ISet<IUnit> querySet = blackboard.LookupUnits(U_IDQuery.TypeName);
             Assert.Equal(0, querySet.Count);
         }
     }
