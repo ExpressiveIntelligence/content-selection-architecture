@@ -4,6 +4,7 @@ using Xunit;
 
 namespace CSATests
 {
+    // fixme: consolidate tests into theories so more test cases can be quickly added. 
     public class TestBlackboardOperations
     {
 
@@ -304,6 +305,33 @@ namespace CSATests
             TestUnit1 u = new TestUnit1("NotOnBlackboard");
             Assert.False(blackboard.RemoveLink(units[3], u, "lType1"));
             var linkSet3 = blackboard.LookupLinks(units[3]);
+            Assert.Equal(1, linkSet3.Count);
+        }
+
+        [Fact]
+        public void TestDeleteUnitWithLinks()
+        {
+            IBlackboard blackboard = new Blackboard();
+            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz"), new ContentUnit() };
+            foreach (var unit in units)
+            {
+                blackboard.AddUnit(unit);
+            }
+            Assert.True(blackboard.AddLink(units[0], units[1], "lType1"));
+            Assert.True(blackboard.AddLink(units[0], units[2], "lType2"));
+            Assert.True(blackboard.AddLink(units[2], units[3], "lType3"));
+
+            var linkSet1 = blackboard.LookupLinks(units[0]);
+            var linkSet2 = blackboard.LookupLinks(units[2]);
+            Assert.Equal(2, linkSet1.Count);
+            Assert.Equal(2, linkSet2.Count);
+
+            Assert.True(blackboard.DeleteUnit(units[0]));
+            linkSet1 = blackboard.LookupLinks(units[0]);
+            linkSet2 = blackboard.LookupLinks(units[1]);
+            var linkSet3 = blackboard.LookupLinks(units[2]);
+            Assert.Equal(0, linkSet1.Count); 
+            Assert.Equal(0, linkSet2.Count);
             Assert.Equal(1, linkSet3.Count);
         }
     }

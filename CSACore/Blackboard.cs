@@ -7,8 +7,9 @@ namespace CSACore
     {
         private readonly IDictionary<string, ISet<IUnit>> dict = new Dictionary<string, ISet<IUnit>>();
 
-        private readonly IDictionary<IUnit, ISet<(IUnit, string)>> links = new Dictionary<IUnit, ISet<(IUnit, string)>>();
+        private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType)>> links = new Dictionary<IUnit, ISet<(IUnit Node, string LinkType)>>();
 
+        // Adds a knoweldge unit to the blackboard.
         // Duplicate units (by reference) not allowed on the blackboard. Using set semantics for Units sharing the same type. 
         public void AddUnit(IUnit unit)
         {
@@ -29,6 +30,7 @@ namespace CSACore
 
         }
 
+        // Removes a knowledge unit from the blackboard. 
         public bool DeleteUnit(IUnit unit)
         {
             if (LookupUnits(unit, out ISet<IUnit> units))
@@ -39,6 +41,14 @@ namespace CSACore
                     {
                         dict.Remove(GetUnitTypeName(unit));
                     }
+
+                    var linksToRemove = LookupLinks(unit);
+                    IUnit node1 = unit;
+                    foreach((IUnit node2, string linkType) in linksToRemove)
+                    {
+                        RemoveLink(node1, node2, linkType);
+                    }
+
                     return true; 
                 }
 
@@ -46,11 +56,13 @@ namespace CSACore
             return false; 
         }
 
+        // Returns a set of knowledge units on the blackboard matching the unit type. 
         public ISet<IUnit> LookupUnits(string unitType)
         {
             return dict.TryGetValue(unitType, out ISet<IUnit> units) ?  new HashSet<IUnit>(units) : new HashSet<IUnit>();
         }
 
+        // Returns true if the argument unit is on the blackboard. 
         public bool ContainsUnit(IUnit unit)
         {
             return LookupUnits(unit, out ISet<IUnit> units) && units.Contains(unit);
@@ -153,10 +165,17 @@ namespace CSACore
             }
         }
 
+        // Removes all knowledge units and links on the blackboard. 
+        public void Clear()
+        {
+            dict.Clear();
+            links.Clear();
+        }
+
         // Returns a set of the links for which the argument unit is an endpoint. 
         // If the unit argument has no links or is not in the blackboard, returns the empty set. 
         // Note that using LookupLinks alone, it is not possible to differentiate between the cases of unit on the blackboard with no links and unit not on the blackboard. 
-        public ISet<(IUnit, string)> LookupLinks(IUnit unit)
+        public ISet<(IUnit Node, string LinkType)> LookupLinks(IUnit unit)
         {
             return links.TryGetValue(unit, out ISet<(IUnit, string)> linkSet) ? new HashSet<(IUnit, string)>(linkSet) : new HashSet<(IUnit, string)>(); 
         }

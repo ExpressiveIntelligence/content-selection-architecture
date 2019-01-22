@@ -4,7 +4,7 @@ namespace CSACore
 {
     public class ContentUnit : Unit
     {
-        public readonly static string CU_Name = new ContentUnit().GetType().FullName;
+        public static new string TypeName { get; } = new ContentUnit().GetType().FullName;
 
         public IDictionary<string, object> Metadata { get; }
 

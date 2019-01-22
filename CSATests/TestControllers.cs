@@ -131,7 +131,7 @@ namespace CSATests
             controller.Execute();
 
             // Four content units total (the original three plus a new selected one)
-            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.CU_Name);
+            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
             Assert.Equal(4, cuSet.Count);
 
             var selectedUnit = from unit in cuSet

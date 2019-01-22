@@ -4,13 +4,13 @@ namespace KnowledgeUnits
 {
     public class U_IDQuery : Unit
     {
-        public new static string TypeName { get; } = new U_IDQuery("").GetType().FullName;
+        public static new string TypeName { get; } = new U_IDQuery("").GetType().FullName;
 
-        public string ContentUnitID { get; }
+        public string TargetContentUnitID { get; }
 
         public U_IDQuery(string ID)
         {
-            ContentUnitID = ID;
+            TargetContentUnitID = ID;
         }
     }
 }
