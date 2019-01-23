@@ -73,7 +73,7 @@ namespace CSATests
             controller.UpdateAgenda();
             Assert.Equal(1, controller.Agenda.Count);
 
-            blackboard.DeleteUnit(u);
+            blackboard.RemoveUnit(u);
             controller.UpdateAgenda();
             Assert.Equal(0, controller.Agenda.Count);
         }

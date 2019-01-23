@@ -41,7 +41,7 @@ namespace CSACore
         }
 
         // Removes a knowledge unit from the blackboard. 
-        public bool DeleteUnit(IUnit unit)
+        public bool RemoveUnit(IUnit unit)
         {
             if (LookupUnits(unit, out ISet<IUnit> units))
             {

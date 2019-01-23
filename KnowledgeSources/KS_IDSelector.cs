@@ -82,7 +82,7 @@ namespace KnowledgeSources
                 m_blackboard.AddUnit(newUnit);
                 m_blackboard.AddLink(randUnit, newUnit, LinkTypes.L_SelectedContentUnit);
             }
-            m_blackboard.DeleteUnit((IUnit)m_boundVars[IDQuery]);
+            m_blackboard.RemoveUnit((IUnit)m_boundVars[IDQuery]);
             m_boundVars = null;
          }
 

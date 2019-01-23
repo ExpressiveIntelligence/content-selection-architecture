@@ -9,7 +9,7 @@ namespace CSACore
 
         // Removes a knowledge unit from the blackboard. 
         // fixme: when deleting a unit, make sure any links associated with the unit are deleted. 
-        bool DeleteUnit(IUnit u);
+        bool RemoveUnit(IUnit u);
 
         // Returns a set of knowledge units on the blackboard matching the unit type. 
         ISet<IUnit> LookupUnits(string unitType);

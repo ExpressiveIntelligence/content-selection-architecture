@@ -238,7 +238,7 @@ namespace CSATests
                 // Second, remove the units from the blackboard
                 foreach (IUnit unitToRemove in unitsToAdd)
                 {
-                    blackboard.DeleteUnit(unitToRemove);
+                    blackboard.RemoveUnit(unitToRemove);
                 }
 
                 // Finally, the obviation condition should now evaluate to true since the matching KUs are no longer on the blackboard. 

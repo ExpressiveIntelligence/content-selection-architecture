@@ -116,7 +116,7 @@ namespace KnowledgeSources
             }
 
             // Remove the displayed SelectedContentUnit from the blackboard.
-            m_blackboard.DeleteUnit((ContentUnit)m_boundVars[SelectedContentUnit]);
+            m_blackboard.RemoveUnit((ContentUnit)m_boundVars[SelectedContentUnit]);
             m_boundVars = null; // Set m_boundVars to null, marking this KS as not executable. 
         }
 

@@ -57,15 +57,15 @@ namespace CSATests
             Assert.True(blackboard.ContainsUnit(u1));
             Assert.True(blackboard.ContainsUnit(u2));
             Assert.True(blackboard.ContainsUnit(u3));
-            blackboard.DeleteUnit(u3);
+            blackboard.RemoveUnit(u3);
             Assert.False(blackboard.ContainsUnit(u3));
             Assert.True(blackboard.ContainsUnit(u2));
             Assert.True(blackboard.ContainsUnit(u1));
-            blackboard.DeleteUnit(u2);
+            blackboard.RemoveUnit(u2);
             Assert.False(blackboard.ContainsUnit(u3));
             Assert.False(blackboard.ContainsUnit(u2));
             Assert.True(blackboard.ContainsUnit(u1));
-            blackboard.DeleteUnit(u1);
+            blackboard.RemoveUnit(u1);
             Assert.False(blackboard.ContainsUnit(u3));
             Assert.False(blackboard.ContainsUnit(u2));
             Assert.False(blackboard.ContainsUnit(u1));
@@ -133,11 +133,11 @@ namespace CSATests
             Assert.Equal(1, blackboard.LookupUnits(type1).Count);
             Assert.Equal(1, blackboard.LookupUnits(type2).Count);
 
-            blackboard.DeleteUnit(u1);
+            blackboard.RemoveUnit(u1);
             Assert.Equal(0, blackboard.LookupUnits(type1).Count);
             Assert.Equal(1, blackboard.LookupUnits(type2).Count);
    
-            blackboard.DeleteUnit(u2);
+            blackboard.RemoveUnit(u2);
             Assert.Equal(0, blackboard.LookupUnits(type1).Count);
             Assert.Equal(0, blackboard.LookupUnits(type2).Count);
         }
@@ -169,8 +169,8 @@ namespace CSATests
             Assert.Equal(3, set1.Count);
             Assert.Equal(2, set2.Count);
 
-            blackboard.DeleteUnit(u1);
-            blackboard.DeleteUnit(u4);
+            blackboard.RemoveUnit(u1);
+            blackboard.RemoveUnit(u4);
 
             set1 = blackboard.LookupUnits(type1);
             set2 = blackboard.LookupUnits(type2);
@@ -326,7 +326,7 @@ namespace CSATests
             Assert.Equal(2, linkSet1.Count);
             Assert.Equal(2, linkSet2.Count);
 
-            Assert.True(blackboard.DeleteUnit(units[0]));
+            Assert.True(blackboard.RemoveUnit(units[0]));
             linkSet1 = blackboard.LookupLinks(units[0]);
             linkSet2 = blackboard.LookupLinks(units[1]);
             var linkSet3 = blackboard.LookupLinks(units[2]);
@@ -427,7 +427,7 @@ namespace CSATests
 
             foreach(IUnit unit in unitsToDelete)
             {
-                blackboard.DeleteUnit(unit);
+                blackboard.RemoveUnit(unit);
             }
 
             Assert.True(blackboard.Changed == changedAfterUnitDelete);
