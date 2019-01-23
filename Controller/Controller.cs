@@ -65,9 +65,12 @@ namespace Controllers
         { 
             UpdateAgenda();
             KnowledgeSource selectedKS = SelectKSForExecution();
-            Debug.Assert(selectedKS.Executable);
-            selectedKS.Execute();
-
+            if (selectedKS != null)
+            {
+                Debug.Assert(selectedKS.Executable);
+                selectedKS.Execute();
+                m_Agenda.Remove(selectedKS);
+            }
         }
 
         protected Controller()

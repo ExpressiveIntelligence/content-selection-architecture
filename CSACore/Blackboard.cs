@@ -9,6 +9,11 @@ namespace CSACore
 
         private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType)>> links = new Dictionary<IUnit, ISet<(IUnit Node, string LinkType)>>();
 
+        protected bool m_changed = false;
+
+        // True if the blackboard has been changed since the last call to ResetChanged()
+        public bool Changed => m_changed;
+
         // Adds a knoweldge unit to the blackboard.
         // Duplicate units (by reference) not allowed on the blackboard. Using set semantics for Units sharing the same type. 
         public void AddUnit(IUnit unit)
@@ -16,8 +21,11 @@ namespace CSACore
 
             if (LookupUnits(unit, out ISet<IUnit> units))
             {
-                units.Add(unit);
-
+                if (units.Add(unit))
+                {
+                    // Blackboard changed only if the unit was successfully added to the set (not a duplicate). 
+                    m_changed = true; 
+                }
             }
             else
             {
@@ -26,8 +34,10 @@ namespace CSACore
                     unit
                 };
                 dict.Add(GetUnitTypeName(unit), newUnits);
-            }
 
+                // Adding a unit with a new type to the blackboard always changes it
+                m_changed = true;
+            }
         }
 
         // Removes a knowledge unit from the blackboard. 
@@ -48,6 +58,9 @@ namespace CSACore
                     {
                         RemoveLink(node1, node2, linkType);
                     }
+
+                    // Removing a unit changes the blackboard (but only if the unit was actually on the blackboard) 
+                    m_changed = true;
 
                     return true; 
                 }
@@ -89,33 +102,50 @@ namespace CSACore
         {
             if (ContainsUnit(unit1) && ContainsUnit(unit2))
             {
-                ISet<(IUnit, string)> linkSet;
-                if (links.TryGetValue(unit1, out linkSet))
+                if (LookupLinks(unit1).Contains((unit2, linkType)))
                 {
-                    linkSet.Add((unit2, linkType)); 
+                    // Link is already on the blackboard
+                    Debug.Assert(LookupLinks(unit2).Contains((unit1, linkType)));
+                    return false;
                 }
                 else
                 {
-                    linkSet = new HashSet<(IUnit, string)>();
-                    linkSet.Add((unit2, linkType));
-                    links.Add(unit1, linkSet);
-                }
+                    // Link is not already on the blackboard. 
 
-                if (links.TryGetValue(unit2, out linkSet))
-                {
-                    linkSet.Add((unit1, linkType));
-                }
-                else
-                {
-                    linkSet = new HashSet<(IUnit, string)>();
-                    linkSet.Add((unit1, linkType));
-                    links.Add(unit2, linkSet);
-                }
+                    if (links.TryGetValue(unit1, out ISet<(IUnit, string)> linkSet))
+                    {
+                        bool bAdd = linkSet.Add((unit2, linkType));
+                        Debug.Assert(bAdd);
+                    }
+                    else
+                    {
+                        linkSet = new HashSet<(IUnit, string)>();
+                        bool bAdd = linkSet.Add((unit2, linkType));
+                        Debug.Assert(bAdd);
+                        links.Add(unit1, linkSet);
+                    }
 
-                return true;
+                    if (links.TryGetValue(unit2, out linkSet))
+                    {
+                        bool bAdd = linkSet.Add((unit1, linkType));
+                        Debug.Assert(bAdd);
+                    }
+                    else
+                    {
+                        linkSet = new HashSet<(IUnit, string)>();
+                        bool bAdd = linkSet.Add((unit1, linkType));
+                        Debug.Assert(bAdd);
+                        links.Add(unit2, linkSet);
+                    }
+
+                    // The blackboard is changed if we hadd a link
+                    m_changed = true;
+                    return true;
+                }
             }
             else
             {
+                // One of the two units is not on the blackboard
                 return false;
             }
         }
@@ -126,10 +156,10 @@ namespace CSACore
             ISet<(IUnit, string)> linkSet1;
             ISet<(IUnit, string)> linkSet2;
 
-            bool bValue1 = links.TryGetValue(unit1, out linkSet1);
-            bool bValue2 = links.TryGetValue(unit2, out linkSet2);
+            bool bGet1 = links.TryGetValue(unit1, out linkSet1);
+            bool bGet2 = links.TryGetValue(unit2, out linkSet2);
 
-            if (bValue1 && bValue2)
+            if (bGet1 && bGet2)
             {
                 // Both unit1 and unit2 are the endpoint of links. 
 
@@ -140,20 +170,21 @@ namespace CSACore
                 // Assert that b1 and b2 have the same value. Either both link sets include the other node with this linkType or neither includes the other node with this linkType; 
                 Debug.Assert(bRemove1 == bRemove2);
 
-                // Returns if a link was removed, false otherwise. 
-                return bRemove1;
+
+                m_changed = bRemove1; // Blackboard changed if a link was removed. 
+                return bRemove1; // Returns true if a link was removed, false otherwise. 
             }
             else
             {
                 // One of the two nodes is not the endpoint of any links
 
-                if (bValue1 && !bValue2)
+                if (bGet1 && !bGet2)
                 {
                     // Only the first node is the endpoint of any links. 
                     // Assert that its link set must not contain the second node with this linkType.
                     Debug.Assert(!linkSet1.Contains((unit2, linkType)));
                 }
-                else if (!bValue1 && bValue2)
+                else if (!bGet1 && bGet2)
                 {
                     // Only the second node is the endpoint of any links. 
                     // Assert that its link set must not contain the second node with this linkType.
@@ -168,6 +199,9 @@ namespace CSACore
         // Removes all knowledge units and links on the blackboard. 
         public void Clear()
         {
+            // Clear changes the blackboard if there are any units on the blackboard (if there are no units there can't be any links)
+            m_changed = dict.Count > 0;
+
             dict.Clear();
             links.Clear();
         }
@@ -178,6 +212,14 @@ namespace CSACore
         public ISet<(IUnit Node, string LinkType)> LookupLinks(IUnit unit)
         {
             return links.TryGetValue(unit, out ISet<(IUnit, string)> linkSet) ? new HashSet<(IUnit, string)>(linkSet) : new HashSet<(IUnit, string)>(); 
+        }
+
+        // Reset whether this blackboard has been changed to false. Returns the current changed status before the reset.  
+        public bool ResetChanged()
+        {
+            bool changed = m_changed;
+            m_changed = false;
+            return changed;
         }
 
         // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by properties rather than just class)

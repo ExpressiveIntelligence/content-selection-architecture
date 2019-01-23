@@ -334,5 +334,114 @@ namespace CSATests
             Assert.Equal(0, linkSet2.Count);
             Assert.Equal(1, linkSet3.Count);
         }
+
+        public static IEnumerable<object[]> Data_TestChanged_Blackboard()
+        {
+
+            TestUnit1 u1 = new TestUnit1("foo");
+            TestUnit1 u2 = new TestUnit1("bar");
+            TestUnit1 u3 = new TestUnit1("baz");
+
+            IBlackboard blackboard = new Blackboard();
+
+            /* Structure of object[]: 
+            * IBlackboard: blackboard,            
+            * IUnit[]: array of units to add
+            * bool: changed after unit add           
+            * (IUnit node1, IUnit node, string linkType)[]: array of links to add,
+            * bool: changed after link add           
+            * IUnit[]: array of units to delete
+            * bool: changed after unit delete           
+            * (IUnit node1, IUnit node, string linkType)[]: array of links to delete,
+            * bool: changed after link delete           
+            */
+
+            return new List<object[]>
+            {
+                // Empty blackboard, no assertions and deletions
+                new object[] { blackboard, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { }, false, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { }, false }, 
+
+                // Adding a unit
+                new object[] { blackboard, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { }, false, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { }, false },
+
+                // Adding and removing a unit
+                new object[] { blackboard, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { }, false, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { }, false },
+
+                // Adding a unit and removing a unit not on the blackboard
+                new object[] { blackboard, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { }, false, new IUnit[] { u2 }, false, new (IUnit, IUnit, string)[] { }, false },
+ 
+                // Adding two units and adding a link
+                new object[] { blackboard, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { }, false, new IUnit[] { u2 }, false, new (IUnit, IUnit, string)[] { }, false },
+
+                // Adding two units and adding a link
+                new object[] { blackboard, new IUnit[] { u1, u2 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { }, false },
+
+                // Adding two units and removing a link
+                new object[] { blackboard, new IUnit[] { u1, u2 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true },
+
+                // Adding two units, adding a link, then removing a non-existant link (no unit)
+                new object[] { blackboard, new IUnit[] { u1, u2 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true, new IUnit[] { }, false, new (IUnit, IUnit, string)[] { (u1, u3, "l_foo") }, false },
+
+                // Adding two units, removing one of them, then trying to remove the link that used to exist
+                new object[] { blackboard, new IUnit[] { u1, u2 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true, new IUnit[] { u1 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, false },
+
+                // Adding three units, adding link, removing unit not participating in link, then removing the link that used to exist
+                new object[] { blackboard, new IUnit[] { u1, u2, u3}, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true, new IUnit[] { u3 }, true, new (IUnit, IUnit, string)[] { (u1, u2, "l_foo") }, true },
+
+            };
+
+        }
+
+        [Theory]
+        [MemberData(nameof(Data_TestChanged_Blackboard))]
+        public void TestChanged_Blackboard(
+            IBlackboard blackboard,
+            IUnit[] unitsToAdd,
+            bool changedAfterUnitAdd,
+            (IUnit node1, IUnit node2, string linkType)[] linksToAdd, 
+            bool changedAfterLinkAdd,
+            IUnit[] unitsToDelete, 
+            bool changedAfterUnitDelete,
+            (IUnit node1, IUnit node2, string linkType)[] linksToDelete,
+            bool changedAfterLinkDelete)
+        {
+            blackboard.Clear();
+
+            foreach(IUnit unit in unitsToAdd)
+            {
+                blackboard.AddUnit(unit);
+            }
+
+            Assert.True(blackboard.Changed == changedAfterUnitAdd);
+            Assert.True(blackboard.ResetChanged() == changedAfterUnitAdd);
+            Assert.False(blackboard.Changed);
+
+            foreach((IUnit node1, IUnit node2, string linkType) link in linksToAdd)
+            {
+                blackboard.AddLink(link.node1, link.node2, link.linkType);
+            }
+
+            Assert.True(blackboard.Changed == changedAfterLinkAdd);
+            Assert.True(blackboard.ResetChanged() == changedAfterLinkAdd);
+            Assert.False(blackboard.Changed);
+
+            foreach(IUnit unit in unitsToDelete)
+            {
+                blackboard.DeleteUnit(unit);
+            }
+
+            Assert.True(blackboard.Changed == changedAfterUnitDelete);
+            Assert.True(blackboard.ResetChanged() == changedAfterUnitDelete);
+            Assert.False(blackboard.Changed);
+
+            foreach((IUnit node1, IUnit node2, string linkType) link in linksToDelete)
+            {
+                blackboard.RemoveLink(link.node1, link.node2, link.linkType);
+            }
+
+            Assert.True(blackboard.Changed == changedAfterLinkDelete);
+            Assert.True(blackboard.ResetChanged() == changedAfterLinkDelete);
+            Assert.False(blackboard.Changed);
+        }
     }
 }

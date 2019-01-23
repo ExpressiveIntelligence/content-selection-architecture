@@ -20,7 +20,7 @@ namespace CSATests
             }
         }
 
-        class ConsoleChoicePresenter_PublicGetChoices : ConsoleChoicePresenter
+        class ConsoleChoicePresenter_PublicGetChoices : KS_ConsoleChoicePresenter
         {
             public new IEnumerable<ContentUnit> GetChoices() => base.GetChoices();
 
@@ -80,21 +80,21 @@ namespace CSATests
                 },
 
                 // ConsoleChoicePresenter, empty blackboard
-                new object[] { blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
+                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
 
                 // ConsoleChoiceSelector, non-matching unit
-                new object[] { blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
+                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
 
                 // ConsoleChoicePresenter, matching unit, previously matched
-                new object[] { blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
+                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
 
                 // ConsoleChoicePresenter, matching unit, not previously matched
-                new object[] { blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
+                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
 
                 // ConsoleChoicePresenter, multiple matching units, not previously matched
                 new object[]
                 {
-                    blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -196,12 +196,12 @@ namespace CSATests
                  },
 
                 // ConsoleChoicePresenter, one matching unit
-                new object[] { blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
+                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
 
                 // ConsoleChoicePresenter, multiple matching units
                 new object[]
                 {
-                    blackboard, new ConsoleChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -249,6 +249,7 @@ namespace CSATests
             } 
         }
 
+        // fixme: Eventually see if testing of KnoledgeSource.Execute() can be turned into a theory. 
         [Fact]
         public void TestExecute_KS_IDSelector_SelectedUnit()
         {
@@ -282,8 +283,12 @@ namespace CSATests
             var KSs = ks.Precondition();
             int count = KSs.Count();
             Assert.Equal(1, count);
+            Assert.True(KSs.ElementAt(0).Executable);
             KSs.ElementAt(0).Execute();
             Assert.False(ks.Executable);
+
+            // The knowledge source should no longer executable after it has executed. 
+            Assert.False(KSs.ElementAt(0).Executable);
 
             // Four content units total (the original three plus a new selected one)
             ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
@@ -304,6 +309,8 @@ namespace CSATests
             // The query has been deleted. 
             ISet<IUnit> querySet = blackboard.LookupUnits(U_IDQuery.TypeName);
             Assert.Equal(0, querySet.Count);
+
+
         }
 
         [Fact]
@@ -339,8 +346,12 @@ namespace CSATests
             var KSs = ks.Precondition();
             int count = KSs.Count();
             Assert.Equal(1, count);
+            Assert.True(KSs.ElementAt(0).Executable);
             KSs.ElementAt(0).Execute();
             Assert.False(ks.Executable);
+
+            // The knowledge source should no longer executable after it has executed. 
+            Assert.False(KSs.ElementAt(0).Executable);
 
             // Three content units total (no selected unit)
             ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);

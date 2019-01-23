@@ -101,8 +101,6 @@ namespace CSATests
             Assert.Equal(30, ks.Properties[KS_PropertyNames.Priority]);
         }
 
-
-        // fixme: finish this test after writing tests for agenda updating and SelectKSForExecution 
         [Fact]
         public void TestExecute_PriorityController()
         {
@@ -144,6 +142,9 @@ namespace CSATests
 
             // The selected content unit is "foo" (matches the query request)
             Assert.True(((ContentUnit)selectedUnit.ElementAt(0)).Metadata[CU_SlotNames.ContentUnitID].Equals("foo"));
+
+            // Since we only added one KS to controller, and there was only one matching blackboard pattern, after execution the agenda should be empty
+            Assert.Empty(controller.Agenda);
         }
     }
 

@@ -33,5 +33,11 @@ namespace CSACore
 
         // Removes all knowledge units and links on the blackboard. 
         void Clear();
-     }
+
+        // True if the blackboard has been changed since the last call to ResetChanged()
+        bool Changed { get; }
+
+        // Resets whether the blackboard has been changed to false. Returns the current changed status before the reset.
+        bool ResetChanged();
+    }
 }

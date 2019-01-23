@@ -7,7 +7,7 @@ using KnowledgeUnits;
 
 namespace KnowledgeSources
 {
-    public class ConsoleChoicePresenter : KnowledgeSource
+    public class KS_ConsoleChoicePresenter : KnowledgeSource
     {
         // Name of the bound context variable
         private const string SelectedContentUnit = "SelectedContentUnit";
@@ -68,10 +68,10 @@ namespace KnowledgeSources
             // Get the original content unit (originalCU)
             (IUnit originalCU, string LinkType) = linkToOrigCU.ElementAt(0);
 
-             // Gather the choices connected to the originalCU.
-            IEnumerable < ContentUnit > choices = from link in m_blackboard.LookupLinks(originalCU)
-                                                  where link.LinkType.Equals(LinkTypes.L_Choice)
-                                                  select (ContentUnit)link.Node;
+            // Gather the choices connected to the originalCU.
+            IEnumerable<ContentUnit> choices = from link in m_blackboard.LookupLinks(originalCU)
+                                               where link.LinkType.Equals(LinkTypes.L_Choice)
+                                               select (ContentUnit)link.Node;
 
             return choices;
 
@@ -86,46 +86,52 @@ namespace KnowledgeSources
 
             string textToDisplay = (string)selectedCU.Content[CU_SlotNames.Text];
 
+            Console.WriteLine(textToDisplay);
+
             var choices = GetChoices();
 
-            Console.WriteLine(textToDisplay);
-            int choiceCounter = 0; 
-            foreach(ContentUnit choice in choices)
+            if (choices.Any())
             {
-                Console.Write("{choiceCounter}. ");
-                Console.WriteLine(choice.Content[CU_SlotNames.Text]);
-                choiceCounter++;
+                int choiceCounter = 0;
+                foreach (ContentUnit choice in choices)
+                {
+                    Console.Write("{0}. ", choiceCounter);
+                    Console.WriteLine(choice.Content[CU_SlotNames.Text]);
+                    choiceCounter++;
+                }
+
+                Debug.Assert(choiceCounter < 10);
+
+                ConsoleKeyInfo keyInfo;
+                do
+                {
+                    keyInfo = Console.ReadKey(true);
+                }
+                while (!char.IsDigit(keyInfo.KeyChar));
+
+                // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
+                int choiceMade = int.Parse(keyInfo.KeyChar.ToString());
+                ContentUnit selectedChoice = (ContentUnit)choices.ElementAt(choiceMade);
+                m_blackboard.AddUnit(new U_IDQuery((string)selectedChoice.Metadata[CU_SlotNames.TargetContentUnitID]));
             }
 
-            Debug.Assert(choiceCounter - 1 < 10);
-
-            ConsoleKeyInfo keyInfo;
-            do
-            {
-                keyInfo = Console.ReadKey(true);
-            }
-            while (!char.IsDigit(keyInfo.KeyChar));
-
-            int choiceMade = int.Parse(keyInfo.KeyChar.ToString());
-
+            // Remove the displayed SelectedContentUnit from the blackboard.
             m_blackboard.DeleteUnit((ContentUnit)m_boundVars[SelectedContentUnit]);
-            ContentUnit selectedChoice = (ContentUnit)choices.ElementAt(choiceMade - 1);
-            m_blackboard.AddUnit(new U_IDQuery((string)selectedChoice.Metadata[CU_SlotNames.TargetContentUnitID]));
-            m_boundVars = null;
+            m_boundVars = null; // Set m_boundVars to null, marking this KS as not executable. 
         }
 
         // fixme: the factory and constructor stuff for knowledge sources (which supports constructing knowledge sources with bound variables)
         // is a bit confusing. See if there's a cleaner way to represent active KSs vs. KSs on the agenda, perhaps with an ActivatedKS class which wraps the KS and its bound variables.
         protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
         {
-            return new ConsoleChoicePresenter(blackboard, boundVars, ks);
+            return new KS_ConsoleChoicePresenter(blackboard, boundVars, ks);
         }
 
-        protected ConsoleChoicePresenter(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks) : base(blackboard, boundVars, ks)
+        protected KS_ConsoleChoicePresenter(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks) : base(blackboard, boundVars, ks)
         {
         }
 
-        public ConsoleChoicePresenter(IBlackboard blackboard) : base(blackboard)
+        public KS_ConsoleChoicePresenter(IBlackboard blackboard) : base(blackboard)
         {
         }
 
