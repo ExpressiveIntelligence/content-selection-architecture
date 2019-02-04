@@ -39,6 +39,7 @@ namespace CSA.KnowledgeSources
 
                 // fixme: this bit of boilerplate code for marking a knowledge unit as having already participated in a matched precondition 
                 // should be baked into the infrastructure somewhere so knowledge source implementers don't always have to do this. 
+                // A good place to add this would be on Unit (and declare a method on IUnit).
                 if (query.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched))
                 {
                     ((HashSet<KnowledgeSource>)query.Properties[U_PropertyNames.KSPreconditionMatched]).Add(this);
@@ -81,6 +82,7 @@ namespace CSA.KnowledgeSources
                 // Default blackboard indexing always uses the type as the hashbucket. This is going to result in creating a zillion types. 
                 // Solution: Add another slot called SelectedContentUnit and add it to a copy of the selected content unit. Value of the new slot is null. 
 
+                // Selected content unit stored as a new ContentUnit with the SelectedContentUnit property set. It is linked back to the original content unit. 
                 ContentUnit newUnit = new ContentUnit(randUnit);
                 newUnit.Metadata[CU_SlotNames.SelectedContentUnit] = null;
                 m_blackboard.AddUnit(newUnit);
@@ -88,22 +90,7 @@ namespace CSA.KnowledgeSources
             }
             m_blackboard.RemoveUnit((IUnit)boundVars[IDQuery]);
          }
-
-        // fixme: the factory and constructor stuff for knowledge sources (which supports constructing knowledge sources with bound variables)
-        // is a bit confusing. See if there's a cleaner way to represent active KSs vs. KSs on the agenda, perhaps with an ActivatedKS class which wraps the KS and its bound variables.
-        /* protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
-        {
-            return new KS_IDSelector(blackboard, boundVars, ks);
-        }
-
-        private KS_IDSelector(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks) : base(blackboard, boundVars, ks)
-        {
-        }
-
-        public KS_IDSelector(IBlackboard blackboard) : base(blackboard)
-        {
-        } */
-
+         
         public KS_IDSelector(IBlackboard blackboard) : base(blackboard)
         {
 

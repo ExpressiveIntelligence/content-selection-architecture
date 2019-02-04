@@ -127,30 +127,6 @@ namespace CSA.Tests
             Assert.Equal(0, count);
         }
 
-        // fixme: remove
-        /* 
-        // Since the Executable property is defined on the abstract class KnowledgeSource, don't need to test this KS by KS (unless a KS overrides the property).
-        [Fact]
-        public void TestExecutable_False()
-        {
-            IBlackboard blackboard = new Blackboard();
-            KS_IDSelector ks = new KS_IDSelector(blackboard);
-            Assert.False(ks.Executable);
-        }
-
-        // Since the Executable property is defined on the abstract class KnowledgeSource, don't need to test this KS by KS (unless a KS overrides the property).
-        [Fact]
-        public void TestExecutable_True()
-        {
-            IBlackboard blackboard = new Blackboard();
-            KS_IDSelector ks = new KS_IDSelector(blackboard);
-            U_IDQuery ku = new U_IDQuery("foo");
-            blackboard.AddUnit(ku);
-            var KSs = ks.Precondition();
-            Assert.True(KSs.ElementAt(0).Executable);
-        }
-        */
-
         public static IEnumerable<object[]> Data_TestObviationCondition()
         {
             IBlackboard blackboard = new Blackboard();
@@ -384,40 +360,6 @@ namespace CSA.Tests
              };
         }
 
-        // fixme: remove
-        // This test method tests a subset of TextExecute_ChoicePresenter below
-        /* [Theory]
-        [MemberData(nameof(Data_TestGetChoices_PublicChoicePresenter))]
-        public void TestGetChoices_PublicChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
-        {
-            blackboard.Clear();
-            blackboard.AddUnit(selectedCU);
-            blackboard.AddUnit(originalCU);
-            blackboard.AddLink(originalCU, selectedCU, LinkTypes.L_SelectedContentUnit);
-
-            foreach(ContentUnit choice in choices)
-            {
-                blackboard.AddUnit(choice);
-                blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
-            }
-
-            ChoicePresenter_PublicAccessors ks = new ChoicePresenter_PublicAccessors(blackboard);
-            var KSs = ks.Precondition();
-
-            int count = KSs.Count();
-            Assert.Equal(1, count);
-
-            int numOfChoices = choices.Length;
-            var returnedChoices = ((ChoicePresenter_PublicAccessors)KSs.ElementAt(0)).GetChoices();
-            int numOfReturnedChoices = returnedChoices.Count();
-
-            Assert.Equal(numOfChoices, numOfReturnedChoices);
-            foreach(ContentUnit choice in choices)
-            {
-                returnedChoices.Contains(choice);
-            }
-        } */
-
         [Theory]
         [MemberData(nameof(Data_TestExecute_PublicChoicePresenter))]
         public void TestExecute_PublicChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
@@ -442,6 +384,8 @@ namespace CSA.Tests
             // Execute the activated choice presenter
             KSAs.ElementAt(0).Execute();
 
+            // fixme: the tests below depend on the choice info being stored on the ks. When this is eventually changed to arguments passed into the event handler, will need to use an event 
+            // handler to make these tests. 
             Assert.Equal(selectedCU.Content[CU_SlotNames.Text], ks.TextToDisplay);
 
             int numOfChoices = choices.Length;

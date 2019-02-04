@@ -24,26 +24,8 @@ namespace CSA.Controllers
             IEnumerable<IKnowledgeSourceActivation> invalidKSAs = m_Agenda.Where(ksa => ksa.EvaluateObviationCondition());
 
             // In the event that m_Agenda has the same elements as invalidKSAs (ie. all the obviation conditions evaluate to true), it looks like Where() is doing an optimization where it just 
-            // aliases m_Agenda. But then this causes an InvalidOperationException because you're modifying a set while you enumerate over it. So need to make a copy, which is what new List() is doing. 
-            m_Agenda.ExceptWith(new List<IKnowledgeSourceActivation>(invalidKSAs));
-
-            // fixme: remove
-            /* ISet<IKnowledgeSourceActivation> ksToRemoveFromAgenda = new HashSet<IKnowledgeSourceActivation>(); 
-            foreach(IKnowledgeSourceActivation ksa in m_Agenda)
-            {
-                if (ksa.EvaluateObviationCondition())
-                {
-                    ksToRemoveFromAgenda.Add(ksa);
-                }
-            } */
-
-            // fixme: remove 
-            /*
-            foreach (var ksa in invalidKSAs)
-            {
-                m_Agenda.Remove(ksa);
-            }
-            */
+            // aliases m_Agenda. But then this causes an InvalidOperationException because you're modifying a set while you enumerate over it. So need to make a copy, which is what ToArray() is doing.  
+            m_Agenda.ExceptWith(invalidKSAs.ToArray());
 
             foreach (IKnowledgeSource ks in m_ActiveKSs)
             {
