@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CSACore\CSACore.csproj" />
+    <ProjectReference Include="..\KnowledgeUnits\KnowledgeUnits.csproj" />
+    <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
+    <ProjectReference Include="..\Controller\Controllers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="TestCSA.cs" />
+  </ItemGroup>
+</Project>

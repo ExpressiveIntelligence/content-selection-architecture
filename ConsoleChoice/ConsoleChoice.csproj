@@ -10,5 +10,6 @@
     <ProjectReference Include="..\Controller\Controllers.csproj" />
     <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
     <ProjectReference Include="..\KnowledgeUnits\KnowledgeUnits.csproj" />
+    <ProjectReference Include="..\Demo\Demo.csproj" />
   </ItemGroup>
 </Project>
