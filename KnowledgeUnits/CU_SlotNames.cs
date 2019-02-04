@@ -1,4 +1,4 @@
-﻿namespace KnowledgeUnits
+﻿namespace CSA.KnowledgeUnits
 {
     public static class CU_SlotNames
     {

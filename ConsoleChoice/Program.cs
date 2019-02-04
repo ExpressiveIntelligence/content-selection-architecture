@@ -1,8 +1,8 @@
 ﻿using System;
-using CSACore;
-using KnowledgeSources;
-using Controllers;
-using KnowledgeUnits;
+using CSA.Core;
+using CSA.KnowledgeSources;
+using CSA.Controllers;
+using CSA.KnowledgeUnits;
 
 namespace ConsoleChoice
 {
@@ -16,13 +16,16 @@ namespace ConsoleChoice
 
             // Set up the ContentUnits on the blackboard
             DefineCUs(blackboard);
-            
+
             // Set up the knowledge sources
-            KnowledgeSource iDSelector = new KS_IDSelector(blackboard);
-            KnowledgeSource choicePresenter = new KS_ConsoleChoicePresenter(blackboard);
+            IKnowledgeSource iDSelector = new KS_IDSelector(blackboard);
+
+            // fixme: Need to come up with interfaces for presenters, but won't know what the general presenter framework looks like until I've written more of them. 
+            KS_ChoicePresenter choicePresenter = new KS_ChoicePresenter(blackboard);
             iDSelector.Properties[KS_PropertyNames.Priority] = 20;
             choicePresenter.Properties[KS_PropertyNames.Priority] = 10;
-
+            choicePresenter.PresenterExecute += EventHandler_ConsoleChoice.DisplayConsoleChoice; 
+            
             // Set up the controller
             IController priControl = new PriorityController();
             priControl.AddKnowledgeSource(iDSelector);
@@ -31,6 +34,7 @@ namespace ConsoleChoice
             // Put request for starting content unit in blackboard
             blackboard.AddUnit(new U_IDQuery("start"));
 
+            // fixme: Currently the top-level loop for blackboard execution is in the calling application. Probably want to move this into the controller or blackboard and make event driven. 
             while(blackboard.Changed)
             {
                 blackboard.ResetChanged();

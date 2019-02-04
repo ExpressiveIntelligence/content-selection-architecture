@@ -1,4 +1,4 @@
-﻿namespace KnowledgeSources
+﻿namespace CSA.KnowledgeSources
 {
     public static class KS_PropertyNames
     {

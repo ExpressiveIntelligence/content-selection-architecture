@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using CSACore;
+using CSA.Core;
 using Xunit;
 
-namespace CSATests
+namespace CSA.Tests
 {
     // fixme: consolidate tests into theories so more test cases can be quickly added. 
     public class TestBlackboardOperations

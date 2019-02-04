@@ -1,12 +1,12 @@
-﻿using KnowledgeSources;
-using KnowledgeUnits;
+﻿using CSA.KnowledgeSources;
+using CSA.KnowledgeUnits;
 using Xunit;
-using Xunit.Abstractions;
-using CSACore;
+using CSA.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CSATests
+namespace CSA.Tests
 {
     public class TestKnowledgeSources
     {
@@ -18,25 +18,6 @@ namespace CSATests
             {
                 S = init;
             }
-        }
-
-        class ConsoleChoicePresenter_PublicGetChoices : KS_ConsoleChoicePresenter
-        {
-            public new IEnumerable<ContentUnit> GetChoices() => base.GetChoices();
-
-            public ConsoleChoicePresenter_PublicGetChoices(IBlackboard blackboard) : base(blackboard) { }
-
-            // fixme: the factory and constructor stuff for knowledge sources (which supports constructing knowledge sources with bound variables)
-            // is a bit confusing. See if there's a cleaner way to represent active KSs vs. KSs on the agenda, perhaps with an ActivatedKS class which wraps the KS and its bound variables.
-            protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
-            {
-                return new ConsoleChoicePresenter_PublicGetChoices(blackboard, boundVars, ks);
-            }
-
-            private ConsoleChoicePresenter_PublicGetChoices(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks) : base(blackboard, boundVars, ks)
-            {
-            }
-
         }
 
         public static IEnumerable<object[]> Data_TestPrecondition()
@@ -79,22 +60,22 @@ namespace CSATests
                     false, 3
                 },
 
-                // ConsoleChoicePresenter, empty blackboard
-                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
+                // ChoicePresenter, empty blackboard
+                new object[] { blackboard, new KS_ChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
 
                 // ConsoleChoiceSelector, non-matching unit
-                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
+                new object[] { blackboard, new KS_ChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
 
-                // ConsoleChoicePresenter, matching unit, previously matched
-                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
+                // ChoicePresenter, matching unit, previously matched
+                new object[] { blackboard, new KS_ChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
 
-                // ConsoleChoicePresenter, matching unit, not previously matched
-                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
+                // ChoicePresenter, matching unit, not previously matched
+                new object[] { blackboard, new KS_ChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
 
-                // ConsoleChoicePresenter, multiple matching units, not previously matched
+                // ChoicePresenter, multiple matching units, not previously matched
                 new object[]
                 {
-                    blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_ChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -123,10 +104,10 @@ namespace CSATests
             }
 
             // Call KnowledgeSource.Precondition() to get the activated KSs.
-            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            IEnumerable<IKnowledgeSourceActivation> KSAs = ks.Precondition();
 
             // Check that the number of activated KSs equals the number we're expecting
-            int count = KSs.Count();
+            int count = KSAs.Count();
             Assert.Equal(numActivatedKSs, count);
 
             // If there were activated KSs, check that the KUs were marked as having been matched.  
@@ -141,11 +122,13 @@ namespace CSATests
             }
 
             // Run the preconditions again to verify that on a second running they don't activate any KSs.
-            KSs = ks.Precondition();
-            count = KSs.Count();
+            KSAs = ks.Precondition();
+            count = KSAs.Count();
             Assert.Equal(0, count);
         }
 
+        // fixme: remove
+        /* 
         // Since the Executable property is defined on the abstract class KnowledgeSource, don't need to test this KS by KS (unless a KS overrides the property).
         [Fact]
         public void TestExecutable_False()
@@ -166,6 +149,7 @@ namespace CSATests
             var KSs = ks.Precondition();
             Assert.True(KSs.ElementAt(0).Executable);
         }
+        */
 
         public static IEnumerable<object[]> Data_TestObviationCondition()
         {
@@ -195,13 +179,13 @@ namespace CSATests
                     }
                  },
 
-                // ConsoleChoicePresenter, one matching unit
-                new object[] { blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
+                // ChoicePresenter, one matching unit
+                new object[] { blackboard, new KS_ChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
 
-                // ConsoleChoicePresenter, multiple matching units
+                // ChoicePresenter, multiple matching units
                 new object[]
                 {
-                    blackboard, new KS_ConsoleChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_ChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -224,15 +208,15 @@ namespace CSATests
             }
 
             // Call KnowledgeSource.Precondition() to get the activated KSs.
-            IEnumerable<KnowledgeSource> KSs = ks.Precondition();
+            IEnumerable<IKnowledgeSourceActivation> KSAs = ks.Precondition();
 
             // If there are any activated KSs...   
-            if (KSs.Any())
+            if (KSAs.Any())
             {
                 // First, the obviation condition should evaluate to false since the matching KUs are still on the blackboard.
-                foreach (KnowledgeSource activatedKS in KSs)
+                foreach (IKnowledgeSourceActivation KSA in KSAs)
                 {
-                      Assert.False(activatedKS.EvaluateObviationCondition());
+                      Assert.False(KSA.EvaluateObviationCondition());
                 }
 
                 // Second, remove the units from the blackboard
@@ -242,9 +226,9 @@ namespace CSATests
                 }
 
                 // Finally, the obviation condition should now evaluate to true since the matching KUs are no longer on the blackboard. 
-                foreach (KnowledgeSource activatedKS in KSs)
+                foreach (IKnowledgeSourceActivation KSA in KSAs)
                 {
-                    Assert.True(activatedKS.EvaluateObviationCondition());
+                    Assert.True(KSA.EvaluateObviationCondition());
                 } 
             } 
         }
@@ -280,15 +264,10 @@ namespace CSATests
                 blackboard.AddUnit(u);
             }
 
-            var KSs = ks.Precondition();
-            int count = KSs.Count();
+            var KSAs = ks.Precondition();
+            int count = KSAs.Count();
             Assert.Equal(1, count);
-            Assert.True(KSs.ElementAt(0).Executable);
-            KSs.ElementAt(0).Execute();
-            Assert.False(ks.Executable);
-
-            // The knowledge source should no longer executable after it has executed. 
-            Assert.False(KSs.ElementAt(0).Executable);
+            KSAs.ElementAt(0).Execute();
 
             // Four content units total (the original three plus a new selected one)
             ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
@@ -343,15 +322,10 @@ namespace CSATests
                 blackboard.AddUnit(u);
             }
 
-            var KSs = ks.Precondition();
-            int count = KSs.Count();
+            var KSAs = ks.Precondition();
+            int count = KSAs.Count();
             Assert.Equal(1, count);
-            Assert.True(KSs.ElementAt(0).Executable);
-            KSs.ElementAt(0).Execute();
-            Assert.False(ks.Executable);
-
-            // The knowledge source should no longer executable after it has executed. 
-            Assert.False(KSs.ElementAt(0).Executable);
+            KSAs.ElementAt(0).Execute();
 
             // Three content units total (no selected unit)
             ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
@@ -371,7 +345,7 @@ namespace CSATests
             Assert.Equal(0, querySet.Count);
         }
 
-        public static IEnumerable<object[]> Data_TestGetChoices_PublicConsoleChoicePresenter()
+        public static IEnumerable<object[]> Data_TestExecute_PublicChoicePresenter()
         {
             IBlackboard blackboard = new Blackboard();
 
@@ -410,9 +384,11 @@ namespace CSATests
              };
         }
 
-        [Theory]
-        [MemberData(nameof(Data_TestGetChoices_PublicConsoleChoicePresenter))]
-        public void TestGetChoices_PublicConsoleChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
+        // fixme: remove
+        // This test method tests a subset of TextExecute_ChoicePresenter below
+        /* [Theory]
+        [MemberData(nameof(Data_TestGetChoices_PublicChoicePresenter))]
+        public void TestGetChoices_PublicChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
         {
             blackboard.Clear();
             blackboard.AddUnit(selectedCU);
@@ -425,14 +401,14 @@ namespace CSATests
                 blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
             }
 
-            ConsoleChoicePresenter_PublicGetChoices ks = new ConsoleChoicePresenter_PublicGetChoices(blackboard);
+            ChoicePresenter_PublicAccessors ks = new ChoicePresenter_PublicAccessors(blackboard);
             var KSs = ks.Precondition();
 
             int count = KSs.Count();
             Assert.Equal(1, count);
 
             int numOfChoices = choices.Length;
-            var returnedChoices = ((ConsoleChoicePresenter_PublicGetChoices)KSs.ElementAt(0)).GetChoices();
+            var returnedChoices = ((ChoicePresenter_PublicAccessors)KSs.ElementAt(0)).GetChoices();
             int numOfReturnedChoices = returnedChoices.Count();
 
             Assert.Equal(numOfChoices, numOfReturnedChoices);
@@ -440,6 +416,44 @@ namespace CSATests
             {
                 returnedChoices.Contains(choice);
             }
+        } */
+
+        [Theory]
+        [MemberData(nameof(Data_TestExecute_PublicChoicePresenter))]
+        public void TestExecute_PublicChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
+        {
+            blackboard.Clear();
+            blackboard.AddUnit(selectedCU);
+            blackboard.AddUnit(originalCU);
+            blackboard.AddLink(originalCU, selectedCU, LinkTypes.L_SelectedContentUnit);
+
+            foreach (ContentUnit choice in choices)
+            {
+                blackboard.AddUnit(choice);
+                blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
+            }
+
+            KS_ChoicePresenter ks = new KS_ChoicePresenter(blackboard);
+            var KSAs = ks.Precondition();
+
+            int count = KSAs.Count();
+            Assert.Equal(1, count);
+
+            // Execute the activated choice presenter
+            KSAs.ElementAt(0).Execute();
+
+            Assert.Equal(selectedCU.Content[CU_SlotNames.Text], ks.TextToDisplay);
+
+            int numOfChoices = choices.Length;
+            Assert.Equal(numOfChoices, ks.ChoicesToDisplay.Length);
+
+            foreach (ContentUnit choice in choices)
+            {
+                Assert.True(Array.Exists(ks.ChoicesToDisplay, element => element.Equals(choice.Content[CU_SlotNames.Text])));
+            }
+
+            // fixme: add a test for KS_ChoicePresenter.SelectChoice()
+
         }
     }
 }

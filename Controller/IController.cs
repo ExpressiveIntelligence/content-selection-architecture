@@ -1,7 +1,7 @@
-﻿using KnowledgeSources;
+﻿using CSA.KnowledgeSources;
 using System.Collections.Generic;
 
-namespace Controllers
+namespace CSA.Controllers
 {
     // fixme: stub. Fill in once I've figured out more general patterns for controllers.
     public interface IController
@@ -12,12 +12,12 @@ namespace Controllers
         // Starts the controller executing. 
         void Execute();
 
-        void AddKnowledgeSource(KnowledgeSource ksToAdd);
+        void AddKnowledgeSource(IKnowledgeSource ksToAdd);
 
-        void RemoveKnowledgeSource(KnowledgeSource ksToRemove);
+        void RemoveKnowledgeSource(IKnowledgeSource ksToRemove);
 
-        ISet<KnowledgeSource> ActiveKSs { get; }
+        ISet<IKnowledgeSource> ActiveKSs { get; }
 
-        ISet<KnowledgeSource> Agenda { get; }
+        ISet<IKnowledgeSourceActivation> Agenda { get; }
     }
 }

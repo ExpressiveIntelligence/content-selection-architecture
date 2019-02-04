@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace CSACore
+namespace CSA.Core
 {
     public class Blackboard : IBlackboard
     {

@@ -2,10 +2,10 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
-using KnowledgeUnits;
-using CSACore;
+using CSA.KnowledgeUnits;
+using CSA.Core;
 
-namespace KnowledgeSources
+namespace CSA.KnowledgeSources
 {
     public class KS_IDSelector : KnowledgeSource
     {
@@ -15,23 +15,27 @@ namespace KnowledgeSources
         // fixme: Used to randomly select from among multiple CU indices. Should be delete when this is converted into a pooling selector. 
         private static readonly Random m_rand = new Random();
 
-        protected override void EvaluatePrecondition()
+        public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the requested U_IDQueries on the blackboard.
-            var queries = from query in m_blackboard.LookupUnits(U_IDQuery.TypeName)
-                          where 
+            var queries = from query in m_blackboard.LookupUnits(U_IDQuery.TypeName) // Lookup ID queries
+                          where // where the query has not been previously matched by this knowledge source precondition
                             (!query.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched)) ||
                             (!((ISet<KnowledgeSource>)query.Properties[U_PropertyNames.KSPreconditionMatched]).Contains(this))
                           select query;
 
-            // Iterate through each of the queries, creating context entries
+            IKnowledgeSourceActivation[] activations = new IKnowledgeSourceActivation[queries.Count()];
+
+            // Iterate through each of the queries, creating KnowledgeSourceActivations
+            int i = 0; 
             foreach (var query in queries)
             {
                 var boundVars = new Dictionary<string, object>
                 {
                     [IDQuery] = query
                 };
-                m_contexts.Add(boundVars);
+
+                activations[i++] = new KnowledgeSourceActivation(this, boundVars);
 
                 // fixme: this bit of boilerplate code for marking a knowledge unit as having already participated in a matched precondition 
                 // should be baked into the infrastructure somewhere so knowledge source implementers don't always have to do this. 
@@ -44,21 +48,21 @@ namespace KnowledgeSources
                     query.Properties[U_PropertyNames.KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
                 }
             }
+
+            return activations;
         }
 
-        public override bool EvaluateObviationCondition()
+        internal override bool EvaluateObviationCondition(IDictionary<string, object> boundVars)
         {
-            Debug.Assert(Executable);
-            return !m_blackboard.ContainsUnit((IUnit)m_boundVars[IDQuery]);
+            return !m_blackboard.ContainsUnit((IUnit)boundVars[IDQuery]);
         }
 
-        public override void Execute()
+        internal override void Execute(IDictionary<string, object> boundVars)
         {
-            Debug.Assert(Executable);
-            string targetContentUnitID = ((U_IDQuery)m_boundVars[IDQuery]).TargetContentUnitID;
-            var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName)
-                               where ((ContentUnit)contentUnit).HasMetadataSlot(CU_SlotNames.ContentUnitID)
-                               where ((ContentUnit)contentUnit).Metadata[CU_SlotNames.ContentUnitID].Equals(targetContentUnitID)
+            string targetContentUnitID = ((U_IDQuery)boundVars[IDQuery]).TargetContentUnitID;
+            var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName) // lookup content units
+                               where ((ContentUnit)contentUnit).HasMetadataSlot(CU_SlotNames.ContentUnitID) // where the content unit has an ID
+                               where ((ContentUnit)contentUnit).Metadata[CU_SlotNames.ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
                                select contentUnit;
             //fixme: for the purposes of getting something running quickly, I'm doing the random selection among potentially multiple content units here.
             // However, this should be done as a pooling process with some other selector selecting from the pool.
@@ -82,13 +86,12 @@ namespace KnowledgeSources
                 m_blackboard.AddUnit(newUnit);
                 m_blackboard.AddLink(randUnit, newUnit, LinkTypes.L_SelectedContentUnit);
             }
-            m_blackboard.RemoveUnit((IUnit)m_boundVars[IDQuery]);
-            m_boundVars = null;
+            m_blackboard.RemoveUnit((IUnit)boundVars[IDQuery]);
          }
 
         // fixme: the factory and constructor stuff for knowledge sources (which supports constructing knowledge sources with bound variables)
         // is a bit confusing. See if there's a cleaner way to represent active KSs vs. KSs on the agenda, perhaps with an ActivatedKS class which wraps the KS and its bound variables.
-        protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
+        /* protected override KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks)
         {
             return new KS_IDSelector(blackboard, boundVars, ks);
         }
@@ -99,6 +102,11 @@ namespace KnowledgeSources
 
         public KS_IDSelector(IBlackboard blackboard) : base(blackboard)
         {
+        } */
+
+        public KS_IDSelector(IBlackboard blackboard) : base(blackboard)
+        {
+
         }
     }
 }

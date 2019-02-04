@@ -1,19 +1,21 @@
 ﻿using System.Collections.Generic;
-using CSACore;
+using CSA.Core;
 
-namespace KnowledgeSources
+namespace CSA.KnowledgeSources
 {
-    public abstract class KnowledgeSource
+    public abstract class KnowledgeSource : IKnowledgeSource
     {
         public IDictionary<string, object> Properties { get; }
 
         protected readonly IBlackboard m_blackboard; 
 
+        // fixme: remove 
         // A list of variable bindings (stored as string/object pairs) for each unique match of the precondition. 
-        protected readonly List<IDictionary<string, object>> m_contexts;
+        // protected readonly List<IDictionary<string, object>> m_contexts;
 
+        // fixme: remove
         // Variable bindings for a particular instantiation of the knowledge source. 
-        protected IDictionary<string, object> m_boundVars;
+        // protected IDictionary<string, object> m_boundVars;
 
         // The precondition for this knolwedge source to be executable. The precondition can bind variables. 
         // For each unique pair of variable bindings, a unique copy of the knowledge source is added to the agenda. 
@@ -21,11 +23,15 @@ namespace KnowledgeSources
         // at all, the list of bindings will be empty.
         // fixme: consider creating a separate, weaker trigger condition as an optimization.
         // fixme: consider making this non-abstract to add assert condition !Executable.  
-        protected abstract void EvaluatePrecondition();
+        // protected abstract void EvaluatePrecondition();
 
+        // Returns activations of the knowledge source.
+        public abstract IKnowledgeSourceActivation[] Precondition();
+  
         // First evaluates the precondition. Then returns an enumerable of instantiated knowledge sources (one for each unique combination of units
         // the precondition is satisfied by). The list is empty if the precondition is not satisfied.  
-        public IEnumerable<KnowledgeSource> Precondition()
+        // fixme: remove 
+        /* public IEnumerable<KnowledgeSource> Precondition()
         {
             m_contexts.RemoveRange(0, m_contexts.Count);
             EvaluatePrecondition();
@@ -35,18 +41,27 @@ namespace KnowledgeSources
                 executableList.Add(Factory(m_blackboard, dict, this));
             }
             return executableList;
-        }
+        } */
 
         // If this condition is satisfied, the executable KS should be removed from the agenda. 
         // fixme: consider making this non-abstract to add assert condition that KS is Executable. 
-        public abstract bool EvaluateObviationCondition();
+        internal abstract bool EvaluateObviationCondition(IDictionary<string, object> boundVars);
 
         // Executes the KS 
-        public abstract void Execute();
+        internal abstract void Execute(IDictionary<string, object> boundVars);
    
-        // True if this knowledge source is executable (has boundVars defined), false otherwise. The Executable KSs form the agenda.
-        public bool Executable => m_boundVars != null;
+        public KnowledgeSource(IBlackboard blackboard)
+        {
+            m_blackboard = blackboard;
+            Properties = new Dictionary<string, object>();
+        }
 
+        // fixme: remove
+        // True if this knowledge source is executable (has boundVars defined), false otherwise. The Executable KSs form the agenda.
+        // public bool Executable => m_boundVars != null;
+
+        // fixme: remove
+        /*
         protected abstract KnowledgeSource Factory(IBlackboard blackboard, IDictionary<string, object> boundVars, KnowledgeSource ks);
 
         public KnowledgeSource(IBlackboard blackboard)
@@ -64,6 +79,6 @@ namespace KnowledgeSources
             m_blackboard = blackboard;
             Properties = new Dictionary<string, object>(ks.Properties);
         }
-
+        */
     }
 }

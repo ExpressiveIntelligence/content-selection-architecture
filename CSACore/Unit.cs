@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CSACore
+namespace CSA.Core
 {
     // Base class for all Blackboard Units.
     public class Unit : IUnit

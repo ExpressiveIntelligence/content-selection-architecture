@@ -1,6 +1,6 @@
-﻿using CSACore;
+﻿using CSA.Core;
 
-namespace KnowledgeUnits
+namespace CSA.KnowledgeUnits
 {
     public class U_IDQuery : Unit
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CSACore
+namespace CSA.Core
 {
     public interface IUnit { 
         IDictionary<string, object> Properties { get; }

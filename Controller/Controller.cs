@@ -1,56 +1,65 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using KnowledgeSources;
+using System.Linq;
+using CSA.KnowledgeSources;
 
-namespace Controllers
+namespace CSA.Controllers
 {
     public abstract class Controller : IController
     {
 
         // fixme: for now have the KSs live in data structures inside the controller. Consider moving them onto the blackboard. 
-        protected readonly ISet<KnowledgeSource> m_ActiveKSs;
-        protected readonly ISet<KnowledgeSource> m_Agenda;
+        protected readonly ISet<IKnowledgeSource> m_ActiveKSs;
+        protected readonly ISet<IKnowledgeSourceActivation> m_Agenda;
+
+        // Return a copy of the ActiveKSs so that the caller can't directly modify the set. 
+        public ISet<IKnowledgeSource> ActiveKSs => new HashSet<IKnowledgeSource>(m_ActiveKSs);
+
+        // Return a copy of the agenda so that the caller can't directly modify the set.
+        public ISet<IKnowledgeSourceActivation> Agenda => new HashSet<IKnowledgeSourceActivation>(m_Agenda);
 
         // To update the agenda, execute obviation conditions to remove KSs from the agenda and execute preconditions to add KSs to the agenda.
         protected void UpdateAgenda()
         {
-            ICollection<KnowledgeSource> ksToRemoveFromAgenda = new HashSet<KnowledgeSource>(); 
-            foreach(KnowledgeSource ks in m_Agenda)
+            IEnumerable<IKnowledgeSourceActivation> invalidKSAs = m_Agenda.Where(ksa => ksa.EvaluateObviationCondition());
+
+            // In the event that m_Agenda has the same elements as invalidKSAs (ie. all the obviation conditions evaluate to true), it looks like Where() is doing an optimization where it just 
+            // aliases m_Agenda. But then this causes an InvalidOperationException because you're modifying a set while you enumerate over it. So need to make a copy, which is what new List() is doing. 
+            m_Agenda.ExceptWith(new List<IKnowledgeSourceActivation>(invalidKSAs));
+
+            // fixme: remove
+            /* ISet<IKnowledgeSourceActivation> ksToRemoveFromAgenda = new HashSet<IKnowledgeSourceActivation>(); 
+            foreach(IKnowledgeSourceActivation ksa in m_Agenda)
             {
-                if (ks.EvaluateObviationCondition())
+                if (ksa.EvaluateObviationCondition())
                 {
-                    Debug.Assert(ks.Executable);
-                    ksToRemoveFromAgenda.Add(ks);
+                    ksToRemoveFromAgenda.Add(ksa);
                 }
-            }
+            } */
 
-            foreach(KnowledgeSource ks in ksToRemoveFromAgenda)
+            // fixme: remove 
+            /*
+            foreach (var ksa in invalidKSAs)
             {
-                m_Agenda.Remove(ks);
+                m_Agenda.Remove(ksa);
             }
+            */
 
-            foreach (KnowledgeSource ks in m_ActiveKSs)
+            foreach (IKnowledgeSource ks in m_ActiveKSs)
             {
-                Debug.Assert(!ks.Executable);
-                IEnumerable<KnowledgeSource> executableKSs = ks.Precondition();
-                foreach(KnowledgeSource execKS in executableKSs)
+                IEnumerable<IKnowledgeSourceActivation> KSAs = ks.Precondition();
+                foreach(IKnowledgeSourceActivation ksa in KSAs)
                 {
-                    m_Agenda.Add(execKS);
+                    m_Agenda.Add(ksa);
                 }
             }
         }
 
-        public void AddKnowledgeSource(KnowledgeSource ks) => m_ActiveKSs.Add(ks);
+        public void AddKnowledgeSource(IKnowledgeSource ks) => m_ActiveKSs.Add(ks);
 
-        public void RemoveKnowledgeSource(KnowledgeSource ks) => m_ActiveKSs.Remove(ks);
+        public void RemoveKnowledgeSource(IKnowledgeSource ks) => m_ActiveKSs.Remove(ks);
 
-        // Return a copy of the ActiveKSs so that the caller can't directly modify the set. 
-        public ISet<KnowledgeSource> ActiveKSs => new HashSet<KnowledgeSource>(m_ActiveKSs);
-
-        // Return a copy of the agenda so that the caller can't directly modify the set.
-        public ISet<KnowledgeSource> Agenda => new HashSet<KnowledgeSource>(m_Agenda);
-
-        protected abstract KnowledgeSource SelectKSForExecution();
+        protected abstract IKnowledgeSourceActivation SelectKSForExecution();
 
         // Any initialization of the controller that needs to happen when it is constructed. 
         // fixme: if I don't find a use case for a controller that needs this, remove it. 
@@ -64,19 +73,18 @@ namespace Controllers
         public void Execute()
         { 
             UpdateAgenda();
-            KnowledgeSource selectedKS = SelectKSForExecution();
-            if (selectedKS != null)
+            IKnowledgeSourceActivation selectedKSA = SelectKSForExecution();
+            if (selectedKSA != null)
             {
-                Debug.Assert(selectedKS.Executable);
-                selectedKS.Execute();
-                m_Agenda.Remove(selectedKS);
+                selectedKSA.Execute();
+                m_Agenda.Remove(selectedKSA);
             }
         }
 
         protected Controller()
         {
-            m_ActiveKSs = new HashSet<KnowledgeSource>();
-            m_Agenda = new HashSet<KnowledgeSource>();
+            m_ActiveKSs = new HashSet<IKnowledgeSource>();
+            m_Agenda = new HashSet<IKnowledgeSourceActivation>();
             Initialize();
         }
     }

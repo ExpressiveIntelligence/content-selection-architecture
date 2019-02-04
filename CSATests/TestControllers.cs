@@ -1,12 +1,12 @@
 ﻿using Xunit;
-using Controllers;
-using KnowledgeSources;
-using CSACore;
+using CSA.Controllers;
+using CSA.KnowledgeSources;
+using CSA.Core;
 using System.Collections.Generic;
-using KnowledgeUnits;
+using CSA.KnowledgeUnits;
 using System.Linq;
 
-namespace CSATests
+namespace CSA.Tests
 {
     public class TestControllers
     {
@@ -24,14 +24,14 @@ namespace CSATests
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
 
-            protected override KnowledgeSource SelectKSForExecution() => throw new System.NotImplementedException();
+            protected override IKnowledgeSourceActivation SelectKSForExecution() => throw new System.NotImplementedException();
         }
 
         class PriorityController_PublicMethods : PriorityController
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
 
-            public new KnowledgeSource SelectKSForExecution() => base.SelectKSForExecution();
+            public new IKnowledgeSourceActivation SelectKSForExecution() => base.SelectKSForExecution();
         }
 
         [Fact]
@@ -97,8 +97,8 @@ namespace CSATests
             controller.UpdateAgenda();
             Assert.Equal(3, controller.Agenda.Count);
 
-            KnowledgeSource ks = controller.SelectKSForExecution();
-            Assert.Equal(30, ks.Properties[KS_PropertyNames.Priority]);
+            IKnowledgeSourceActivation KSA = controller.SelectKSForExecution();
+            Assert.Equal(30, KSA.Properties[KS_PropertyNames.Priority]);
         }
 
         [Fact]
