@@ -5,6 +5,8 @@ using CSA.Core;
 using System.Collections.Generic;
 using CSA.KnowledgeUnits;
 using System.Linq;
+using static CSA.KnowledgeSources.KSProps;
+using static CSA.KnowledgeUnits.CUSlots;
 
 namespace CSA.Tests
 {
@@ -65,7 +67,7 @@ namespace CSA.Tests
             IBlackboard blackboard = new Blackboard();
             KS_IDSelector ks = new KS_IDSelector(blackboard);
             controller.AddKnowledgeSource(ks);
-            IUnit u = new U_IDQuery("foo");
+            IUnit u = new U_IDSelectRequest("foo");
 
             blackboard.AddUnit(u);
             Assert.Equal(0, controller.Agenda.Count);
@@ -86,19 +88,19 @@ namespace CSA.Tests
             KS_IDSelector ks1 = new KS_IDSelector(blackboard);
             KS_IDSelector ks2 = new KS_IDSelector(blackboard);
             KS_IDSelector ks3 = new KS_IDSelector(blackboard);
-            ks1.Properties[KS_PropertyNames.Priority] = 10;
-            ks2.Properties[KS_PropertyNames.Priority] = 30;
-            ks3.Properties[KS_PropertyNames.Priority] = 20;
+            ks1.Properties[Priority] = 10;
+            ks2.Properties[Priority] = 30;
+            ks3.Properties[Priority] = 20;
             controller.AddKnowledgeSource(ks1);
             controller.AddKnowledgeSource(ks2);
             controller.AddKnowledgeSource(ks3);
-            blackboard.AddUnit(new U_IDQuery("foo"));
+            blackboard.AddUnit(new U_IDSelectRequest("foo"));
             
             controller.UpdateAgenda();
             Assert.Equal(3, controller.Agenda.Count);
 
             IKnowledgeSourceActivation KSA = controller.SelectKSForExecution();
-            Assert.Equal(30, KSA.Properties[KS_PropertyNames.Priority]);
+            Assert.Equal(30, KSA.Properties[KSProps.Priority]);
         }
 
         [Fact]
@@ -107,9 +109,9 @@ namespace CSA.Tests
             PriorityController_PublicMethods controller = new PriorityController_PublicMethods();
             IBlackboard blackboard = new Blackboard();
             KS_IDSelector ks1 = new KS_IDSelector(blackboard);
-            ks1.Properties[KS_PropertyNames.Priority] = 10;
+            ks1.Properties[Priority] = 10;
             controller.AddKnowledgeSource(ks1);
-            blackboard.AddUnit(new U_IDQuery("foo"));       
+            blackboard.AddUnit(new U_IDSelectRequest("foo"));       
   
             List<ContentUnit> cuList = new List<ContentUnit>
             {
@@ -117,9 +119,9 @@ namespace CSA.Tests
                 new ContentUnit(),
                 new ContentUnit()
             };
-            cuList[0].Metadata[CU_SlotNames.ContentUnitID] = "foo";
-            cuList[1].Metadata[CU_SlotNames.ContentUnitID] = "bar";
-            cuList[2].Metadata[CU_SlotNames.ContentUnitID] = "baz";
+            cuList[0].Metadata[ContentUnitID] = "foo";
+            cuList[1].Metadata[ContentUnitID] = "bar";
+            cuList[2].Metadata[ContentUnitID] = "baz";
 
             foreach (IUnit u in cuList)
             {
@@ -133,7 +135,7 @@ namespace CSA.Tests
             Assert.Equal(4, cuSet.Count);
 
             var selectedUnit = from unit in cuSet
-                               where ((ContentUnit)unit).HasMetadataSlot(CU_SlotNames.SelectedContentUnit)
+                               where ((ContentUnit)unit).HasMetadataSlot(SelectedContentUnit)
                                select unit;
 
             // Exactly 1 selected content unit
@@ -141,7 +143,7 @@ namespace CSA.Tests
             Assert.Equal(1, count);
 
             // The selected content unit is "foo" (matches the query request)
-            Assert.True(((ContentUnit)selectedUnit.ElementAt(0)).Metadata[CU_SlotNames.ContentUnitID].Equals("foo"));
+            Assert.True(((ContentUnit)selectedUnit.ElementAt(0)).Metadata[ContentUnitID].Equals("foo"));
 
             // Since we only added one KS to controller, and there was only one matching blackboard pattern, after execution the agenda should be empty
             Assert.Empty(controller.Agenda);

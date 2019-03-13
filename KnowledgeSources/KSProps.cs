@@ -1,6 +1,6 @@
 ﻿namespace CSA.KnowledgeSources
 {
-    public static class KS_PropertyNames
+    public static class KSProps
     {
         public const string Priority = "Priority";
     }

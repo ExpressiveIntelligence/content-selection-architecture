@@ -5,12 +5,14 @@ using System.Diagnostics;
 
 using CSA.Core;
 using CSA.KnowledgeUnits;
+using static CSA.KnowledgeUnits.CUSlots;
+using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
     public class KS_ChoicePresenter : KnowledgeSource
     {
-        // Name of the bound context variable
+        // Name of the bound activation variable
         private const string SelectedContentUnit = "SelectedContentUnit";
 
         // fixme: storing the choice information on fields on the knowledge source assumes that there will always only be one activation for KS_ChoicePresenter that is executed. If multiple 
@@ -33,18 +35,18 @@ namespace CSA.KnowledgeSources
         public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the selected content units on the blackkboard
-            var cuS = from cu in m_blackboard.LookupUnits(ContentUnit.TypeName)
-                      where ((ContentUnit)cu).HasMetadataSlot(CU_SlotNames.SelectedContentUnit) // look for a selected content unit
+            var CUs = from ContentUnit cu in m_blackboard.LookupUnits(ContentUnit.TypeName)
+                      where cu.HasMetadataSlot(SelectedContentUnit) // look for a selected content unit
                       where // that has not been previously matched by this precondition
-                        (!cu.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched)) ||
-                        (!((ISet<KnowledgeSource>)cu.Properties[U_PropertyNames.KSPreconditionMatched]).Contains(this))
+                        (!cu.Properties.ContainsKey(KSPreconditionMatched)) ||
+                        (!((ISet<KnowledgeSource>)cu.Properties[KSPreconditionMatched]).Contains(this))
                       select cu;
 
             // Iterate through each of the selected content units, creating KnowledgeSourceActivations
-            IKnowledgeSourceActivation[] activations = new KnowledgeSourceActivation[cuS.Count()];
+            IKnowledgeSourceActivation[] activations = new KnowledgeSourceActivation[CUs.Count()];
 
             int i = 0;
-            foreach (var cu in cuS)
+            foreach (var cu in CUs)
             {
                 var boundVars = new Dictionary<string, object>
                 {
@@ -56,13 +58,13 @@ namespace CSA.KnowledgeSources
                 // fixme: this bit of boilerplate code for marking a knowledge unit as having already participated in a matched precondition 
                 // should be baked into the infrastructure somewhere so knowledge source implementers don't always have to do this. 
                 // A good place to add this would be on Unit (and declare a method on IUnit).
-                if (cu.Properties.ContainsKey(U_PropertyNames.KSPreconditionMatched))
+                if (cu.Properties.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<KnowledgeSource>)cu.Properties[U_PropertyNames.KSPreconditionMatched]).Add(this);
+                    ((HashSet<KnowledgeSource>)cu.Properties[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    cu.Properties[U_PropertyNames.KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
+                    cu.Properties[KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
                 }
             }
 
@@ -105,7 +107,7 @@ namespace CSA.KnowledgeSources
         {
             ContentUnit selectedCU = (ContentUnit)boundVars[SelectedContentUnit];
 
-            m_textToDisplay = (string)selectedCU.Content[CU_SlotNames.Text];
+            m_textToDisplay = (string)selectedCU.Content[Text];
 
             m_choices = GetChoices(boundVars);
 
@@ -115,7 +117,7 @@ namespace CSA.KnowledgeSources
                 m_choicesToDisplay = new string[m_choices.Count()];
                 foreach (ContentUnit choice in m_choices)
                 {
-                    m_choicesToDisplay[choiceCounter++] = (string)choice.Content[CU_SlotNames.Text];
+                    m_choicesToDisplay[choiceCounter++] = (string)choice.Content[Text];
                 }
             }
             else
@@ -127,19 +129,23 @@ namespace CSA.KnowledgeSources
             // Remove the displayed SelectedContentUnit from the blackboard.
             m_blackboard.RemoveUnit((IUnit)boundVars[SelectedContentUnit]);
 
-            PresenterExecute?.Invoke(this, EventArgs.Empty);
+            OnExecute(EventArgs.Empty);
+        }
 
+        protected virtual void OnExecute(EventArgs e)
+        {
+            PresenterExecute?.Invoke(this, EventArgs.Empty);
         }
 
         // Given a 0-indexed choice selection, sets the appropriate query on the blackboard.
         // fixme: This should be removed when the choice info is not longer stored on the KS. 
-         public void SelectChoice(int choiceMade)
+        public void SelectChoice(int choiceMade)
         {
             if (choiceMade >= 0 && choiceMade < m_choicesToDisplay.Length)
             {
                 // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
                 ContentUnit selectedChoice = m_choices.ElementAt(choiceMade);
-                m_blackboard.AddUnit(new U_IDQuery((string)selectedChoice.Metadata[CU_SlotNames.TargetContentUnitID]));
+                m_blackboard.AddUnit(new U_IDSelectRequest((string)selectedChoice.Metadata[TargetContentUnitID]));
              }
             else
             {

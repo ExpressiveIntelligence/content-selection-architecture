@@ -20,10 +20,19 @@ namespace CSA.KnowledgeSources
         // Executes the KS 
         // Argument: A dictionary of bound variables that were bound by the Precondition.
         internal abstract void Execute(IDictionary<string, object> boundVars);
-   
+
+        protected readonly IList<HashSet<IUnit>> m_previousMatchSets;
+
+        /*
+         * An IKnowledgeSourceActivation array of length 0. Can be returned from Precondition() when there's no match without having to construct one.
+         */
+        protected readonly IKnowledgeSourceActivation[] m_emptyActivations;
+
         public KnowledgeSource(IBlackboard blackboard)
         {
             m_blackboard = blackboard;
+            m_previousMatchSets = new List<HashSet<IUnit>>();
+            m_emptyActivations = new KnowledgeSourceActivation[0];
             Properties = new Dictionary<string, object>();
         }
     }

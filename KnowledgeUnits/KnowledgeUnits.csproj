@@ -10,4 +10,12 @@
   <ItemGroup>
     <Compile Remove="KU_Names.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Prolog">
+      <HintPath>..\Prolog.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

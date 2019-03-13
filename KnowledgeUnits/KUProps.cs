@@ -1,6 +1,6 @@
 ﻿namespace CSA.KnowledgeUnits
 {
-    public static class U_PropertyNames
+    public static class KUProps
     {
         public const string KSPreconditionMatched = "KSPreconditionMatched"; 
     }

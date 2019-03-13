@@ -1,4 +1,5 @@
 ﻿using CSA.KnowledgeSources;
+using static CSA.KnowledgeSources.KSProps;
 using System.Diagnostics;
 
 namespace CSA.Controllers
@@ -16,8 +17,8 @@ namespace CSA.Controllers
             int highestPriority = int.MinValue;
             foreach(IKnowledgeSourceActivation KSA in m_Agenda)
             { 
-                Debug.Assert(KSA.Properties.ContainsKey(KS_PropertyNames.Priority));
-                int curPriority = (int)KSA.Properties[KS_PropertyNames.Priority];
+                Debug.Assert(KSA.Properties.ContainsKey(Priority));
+                int curPriority = (int)KSA.Properties[Priority];
                 if (curPriority > highestPriority)
                 {
                     highestPriorityKSA = KSA;
