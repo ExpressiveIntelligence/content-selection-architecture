@@ -8,4 +8,9 @@
     <ProjectReference Include="..\CSACore\CSACore.csproj" />
     <ProjectReference Include="..\KnowledgeUnits\KnowledgeUnits.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Prolog">
+      <HintPath>..\Prolog.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

@@ -12,24 +12,24 @@ namespace CSA.Tests
 {
     public class TestControllers
     {
-        class KS_Dummy1 : KS_IDSelector
+        class KS_Dummy1 : KS_ReactiveIDSelector
         {
             public KS_Dummy1(IBlackboard blackboard) : base(blackboard) { }
         }
 
-        class KS_Dummy2 : KS_IDSelector
+        class KS_Dummy2 : KS_ReactiveIDSelector
         {
             public KS_Dummy2(IBlackboard blackboard) : base(blackboard) { }
         }
 
-        class Controller_PublicUpdateAgenda : Controller
+        class Controller_PublicUpdateAgenda : ReactiveController
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
 
             protected override IKnowledgeSourceActivation SelectKSForExecution() => throw new System.NotImplementedException();
         }
 
-        class PriorityController_PublicMethods : PriorityController
+        class PriorityController_PublicMethods : ReactivePriorityController
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
 
@@ -40,9 +40,9 @@ namespace CSA.Tests
         public void TestAddingKS()
         {
             // Maintaining the activeKSs is done through the abstract class Controller. Using the concrete class LexemeController for testing. 
-            IController controller = new PriorityController();
+            IReactiveController controller = new ReactivePriorityController();
             IBlackboard blackboard = new Blackboard();
-            KnowledgeSource ks = new KS_IDSelector(blackboard);
+            ReactiveKnowledgeSource ks = new KS_ReactiveIDSelector(blackboard);
             Assert.Equal(0, controller.ActiveKSs.Count);
             controller.AddKnowledgeSource(ks);
             Assert.Equal(1, controller.ActiveKSs.Count);
@@ -51,9 +51,9 @@ namespace CSA.Tests
         [Fact]
         public void TestRemovingKS()
         {
-            IController controller = new PriorityController();
+            IReactiveController controller = new ReactivePriorityController();
             IBlackboard blackboard = new Blackboard();
-            KnowledgeSource ks = new KS_IDSelector(blackboard);
+            ReactiveKnowledgeSource ks = new KS_ReactiveIDSelector(blackboard);
             controller.AddKnowledgeSource(ks);
             Assert.Equal(1, controller.ActiveKSs.Count);
             controller.RemoveKnowledgeSource(ks);
@@ -65,7 +65,7 @@ namespace CSA.Tests
         {
             Controller_PublicUpdateAgenda controller = new Controller_PublicUpdateAgenda();
             IBlackboard blackboard = new Blackboard();
-            KS_IDSelector ks = new KS_IDSelector(blackboard);
+            KS_ReactiveIDSelector ks = new KS_ReactiveIDSelector(blackboard);
             controller.AddKnowledgeSource(ks);
             IUnit u = new U_IDSelectRequest("foo");
 
@@ -85,9 +85,9 @@ namespace CSA.Tests
         {
             PriorityController_PublicMethods controller = new PriorityController_PublicMethods();
             IBlackboard blackboard = new Blackboard();
-            KS_IDSelector ks1 = new KS_IDSelector(blackboard);
-            KS_IDSelector ks2 = new KS_IDSelector(blackboard);
-            KS_IDSelector ks3 = new KS_IDSelector(blackboard);
+            KS_ReactiveIDSelector ks1 = new KS_ReactiveIDSelector(blackboard);
+            KS_ReactiveIDSelector ks2 = new KS_ReactiveIDSelector(blackboard);
+            KS_ReactiveIDSelector ks3 = new KS_ReactiveIDSelector(blackboard);
             ks1.Properties[Priority] = 10;
             ks2.Properties[Priority] = 30;
             ks3.Properties[Priority] = 20;
@@ -108,7 +108,7 @@ namespace CSA.Tests
         {
             PriorityController_PublicMethods controller = new PriorityController_PublicMethods();
             IBlackboard blackboard = new Blackboard();
-            KS_IDSelector ks1 = new KS_IDSelector(blackboard);
+            KS_ReactiveIDSelector ks1 = new KS_ReactiveIDSelector(blackboard);
             ks1.Properties[Priority] = 10;
             controller.AddKnowledgeSource(ks1);
             blackboard.AddUnit(new U_IDSelectRequest("foo"));       

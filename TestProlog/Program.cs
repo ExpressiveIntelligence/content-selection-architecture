@@ -16,6 +16,7 @@ namespace TestProlog
             //CreatePrologKBAFromFilAndQuery();
             //AssertingAFact();
             // TestExpandoObjectWithInterface();
+            TestVariableBinding();
 
         }
 
@@ -38,9 +39,28 @@ namespace TestProlog
 
         }
 
+        /* 
+         * Test that SolveFor() can be used to bind variables.
+         * Findings:
+         * If the variable is bound to a simple value it's a Symbol.
+         * If the variable is bound to a composite value (like a functor) it's a Structure.
+         * If the query doesn't succeed the returned variable is null.
+         * If the query succeeds but the variable isn't bound in the query, the returned variable is a gensym.
+         * If you need to return multiple values with a query, you can create a predicate on the prolog side which binds multiple values in a functor and unify that with the return variable. 
+         */
+        private static void TestVariableBinding()
+        {
+            KnowledgeBase kb = new KnowledgeBase("Global", null);
+            kb.Consult("PrologTest.prolog");
+            var x = kb.SolveForParsed("X:test(X).");
+            Console.WriteLine("The value of x is " + x);
+            Console.WriteLine("The type of x is " + x.GetType());
+            //Console.WriteLine("The type of x is " + ((Structure)x).Argument(1));
+        }
+
         /*
          * Demonstrates assertions, and that queries are correctly solved after appropriate assertion of facts and rules.
-         */       
+         */
         private static void AssertingAFact()
         {
             KnowledgeBase kb = new KnowledgeBase("global", null);
@@ -52,7 +72,7 @@ namespace TestProlog
             kb.IsTrueWrite("person(socratese).");
             kb.IsTrueWrite("mortal(socratese).");
             kb.IsTrueWrite("mortal(plato), person(socratese).");
-         }
+        }
 
         /*
          * Experiments with the following configuration:
@@ -84,6 +104,14 @@ namespace TestProlog
             return kb.IsTrue(ISOPrologReader.Read(query));
         }
 
+        public static object SolveForParsed(this KnowledgeBase kb, string variableAndConstraint)
+        {
+            if (!(ISOPrologReader.Read(variableAndConstraint) is Structure colonExpression) || !colonExpression.IsFunctor(Symbol.Colon, 2))
+                throw new ArgumentException("Arguent to SolveFor(string) must be of the form Var:Goal.");
+            return kb.SolveFor((LogicVariable)colonExpression.Argument(0), colonExpression.Argument(1), null, false);
+
+        }
+
         /*
          * Test whether an interface can be used to make intellisence work with an ExpandoObject. 
          */
@@ -99,7 +127,8 @@ namespace TestProlog
             Console.WriteLine(test.Foo);
         }
 
-         public interface ITestInterface {
+        public interface ITestInterface
+        {
             int Foo { get; set; }
             object Bar { get; set; }
         }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using CSA.KnowledgeUnits;
@@ -8,7 +7,7 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_PrologEval : KnowledgeSource
+    public class KS_ReactivePrologEval : ReactiveKnowledgeSource
     {
         // Name of the bound context variables
         private const string PrologEvalRequest = "PrologEvalRequest";
@@ -20,7 +19,7 @@ namespace CSA.KnowledgeSources
             var requests = from request in m_blackboard.LookupUnits(U_PrologEvalRequest.TypeName) // Lookup ID select requests
                            where // where the request has not been previously matched by this knowledge source precondition
                             (!request.Properties.ContainsKey(KSPreconditionMatched)) ||
-                            (!((ISet<KnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
+                            (!((ISet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
                           select request;
 
             IKnowledgeSourceActivation[] activations = new IKnowledgeSourceActivation[requests.Count()];
@@ -48,11 +47,11 @@ namespace CSA.KnowledgeSources
                 // A good place to add this would be on Unit (and declare a method on IUnit).
                 if (request.Properties.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<KnowledgeSource>)request.Properties[KSPreconditionMatched]).Add(this);
+                    ((HashSet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    request.Properties[KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
+                    request.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
                 }
             }
 
@@ -101,7 +100,7 @@ namespace CSA.KnowledgeSources
 
         }
 
-        public KS_PrologEval(IBlackboard blackboard) : base(blackboard)
+        public KS_ReactivePrologEval(IBlackboard blackboard) : base(blackboard)
         {
         }
     }

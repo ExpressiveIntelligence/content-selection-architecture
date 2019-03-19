@@ -10,7 +10,7 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_ChoicePresenter : KnowledgeSource
+    public class KS_ReactiveChoicePresenter : ReactiveKnowledgeSource
     {
         // Name of the bound activation variable
         private const string SelectedContentUnit = "SelectedContentUnit";
@@ -30,8 +30,6 @@ namespace CSA.KnowledgeSources
         // The delegate for event handling within the Execute() method
         public event EventHandler PresenterExecute; 
 
-        public int i;
-
         public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the selected content units on the blackkboard
@@ -39,7 +37,7 @@ namespace CSA.KnowledgeSources
                       where cu.HasMetadataSlot(SelectedContentUnit) // look for a selected content unit
                       where // that has not been previously matched by this precondition
                         (!cu.Properties.ContainsKey(KSPreconditionMatched)) ||
-                        (!((ISet<KnowledgeSource>)cu.Properties[KSPreconditionMatched]).Contains(this))
+                        (!((ISet<ReactiveKnowledgeSource>)cu.Properties[KSPreconditionMatched]).Contains(this))
                       select cu;
 
             // Iterate through each of the selected content units, creating KnowledgeSourceActivations
@@ -60,11 +58,11 @@ namespace CSA.KnowledgeSources
                 // A good place to add this would be on Unit (and declare a method on IUnit).
                 if (cu.Properties.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<KnowledgeSource>)cu.Properties[KSPreconditionMatched]).Add(this);
+                    ((HashSet<ReactiveKnowledgeSource>)cu.Properties[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    cu.Properties[KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
+                    cu.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
                 }
             }
 
@@ -153,7 +151,7 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_ChoicePresenter(IBlackboard blackboard) : base(blackboard)
+        public KS_ReactiveChoicePresenter(IBlackboard blackboard) : base(blackboard)
         {
 
         }

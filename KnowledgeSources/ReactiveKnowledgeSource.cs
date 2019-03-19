@@ -3,7 +3,7 @@ using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
-    public abstract class KnowledgeSource : IKnowledgeSource
+    public abstract class ReactiveKnowledgeSource : IReactiveKnowledgeSource
     {
         public IDictionary<string, object> Properties { get; }
 
@@ -28,7 +28,7 @@ namespace CSA.KnowledgeSources
          */
         protected readonly IKnowledgeSourceActivation[] m_emptyActivations;
 
-        public KnowledgeSource(IBlackboard blackboard)
+        public ReactiveKnowledgeSource(IBlackboard blackboard)
         {
             m_blackboard = blackboard;
             m_previousMatchSets = new List<HashSet<IUnit>>();

@@ -10,7 +10,7 @@ namespace ConsoleChoice
         {
             Console.WriteLine("Starting ConsoleChoice");
 
-            Demo1 demo = new Demo1();
+            Demo1_Reactive demo = new Demo1_Reactive();
 
             demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoice);
 

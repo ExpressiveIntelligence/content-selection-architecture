@@ -5,15 +5,15 @@ using CSA.KnowledgeSources;
 
 namespace CSA.Controllers
 {
-    public abstract class Controller : IController
+    public abstract class ReactiveController : IReactiveController
     {
 
         // fixme: for now have the KSs live in data structures inside the controller. Consider moving them onto the blackboard. 
-        protected readonly ISet<IKnowledgeSource> m_ActiveKSs;
+        protected readonly ISet<IReactiveKnowledgeSource> m_ActiveKSs;
         protected readonly ISet<IKnowledgeSourceActivation> m_Agenda;
 
         // Return a copy of the ActiveKSs so that the caller can't directly modify the set. 
-        public ISet<IKnowledgeSource> ActiveKSs => new HashSet<IKnowledgeSource>(m_ActiveKSs);
+        public ISet<IReactiveKnowledgeSource> ActiveKSs => new HashSet<IReactiveKnowledgeSource>(m_ActiveKSs);
 
         // Return a copy of the agenda so that the caller can't directly modify the set.
         public ISet<IKnowledgeSourceActivation> Agenda => new HashSet<IKnowledgeSourceActivation>(m_Agenda);
@@ -27,7 +27,7 @@ namespace CSA.Controllers
             // aliases m_Agenda. But then this causes an InvalidOperationException because you're modifying a set while you enumerate over it. So need to make a copy, which is what ToArray() is doing.  
             m_Agenda.ExceptWith(invalidKSAs.ToArray());
 
-            foreach (IKnowledgeSource ks in m_ActiveKSs)
+            foreach (IReactiveKnowledgeSource ks in m_ActiveKSs)
             {
                 IEnumerable<IKnowledgeSourceActivation> KSAs = ks.Precondition();
                 foreach(IKnowledgeSourceActivation ksa in KSAs)
@@ -37,9 +37,9 @@ namespace CSA.Controllers
             }
         }
 
-        public void AddKnowledgeSource(IKnowledgeSource ks) => m_ActiveKSs.Add(ks);
+        public void AddKnowledgeSource(IReactiveKnowledgeSource ks) => m_ActiveKSs.Add(ks);
 
-        public void RemoveKnowledgeSource(IKnowledgeSource ks) => m_ActiveKSs.Remove(ks);
+        public void RemoveKnowledgeSource(IReactiveKnowledgeSource ks) => m_ActiveKSs.Remove(ks);
 
         protected abstract IKnowledgeSourceActivation SelectKSForExecution();
 
@@ -63,9 +63,9 @@ namespace CSA.Controllers
             }
         }
 
-        protected Controller()
+        protected ReactiveController()
         {
-            m_ActiveKSs = new HashSet<IKnowledgeSource>();
+            m_ActiveKSs = new HashSet<IReactiveKnowledgeSource>();
             m_Agenda = new HashSet<IKnowledgeSourceActivation>();
             Initialize();
         }

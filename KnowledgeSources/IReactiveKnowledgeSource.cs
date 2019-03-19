@@ -2,7 +2,7 @@
 
 namespace CSA.KnowledgeSources
 {
-    public interface IKnowledgeSource
+    public interface IReactiveKnowledgeSource
     {
 
         IDictionary<string, object> Properties { get; }

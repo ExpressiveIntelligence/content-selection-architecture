@@ -7,7 +7,7 @@ namespace CSA.KnowledgeSources
     {
         public static void DisplayConsoleChoice(object sender, EventArgs e)
         {
-            KS_ChoicePresenter cp = (KS_ChoicePresenter)sender;
+            KS_ReactiveChoicePresenter cp = (KS_ReactiveChoicePresenter)sender;
             Console.WriteLine(cp.TextToDisplay);
 
 

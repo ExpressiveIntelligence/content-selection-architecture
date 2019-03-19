@@ -9,7 +9,7 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_IDSelector : KnowledgeSource
+    public class KS_ReactiveIDSelector : ReactiveKnowledgeSource
     {
         // Name of the bound context variable
         private const string IDSelectRequest = "IDSelectRequest";
@@ -23,7 +23,7 @@ namespace CSA.KnowledgeSources
             var requests = from request in m_blackboard.LookupUnits(U_IDSelectRequest.TypeName) // Lookup ID queries
                           where // where the query has not been previously matched by this knowledge source precondition
                             (!request.Properties.ContainsKey(KSPreconditionMatched)) ||
-                            (!((ISet<KnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
+                            (!((ISet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
                           select request;
 
             IKnowledgeSourceActivation[] activations = new IKnowledgeSourceActivation[requests.Count()];
@@ -44,11 +44,11 @@ namespace CSA.KnowledgeSources
                 // A good place to add this would be on Unit (and declare a method on IUnit).
                 if (request.Properties.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<KnowledgeSource>)request.Properties[KSPreconditionMatched]).Add(this);
+                    ((HashSet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    request.Properties[KSPreconditionMatched] = new HashSet<KnowledgeSource> { this };
+                    request.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
                 }
             }
 
@@ -93,7 +93,7 @@ namespace CSA.KnowledgeSources
             m_blackboard.RemoveUnit((IUnit)boundVars[IDSelectRequest]);
          }
          
-        public KS_IDSelector(IBlackboard blackboard) : base(blackboard)
+        public KS_ReactiveIDSelector(IBlackboard blackboard) : base(blackboard)
         {
 
         }

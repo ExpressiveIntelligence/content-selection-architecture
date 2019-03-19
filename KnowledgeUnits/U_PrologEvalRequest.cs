@@ -17,11 +17,21 @@ namespace CSA.KnowledgeUnits
         // fixme: for now just returning a boolean result. Need to figure out how to return bound variables. 
         public string PrologResultSlotName { get; }
 
+        public string PrologBoundVarSlotName { get; }
+
         public U_PrologEvalRequest(string prologQuerySlotName, string prologResultSlotName)
         {
             PrologQuerySlotName = prologQuerySlotName;
             PrologResultSlotName = prologResultSlotName;
+            PrologBoundVarSlotName = null;
         }
- 
+
+        public U_PrologEvalRequest(string prologQuerySlotName, string prologResultSlotName, string prologBoundVarSlotName)
+        {
+            PrologQuerySlotName = prologQuerySlotName;
+            PrologResultSlotName = prologResultSlotName;
+            PrologBoundVarSlotName = prologBoundVarSlotName;
+        }
+
     }
 }

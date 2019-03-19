@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace CSA.Controllers
 {
-    public class PriorityController : Controller
+    public class ReactivePriorityController : ReactiveController
     {
  
         // fixme: selects the highest priority KSA for execution. More generally, would want to select KSs probabilistically based on priority.
