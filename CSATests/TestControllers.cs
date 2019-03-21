@@ -148,6 +148,106 @@ namespace CSA.Tests
             // Since we only added one KS to controller, and there was only one matching blackboard pattern, after execution the agenda should be empty
             Assert.Empty(controller.Agenda);
         }
+
+        // fixme: eventually make this a theory 
+        [Fact]
+        public void TestAddKnowledgeSource_ScheduledSequenceController()
+        {
+            IBlackboard blackboard = new Blackboard();
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            ScheduledSequenceController controller = new ScheduledSequenceController();
+
+            controller.AddKnowledgeSource(ks1);
+            controller.AddKnowledgeSource(ks2);
+            controller.AddKnowledgeSource(ks3);
+
+            Assert.True(controller.RegisteredKnowledgeSource(ks1));
+            Assert.True(controller.RegisteredKnowledgeSource(ks2));
+            Assert.True(controller.RegisteredKnowledgeSource(ks3));
+        }
+
+        // fixme: eventually make this a theory 
+        [Fact]
+        public void TestRemoveKnowledgeSource_ScheduledSequenceController()
+        {
+            IBlackboard blackboard = new Blackboard();
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            ScheduledSequenceController controller = new ScheduledSequenceController();
+
+            controller.AddKnowledgeSource(ks1);
+            controller.AddKnowledgeSource(ks2);
+            controller.AddKnowledgeSource(ks3);
+
+            Assert.True(controller.RegisteredKnowledgeSource(ks1));
+            Assert.True(controller.RegisteredKnowledgeSource(ks2));
+            Assert.True(controller.RegisteredKnowledgeSource(ks3));
+
+            controller.RemoveKnowledgeSource(ks3);
+            Assert.True(controller.RegisteredKnowledgeSource(ks1));
+            Assert.True(controller.RegisteredKnowledgeSource(ks2));
+            Assert.False(controller.RegisteredKnowledgeSource(ks3));
+
+            controller.RemoveKnowledgeSource(ks2);
+            Assert.True(controller.RegisteredKnowledgeSource(ks1));
+            Assert.False(controller.RegisteredKnowledgeSource(ks2));
+            Assert.False(controller.RegisteredKnowledgeSource(ks3));
+
+            controller.RemoveKnowledgeSource(ks1);
+            Assert.False(controller.RegisteredKnowledgeSource(ks1));
+            Assert.False(controller.RegisteredKnowledgeSource(ks2));
+            Assert.False(controller.RegisteredKnowledgeSource(ks3));
+
+        }
+
+        // fixme: eventually make this a theory 
+        [Fact]
+        public void TestExecute_ScheduledSequenceController()
+        {
+            string id = "id1";
+            string pool1 = "pool1";
+            string pool2 = "pool2";
+
+            IBlackboard blackboard = new Blackboard();
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, pool1);
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, pool1, pool2);
+            ScheduledSequenceController controller = new ScheduledSequenceController();
+
+            controller.AddKnowledgeSource(ks1);
+            controller.AddKnowledgeSource(ks2);
+
+            ContentUnit contentUnit = new ContentUnit();
+            contentUnit.Metadata[ContentUnitID] = id;
+            blackboard.AddUnit(contentUnit);
+
+            U_IDSelectRequest req = new U_IDSelectRequest(id);
+            blackboard.AddUnit(req);
+
+            controller.Execute();
+
+            var pool1CUs = from ContentUnit cu in blackboard.LookupUnits(ContentUnit.TypeName)
+                           let cuCast = cu as ContentUnit
+                           where cuCast.HasMetadataSlot(ContentPool)
+                           where cuCast.Metadata[ContentPool].Equals(pool1)
+                           select cuCast;
+
+            var pool2CUs = from ContentUnit cu in blackboard.LookupUnits(ContentUnit.TypeName)
+                           let cuCast = cu as ContentUnit
+                           where cuCast.HasMetadataSlot(ContentPool)
+                           where cuCast.Metadata[ContentPool].Equals(pool2)
+                           select cuCast;
+
+            int pool1Count = pool1CUs.Count();
+            int pool2Count = pool2CUs.Count();
+            Assert.Equal(1, pool1Count);
+            Assert.Equal(1, pool2Count);
+
+            Assert.True(pool1CUs.First().Metadata[ContentUnitID].Equals(id));
+            Assert.True(pool2CUs.First().Metadata[ContentUnitID].Equals(id));
+        }
     }
 
 }

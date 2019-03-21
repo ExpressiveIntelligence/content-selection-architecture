@@ -7,6 +7,7 @@ using CSA.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace CSA.Tests
 {
@@ -547,6 +548,21 @@ namespace CSA.Tests
             return cu.HasMetadataSlot("Test") && (int)cu.Metadata["Test"] == 1 ? true : false;
         }
 
+        /* Given a set of links which go from a unit in an input pool to a unit in an output pool, check that the L_SelectedContentUnit link is 
+         * set up correctly and that the linked CU is in the correct output pool. 
+         */
+        static private void TestFilterLinks(ISet<(IUnit, string, LinkDirection)> links, string outputPool)
+        {
+            int count = links.Count();
+            Assert.Equal(1, count);
+            (IUnit cu, string linkType, LinkDirection dir) = links.First();
+            Assert.Equal(LinkTypes.L_SelectedContentUnit, linkType);
+            Assert.Equal(LinkDirection.End, dir);
+            ContentUnit cuCopy = cu as ContentUnit;
+            Assert.True(cuCopy.HasMetadataSlot(ContentPool));
+            Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
+        }
+
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledFilterSelector))]
         public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
@@ -570,11 +586,7 @@ namespace CSA.Tests
             foreach (var cu in filteredUnits)
             {
                 ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
-                int count = s.Count();
-                Assert.Equal(1, count);
-                ContentUnit cuCopy = s.First().Item1 as ContentUnit;
-                Assert.True(cuCopy.HasMetadataSlot(ContentPool));
-                Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
+                TestFilterLinks(s, outputPool);
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
@@ -586,6 +598,8 @@ namespace CSA.Tests
 
             Assert.Equal(filteredUnits.Length, CUs.Count());
 
+            // Verify that L_SelectedContentUnit links have been correctly added. 
+            
         }
 
         public static IEnumerable<object[]> Data_TestExecute_ScheduledIDSelector()
@@ -684,13 +698,20 @@ namespace CSA.Tests
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
             foreach (var cu in filteredUnits)
             {
-                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit CU, string, LinkDirection)> s = blackboard.LookupLinks(cu);
                 int count = s.Count();
                 Assert.Equal(1, count);
-                ContentUnit cuCopy = s.First().Item1 as ContentUnit;
+                ContentUnit cuCopy = s.First().CU as ContentUnit;
                 Assert.True(cuCopy.HasMetadataSlot(ContentPool));
                 Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
             }
+
+            // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
+            foreach (var cu in filteredUnits)
+            {
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
+                TestFilterLinks(s, outputPool);
+             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
             var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
@@ -796,11 +817,7 @@ namespace CSA.Tests
             {
                 int r = i + random.Next(unitsToSelectFrom.Length - i);
                 ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unitsToSelectFrom[r]);
-                int count = s.Count();
-                Assert.Equal(1, count);
-                ContentUnit cuCopy = s.First().Item1 as ContentUnit;
-                Assert.True(cuCopy.HasMetadataSlot(ContentPool));
-                Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
+                TestFilterLinks(s, outputPool);
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as numberToSelect
@@ -811,6 +828,194 @@ namespace CSA.Tests
                       select cuCast;
 
             Assert.Equal(Math.Min(numberToSelect, unitsToSelectFrom.Length), CUs.Count());
+        }
+
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledPoolCleaner()
+        {
+            string pool1 = "pool1";
+            string pool2 = "pool2";
+            string pool3 = "pool3";
+         
+            IBlackboard blackboard = new Blackboard();
+
+            ContentUnit cu1 = new ContentUnit();
+            ContentUnit cu2 = new ContentUnit();
+            ContentUnit cu3 = new ContentUnit();
+            ContentUnit cu4 = new ContentUnit();
+            ContentUnit cu5 = new ContentUnit();
+
+            cu1.Metadata[ContentPool] = pool1;
+            cu2.Metadata[ContentPool] = pool1;
+            cu3.Metadata[ContentPool] = pool2;
+            cu4.Metadata[ContentPool] = pool3;
+
+            /* Structure of object[]: 
+            * IBlackboard: blackboard, 
+            * KS_ScheduledFilterPoolCleaner: the knowledge source to test            
+            * ContentUnit[]: array of CUs to add to the blackboard
+            * ContentUnit[]: the content units that should be left on the blackboard           
+            */
+
+            return new List<object[]>
+            {
+                // One pool to clean
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }), 
+                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
+
+                // Two pools to clean
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2 }),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu4, cu5 } }, 
+
+                // Three pools to clean
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu5 } },
+
+                // Empty pool to clean
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
+                    new ContentUnit[] { cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
+
+                // Empty blackboard
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }), 
+                    new ContentUnit[0], new ContentUnit[0] },
+
+                // No filter pools specified in constructor
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[0]),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu1, cu2, cu3, cu4, cu5 } },
+
+             };
+        }
+
+        [Theory]
+        [MemberData(nameof(Data_TestExecute_ScheduledPoolCleaner))]
+        public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_ScheduledFilterPoolCleaner cleaner,
+            ContentUnit[] unitsToAdd, ContentUnit[] unitsRemaining)
+        {
+            // Clear the blackboard of any previous testing state
+            blackboard.Clear();
+
+            // Add the content units to the blackboard
+            foreach (var cu in unitsToAdd)
+            {
+                blackboard.AddUnit(cu);
+            }
+
+            // Executed the cleaner
+            cleaner.Execute();
+
+            // Check that only the remaining units are on the blackboard 
+            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
+            Assert.True(cuSet.SetEquals(unitsRemaining));
+        }
+
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
+        {
+            IBlackboard blackboard = new Blackboard();
+
+            ContentUnit originalCU = new ContentUnit();
+            originalCU.Metadata[ContentUnitID] = "foo";
+            originalCU.Content[Text] = "Here is a node with choices";
+
+            ContentUnit selectedCU = new ContentUnit(originalCU);
+            selectedCU.Metadata[ContentPool] = KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
+
+            ContentUnit choice1 = new ContentUnit();
+            choice1.Metadata[TargetContentUnitID] = "bar";
+            choice1.Content[Text] = "Choice 1";
+
+            ContentUnit choice2 = new ContentUnit();
+            choice2.Metadata[TargetContentUnitID] = "baz";
+            choice2.Content[Text] = "Choice 2";
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard, 
+             * KSScheduledChoicePresenter: the choice presenter to test            
+             * ContentUnit: the selected CU,
+             * ContentUnit: the original CU (selected CU is an copy of this),
+             * ContentUnit[]: array of choices (ContentUnits) 
+             */
+
+            return new List<object[]>
+            {
+                // Selected and original CU, no choices
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU,  new ContentUnit[] { } }, 
+
+                // Selected and original CU, one choice
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU, new ContentUnit[] { choice1 } },
+
+                // Selected and original CU, two choices
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU, new ContentUnit[] { choice1, choice2} },
+
+                // empty blackboard
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, null, new ContentUnit[0] },
+
+                // no selected CU
+                 new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, originalCU, new ContentUnit[] { choice1, choice2} },
+             };
+        }
+
+        [Theory]
+        [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
+        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU, 
+            ContentUnit originalCU, ContentUnit[] choices)
+        {
+            Debug.Assert((selectedCU != null && originalCU != null) || (selectedCU == null));
+
+            blackboard.Clear();
+
+            if (selectedCU != null)
+            {
+                blackboard.AddUnit(selectedCU);
+            }
+
+            foreach (ContentUnit choice in choices)
+            {
+                blackboard.AddUnit(choice);
+            }
+
+            if (originalCU != null)
+            {
+                blackboard.AddUnit(originalCU);
+                foreach (ContentUnit choice in choices)
+                {
+                    blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
+                }
+            }
+
+            if (originalCU != null && selectedCU != null)
+            {
+                blackboard.AddLink(originalCU, selectedCU, LinkTypes.L_SelectedContentUnit, true);
+            }
+
+            // Execute the choice presenter
+            ks.Execute();
+
+            // fixme: the tests below depend on the choice info being stored on the ks. When this is eventually changed to arguments passed into the event handler, will need to use an event 
+            // handler to make these tests. 
+            if (selectedCU != null)
+            {
+                Assert.Equal(selectedCU.Content[Text], ks.TextToDisplay);
+                int numOfChoices = choices.Length;
+                Assert.Equal(numOfChoices, ks.ChoicesToDisplay.Length);
+
+                foreach (ContentUnit choice in choices)
+                {
+                    Assert.True(Array.Exists(ks.ChoicesToDisplay, element => element.Equals(choice.Content[Text])));
+                }
+            }
+            else
+            {
+                Assert.Equal("", ks.TextToDisplay);
+            }
+
+            if (ks.ChoicesToDisplay.Length > 0)
+            {
+                Random random = new Random();
+                int r = random.Next(ks.ChoicesToDisplay.Length);
+                ks.SelectChoice(r);
+                ISet<IUnit> idSelectRequest = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+                Assert.Equal(1, idSelectRequest.Count);
+                Assert.True(((U_IDSelectRequest)idSelectRequest.First()).TargetContentUnitID.Equals(choices[r].Metadata[TargetContentUnitID]));
+            }
         }
 
     }

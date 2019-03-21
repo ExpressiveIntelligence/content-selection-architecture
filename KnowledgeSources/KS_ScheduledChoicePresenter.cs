@@ -80,8 +80,8 @@ namespace CSA.KnowledgeSources
         // fixme: should't store display info on KS but rather should pass it as args through to the event handler. 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            var selectedCUs = (IEnumerable<ContentUnit>)boundVars[FilteredContentUnits];
-
+            var selectedCUs = ContentUnitsFilteredByPrecondition(boundVars);
+ 
             Debug.Assert(selectedCUs.Count() == 1); // fixme: With choice information stored on the KS, can only manage one selected content unit to display.
 
             ContentUnit selectedCU = selectedCUs.First();

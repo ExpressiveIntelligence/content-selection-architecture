@@ -12,7 +12,7 @@ namespace ConsoleChoice
 
             Demo1_Reactive demo = new Demo1_Reactive();
 
-            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoiceReactive);
 
             while (demo.Blackboard.Changed)
             {
@@ -27,7 +27,7 @@ namespace ConsoleChoice
 
             Demo1_Scheduled demo = new Demo1_Scheduled();
 
-            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoiceScheduled);
 
             while(demo.Blackboard.Changed)
             {
