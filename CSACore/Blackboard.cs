@@ -7,7 +7,8 @@ namespace CSA.Core
     {
         private readonly IDictionary<string, ISet<IUnit>> dict = new Dictionary<string, ISet<IUnit>>();
 
-        private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType)>> links = new Dictionary<IUnit, ISet<(IUnit Node, string LinkType)>>();
+        private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType, LinkDirection Direction)>> links = 
+            new Dictionary<IUnit, ISet<(IUnit Node, string LinkType, LinkDirection Direction)>>();
 
         protected bool m_changed = false;
 
@@ -54,9 +55,16 @@ namespace CSA.Core
 
                     var linksToRemove = LookupLinks(unit);
                     IUnit node1 = unit;
-                    foreach((IUnit node2, string linkType) in linksToRemove)
+                    foreach((IUnit node2, string linkType, LinkDirection direction) in linksToRemove)
                     {
-                        RemoveLink(node1, node2, linkType);
+                        if (direction == LinkDirection.Undirected)
+                        {
+                            RemoveLink(node1, node2, linkType, false);
+                        }
+                        else
+                        {
+                            RemoveLink(node1, node2, linkType, true);
+                        }
                     }
 
                     // Removing a unit changes the blackboard (but only if the unit was actually on the blackboard) 
@@ -97,43 +105,55 @@ namespace CSA.Core
         // Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
         // link can be added, false otherwise. 
         // fixme: consider making linkTypes full-fledged classes that can store additional information
-        // fixme: add a link direction so that links can be directed as well as undirected
-        public bool AddLink(IUnit unit1, IUnit unit2, string linkType)
+        public bool AddLink(IUnit unit1, IUnit unit2, string linkType, bool directed=false)
         {
             if (ContainsUnit(unit1) && ContainsUnit(unit2))
             {
-                if (LookupLinks(unit1).Contains((unit2, linkType)))
+                LinkDirection unit1Dir;
+                LinkDirection unit2Dir; 
+
+                if (directed)
+                {
+                    unit1Dir = LinkDirection.Start;
+                    unit2Dir = LinkDirection.End;
+                }
+                else
+                {
+                    unit1Dir = unit2Dir = LinkDirection.Undirected;
+                }
+
+                if (LookupLinks(unit1).Contains((unit2, linkType, unit2Dir)))
                 {
                     // Link is already on the blackboard
-                    Debug.Assert(LookupLinks(unit2).Contains((unit1, linkType)));
+                    Debug.Assert(LookupLinks(unit2).Contains((unit1, linkType, unit1Dir)));
                     return false;
                 }
                 else
                 {
                     // Link is not already on the blackboard. 
 
-                    if (links.TryGetValue(unit1, out ISet<(IUnit, string)> linkSet))
+                    if (links.TryGetValue(unit1, out ISet<(IUnit, string, LinkDirection)> linkSet))
                     {
-                        bool bAdd = linkSet.Add((unit2, linkType));
+                        bool bAdd = linkSet.Add((unit2, linkType, unit2Dir));
                         Debug.Assert(bAdd);
                     }
                     else
                     {
-                        linkSet = new HashSet<(IUnit, string)>();
-                        bool bAdd = linkSet.Add((unit2, linkType));
+                        linkSet = new HashSet<(IUnit, string, LinkDirection)>();
+                        bool bAdd = linkSet.Add((unit2, linkType, unit2Dir));
                         Debug.Assert(bAdd);
                         links.Add(unit1, linkSet);
                     }
 
                     if (links.TryGetValue(unit2, out linkSet))
                     {
-                        bool bAdd = linkSet.Add((unit1, linkType));
+                        bool bAdd = linkSet.Add((unit1, linkType, unit1Dir));
                         Debug.Assert(bAdd);
                     }
                     else
                     {
-                        linkSet = new HashSet<(IUnit, string)>();
-                        bool bAdd = linkSet.Add((unit1, linkType));
+                        linkSet = new HashSet<(IUnit, string, LinkDirection)>();
+                        bool bAdd = linkSet.Add((unit1, linkType, unit1Dir));
                         Debug.Assert(bAdd);
                         links.Add(unit2, linkSet);
                     }
@@ -151,21 +171,34 @@ namespace CSA.Core
         }
 
         // Removes the undirected link linkType between unit1 and unit2. Returns true if the link exists and was removed, false if the link doesn't exist. 
-        public bool RemoveLink(IUnit unit1, IUnit unit2, string linkType)
+        public bool RemoveLink(IUnit unit1, IUnit unit2, string linkType, bool directed=false)
         {
-            ISet<(IUnit, string)> linkSet1;
-            ISet<(IUnit, string)> linkSet2;
+            ISet<(IUnit, string, LinkDirection)> linkSet1;
+            ISet<(IUnit, string, LinkDirection)> linkSet2;
 
             bool bGet1 = links.TryGetValue(unit1, out linkSet1);
             bool bGet2 = links.TryGetValue(unit2, out linkSet2);
+
+            LinkDirection unit1Dir;
+            LinkDirection unit2Dir;
+
+            if (directed)
+            {
+                unit1Dir = LinkDirection.Start;
+                unit2Dir = LinkDirection.End;
+            }
+            else
+            {
+                unit1Dir = unit2Dir = LinkDirection.Undirected;
+            }
 
             if (bGet1 && bGet2)
             {
                 // Both unit1 and unit2 are the endpoint of links. 
 
                 // Remove the appropriate node from each set. 
-                bool bRemove1 = linkSet1.Remove((unit2, linkType));
-                bool bRemove2 = linkSet2.Remove((unit1, linkType));
+                bool bRemove1 = linkSet1.Remove((unit2, linkType, unit2Dir));
+                bool bRemove2 = linkSet2.Remove((unit1, linkType, unit1Dir));
 
                 // Assert that b1 and b2 have the same value. Either both link sets include the other node with this linkType or neither includes the other node with this linkType; 
                 Debug.Assert(bRemove1 == bRemove2);
@@ -182,13 +215,13 @@ namespace CSA.Core
                 {
                     // Only the first node is the endpoint of any links. 
                     // Assert that its link set must not contain the second node with this linkType.
-                    Debug.Assert(!linkSet1.Contains((unit2, linkType)));
+                    Debug.Assert(!linkSet1.Contains((unit2, linkType, unit2Dir)));
                 }
                 else if (!bGet1 && bGet2)
                 {
                     // Only the second node is the endpoint of any links. 
-                    // Assert that its link set must not contain the second node with this linkType.
-                    Debug.Assert(!linkSet2.Contains((unit1, linkType)));
+                    // Assert that its link set must not contain the first node with this linkType.
+                    Debug.Assert(!linkSet2.Contains((unit1, linkType, unit1Dir)));
                 }
 
                 // Nothing removed. 
@@ -206,12 +239,17 @@ namespace CSA.Core
             links.Clear();
         }
 
-        // Returns a set of the links for which the argument unit is an endpoint. 
-        // If the unit argument has no links or is not in the blackboard, returns the empty set. 
-        // Note that using LookupLinks alone, it is not possible to differentiate between the cases of unit on the blackboard with no links and unit not on the blackboard. 
-        public ISet<(IUnit Node, string LinkType)> LookupLinks(IUnit unit)
+        /*
+         * Returns a set of the links for which the argument unit is an endpoint. 
+         * If the unit argument has no links or is not in the blackboard, returns the empty set.   
+         * Note that using LookupLinks alone, it is not possible to differentiate between the cases of unit on the blackboard with no links and unit 
+         * not on the blackboard.        
+         */
+
+        public ISet<(IUnit Node, string LinkType, LinkDirection Direction)> LookupLinks(IUnit unit)
         {
-            return links.TryGetValue(unit, out ISet<(IUnit, string)> linkSet) ? new HashSet<(IUnit, string)>(linkSet) : new HashSet<(IUnit, string)>(); 
+            return links.TryGetValue(unit, out ISet<(IUnit, string, LinkDirection)> linkSet) ? new HashSet<(IUnit, string, LinkDirection)>(linkSet) 
+                : new HashSet<(IUnit, string, LinkDirection)>(); 
         }
 
         // Reset whether this blackboard has been changed to false. Returns the current changed status before the reset.  

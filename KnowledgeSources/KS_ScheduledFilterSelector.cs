@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using CSA.Core;
 using static CSA.KnowledgeUnits.CUSlots;
 using CSA.KnowledgeUnits;
@@ -30,14 +31,7 @@ namespace CSA.KnowledgeSources
 
         private bool SelectFromPool(ContentUnit cu)
         {
-            if (cu.HasMetadataSlot(ContentPool) && cu.Metadata[ContentPool].Equals(InputPool))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return cu.HasMetadataSlot(ContentPool) && cu.Metadata[ContentPool].Equals(InputPool);
         }
 
         protected override IDictionary<string, object>[] Precondition()
@@ -75,7 +69,7 @@ namespace CSA.KnowledgeSources
             ContentUnit newUnit = new ContentUnit(contentUnit);
             newUnit.Metadata[ContentPool] = OutputPool;
             m_blackboard.AddUnit(newUnit);
-            m_blackboard.AddLink(contentUnit, newUnit, LinkTypes.L_SelectedContentUnit); // fixme: need a more general link type for copies between pools
+            m_blackboard.AddLink(contentUnit, newUnit, LinkTypes.L_SelectedContentUnit, true); // fixme: need a more general link type for copies between pools
             return newUnit;
         }
 
@@ -111,16 +105,21 @@ namespace CSA.KnowledgeSources
 
         public KS_ScheduledFilterSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard)
         {
+            Debug.Assert(filter != null);
+
             OutputPool = outputPool;
             FilterConditionDel = filter;
         }
 
-        /*
+         /*
          * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
          * as the FilterConditionDel.         
          */
-         public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter) : base(blackboard)
+        public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter) : base(blackboard)
         {
+            Debug.Assert(filter != null);
+            Debug.Assert(inputPool != null);
+
             InputPool = inputPool;
             OutputPool = outputPool;
             FilterConditionDel = (ContentUnit cu) => SelectFromPool(cu) && filter(cu);

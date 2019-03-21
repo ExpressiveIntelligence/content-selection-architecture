@@ -261,16 +261,16 @@ namespace CSA.Tests
 
             var linkSet1 = blackboard.LookupLinks(units[0]);
             Assert.Equal(2, linkSet1.Count);
-            Assert.True(linkSet1.Contains((units[1], "lType1")));
-            Assert.True(linkSet1.Contains((units[2], "lType2")));
+            Assert.True(linkSet1.Contains((units[1], "lType1", LinkDirection.Undirected)));
+            Assert.True(linkSet1.Contains((units[2], "lType2", LinkDirection.Undirected)));
 
             var linkSet2 = blackboard.LookupLinks(units[1]);
             Assert.Equal(1, linkSet2.Count);
-            Assert.True(linkSet2.Contains((units[0], "lType1")));
+            Assert.True(linkSet2.Contains((units[0], "lType1", LinkDirection.Undirected)));
 
             var linkSet3 = blackboard.LookupLinks(units[2]);
             Assert.Equal(1, linkSet3.Count);
-            Assert.True(linkSet3.Contains((units[0], "lType2")));
+            Assert.True(linkSet3.Contains((units[0], "lType2", LinkDirection.Undirected)));
         }
 
         [Fact]

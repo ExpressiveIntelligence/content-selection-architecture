@@ -52,7 +52,7 @@ namespace CSA.KnowledgeSources
                 var shuffledContentUnits = ShuffleContentUnits(contentUnits, NumberToSelect);
                 for (int i = 0; i < NumberToSelect; i++)
                 {
-                    base.CopyCUToOutputPool(shuffledContentUnits[i]);
+                    CopyCUToOutputPool(shuffledContentUnits[i]);
                 }
             }
         }

@@ -569,7 +569,7 @@ namespace CSA.Tests
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
             foreach (var cu in filteredUnits)
             {
-                ISet<(IUnit, string)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
                 int count = s.Count();
                 Assert.Equal(1, count);
                 ContentUnit cuCopy = s.First().Item1 as ContentUnit;
@@ -684,7 +684,7 @@ namespace CSA.Tests
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
             foreach (var cu in filteredUnits)
             {
-                ISet<(IUnit, string)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
                 int count = s.Count();
                 Assert.Equal(1, count);
                 ContentUnit cuCopy = s.First().Item1 as ContentUnit;
@@ -795,7 +795,7 @@ namespace CSA.Tests
             for(int i = 0; i < Math.Min(numberToSelect, unitsToSelectFrom.Length); i++)
             {
                 int r = i + random.Next(unitsToSelectFrom.Length - i);
-                ISet<(IUnit, string)> s = blackboard.LookupLinks(unitsToSelectFrom[r]);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unitsToSelectFrom[r]);
                 int count = s.Count();
                 Assert.Equal(1, count);
                 ContentUnit cuCopy = s.First().Item1 as ContentUnit;

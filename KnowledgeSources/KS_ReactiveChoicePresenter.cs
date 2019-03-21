@@ -88,7 +88,7 @@ namespace CSA.KnowledgeSources
             Debug.Assert(linkToOrigCU.Count() == 1);
 
             // Get the original content unit (originalCU)
-            (IUnit originalCU, string LinkType) = linkToOrigCU.ElementAt(0);
+            (IUnit originalCU, _, _) = linkToOrigCU.ElementAt(0);
 
             // Gather the choices connected to the originalCU.
             IEnumerable<ContentUnit> choices = from link in m_blackboard.LookupLinks(originalCU)

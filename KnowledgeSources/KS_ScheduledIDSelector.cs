@@ -58,35 +58,6 @@ namespace CSA.KnowledgeSources
             }
 
         }
-
-        // fixme: remove Execute() once testing has confirmed that the default Execute() works
-        /*
-        protected override void Execute(IDictionary<string, object> boundVars)
-        {
-            string targetContentUnitID = ((U_IDSelectRequest)boundVars[IDSelectRequest]).TargetContentUnitID;
-            var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName) // lookup content units
-                               where FilterConditionDel((ContentUnit)contentUnit) // where the content unit satisfies some user provided filter condition 
-                               where ((ContentUnit)contentUnit).HasMetadataSlot(ContentUnitID) // where the content unit has an ID
-                               where ((ContentUnit)contentUnit).Metadata[ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
-                               select contentUnit;
-
-            // If there are any selected content units, write copies of them to a SelectedContentUnit output pool
-            if (contentUnits.Any())
-            {
-                // One or more content units matching the ContentUnitID in the U_IDQuery were found.
-                // fixme: if no matching content unit was found, perhaps the KS should post something indiciating the execution failed. 
-                // Or this could be done via tracing, with a KS that looks for tracing patterns, though this will require separate "failure patterns"
-                // for each case. So probably better to have more general semantics for KSs to post success and failure into the trace. 
-
-                foreach (var contentUnit in (IEnumerable<ContentUnit>)contentUnits)
-                {
-                    CopyCUToOutputPool(contentUnit);
-                }
-            }
-            m_blackboard.RemoveUnit((IUnit)boundVars[IDSelectRequest]); // Remove the U_IDSelectRequest from the blackboard
-        }
-        */
-
         
         public KS_ScheduledIDSelector(IBlackboard blackboard) : base(blackboard, DefaultOutputPoolName)
         {
