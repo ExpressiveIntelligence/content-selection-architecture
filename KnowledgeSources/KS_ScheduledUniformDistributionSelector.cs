@@ -15,6 +15,9 @@ namespace CSA.KnowledgeSources
         // Number of items to uniformly select from the input set. 
         public uint NumberToSelect { get; }
 
+        // The seed used for the random number generator
+        public int Seed { get; }
+
         private readonly Random m_random;
 
         private ContentUnit[] ShuffleContentUnits(IEnumerable<ContentUnit> contentUnits, uint numberToShuffle)
@@ -66,6 +69,7 @@ namespace CSA.KnowledgeSources
         public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, int seed = int.MinValue) : base(blackboard, DefaultOutputPoolName)
         {
             m_random = InitializeRandom(seed);
+            Seed = seed;
             NumberToSelect = 1;
         }
 
@@ -73,6 +77,7 @@ namespace CSA.KnowledgeSources
             base(blackboard, outputPool)
         {
             m_random = InitializeRandom(seed);
+            Seed = seed;
             NumberToSelect = 1;
         }
 
@@ -80,6 +85,7 @@ namespace CSA.KnowledgeSources
             int seed = int.MinValue) : base(blackboard, inputPool, outputPool)
         {
             m_random = InitializeRandom(seed);
+            Seed = seed;
             NumberToSelect = numberToSelect;
         }
 
@@ -87,6 +93,7 @@ namespace CSA.KnowledgeSources
             int seed = int.MinValue) : base(blackboard, outputPool, filter)
         {
             m_random = InitializeRandom(seed);
+            Seed = seed;
             NumberToSelect = numberToSelect;
         }
 
@@ -94,6 +101,7 @@ namespace CSA.KnowledgeSources
             uint numberToSelect, int seed = int.MinValue) : base(blackboard, inputPool, outputPool, filter)
         {
             m_random = InitializeRandom(seed);
+            Seed = seed;
             NumberToSelect = numberToSelect;
         }
 

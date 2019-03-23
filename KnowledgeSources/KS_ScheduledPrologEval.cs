@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using Prolog;
@@ -23,11 +23,11 @@ namespace CSA.KnowledgeSources
             /* 
              * fixme: the logic for for processing the U_PrologEvalRequest is almost identical to the logic for processing U_IDSelectionRequest. 
              * Come up with a general inherited mechanism for managing requests. 
+             * fixme: consider adding additional fields to request units to indicate additional filtering, so that filter logic is associated with the 
+             * request rather than the KS.
              */
-            // fixme: consider adding additional fields to request units to indicate additional filtering, so that filter logic is associated with the request rather than the KS.
             // Use LINQ to create a collection of the requested U_PrologEvalQueries on the blackboard.
-            var requests = from request in m_blackboard.LookupUnits(U_PrologEvalRequest.TypeName) // Lookup ID select requests
-                           select request;
+            var requests = m_blackboard.LookupUnits(U_PrologEvalRequest.TypeName);
 
             if (requests.Any())
             {
@@ -36,7 +36,7 @@ namespace CSA.KnowledgeSources
                 var bindings = new IDictionary<string, object>[requests.Count()];
 
                 int i = 0;
-                foreach (var request in (IEnumerable<U_PrologEvalRequest>)requests)
+                foreach (U_PrologEvalRequest request in requests)
                 {
                     bindings[i++] = new Dictionary<string, object>
                     {
@@ -57,54 +57,36 @@ namespace CSA.KnowledgeSources
             string prologResultSlotName = ((U_PrologEvalRequest)boundVars[PrologEvalRequest]).PrologResultSlotName;
             string prologBoundVarSlotName = ((U_PrologEvalRequest)boundVars[PrologEvalRequest]).PrologBoundVarSlotName;
             var contentUnitsWithQuerySlot = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName)
-                                            where FilterConditionDel((ContentUnit)contentUnit) // where the content unit satisfies some user provided filter condition 
-                                            where ((ContentUnit)contentUnit).HasMetadataSlot(prologQuerySlotName) // where the content unit has the prolog query
-                                            select contentUnit;
+                                            let cuCast = contentUnit as ContentUnit
+                                            where FilterConditionDel(cuCast) // where the content unit satisfies some user provided filter condition 
+                                            where cuCast.HasMetadataSlot(prologQuerySlotName) // where the content unit has the prolog query
+                                            select cuCast;
 
-            var prologKB = from kb in m_blackboard.LookupUnits(U_PrologKB.TypeName)
-                           select kb;
+            var prologKB = m_blackboard.LookupUnits(U_PrologKB.TypeName);
 
-            if (prologKB.Count() == 1)
+            XunitOutput?.WriteLine("In PrologEval.Execute()");
+
+            Debug.Assert(prologKB.Count == 1);
+
+            U_PrologKB kb = (U_PrologKB)prologKB.First();
+
+            /* 
+             * fixme: the copy logic won't work with multiple prolog eval requests - a different copy will be made for each unique query slot instead
+             * of evaluating all the query slots on each content unit. Resolution: use a single eval request with arrays of slots. 
+             */
+            foreach (var contentUnit in contentUnitsWithQuerySlot)
             {
-                KnowledgeBase kb = ((U_PrologKB)prologKB.First()).KB;
-
-                /* 
-                 * fixme: the copy logic won't work with multiple prolog eval requests - a different copy will be made for each unique query slot instead
-                 * of evaluating all the query slots on each content unit. 
-                 */
-                foreach (var contentUnit in (IEnumerable<ContentUnit>)contentUnitsWithQuerySlot)
+                XunitOutput?.WriteLine("Evaluting prolog eval on ContentUnit: " + contentUnit.Metadata[CUSlots.ContentUnitID]);
+                ContentUnit contentUnitCopy = CopyCUToOutputPool(contentUnit);
+                var result = kb.SolveForParsed((string)contentUnitCopy.Metadata[prologQuerySlotName]);
+                XunitOutput?.WriteLine("Result of evaluation: " + result);
+                contentUnitCopy.Metadata[prologResultSlotName] = result != null;
+                if (prologBoundVarSlotName != null)
                 {
-                    ContentUnit contentUnitCopy = CopyCUToOutputPool(contentUnit);
-                    var query = ISOPrologReader.Read((string)contentUnitCopy.Metadata[prologQuerySlotName]);
-                    if (!(query is Structure colonExpression) || !colonExpression.IsFunctor(Symbol.Colon, 2))
-                    {
-                        // The query is not a colon expression - use isTrue and ignore prologBoundVarSlotName
-                        contentUnitCopy.Metadata[prologResultSlotName] = kb.IsTrue(query);
-                        if (prologBoundVarSlotName != null)
-                        {
-                            contentUnitCopy.Metadata[prologBoundVarSlotName] = null;
-                        }
-                    }
-                    else
-                    {
-                        // The query is a colon expression - use SolveFor and set the prolog bound variable slot
-                        var result = kb.SolveFor((LogicVariable)colonExpression.Argument(0), colonExpression.Argument(1), null, false);
-                        if (result != null)
-                        {
-                            contentUnitCopy.Metadata[prologResultSlotName] = true;
-                        }
-                        else
-                        {
-                            contentUnitCopy.Metadata[prologResultSlotName] = false;
-                        }
-
-                        if (prologBoundVarSlotName != null)
-                        {
-                            contentUnitCopy.Metadata[prologBoundVarSlotName] = result;
-                        }
-                    }
+                    contentUnitCopy.Metadata[prologBoundVarSlotName] = result;
                 }
             }
+
             m_blackboard.RemoveUnit((IUnit)boundVars[PrologEvalRequest]);
         }
 
@@ -115,9 +97,9 @@ namespace CSA.KnowledgeSources
         public KS_ScheduledPrologEval(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
         {
         }
-         
+
         public KS_ScheduledPrologEval(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
-        { 
+        {
         }
 
         public KS_ScheduledPrologEval(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)

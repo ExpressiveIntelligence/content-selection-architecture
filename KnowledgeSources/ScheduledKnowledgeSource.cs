@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit.Abstractions;
 using CSA.Core;
 
 namespace CSA.KnowledgeSources
@@ -6,6 +7,8 @@ namespace CSA.KnowledgeSources
     public abstract class ScheduledKnowledgeSource : IScheduledKnowledgeSource
     {
         public IDictionary<string, object> Properties { get; }
+
+        public ITestOutputHelper XunitOutput { get; set; }
 
         protected readonly IBlackboard m_blackboard;
 

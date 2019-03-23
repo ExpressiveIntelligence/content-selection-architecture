@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit.Abstractions;
 
 namespace CSA.KnowledgeSources
 {
@@ -11,6 +12,8 @@ namespace CSA.KnowledgeSources
          * data to operate on and then executing each of the resulting activations.         
          */
         void Execute();
+
+        ITestOutputHelper XunitOutput { get; set; }
 
     }
 }

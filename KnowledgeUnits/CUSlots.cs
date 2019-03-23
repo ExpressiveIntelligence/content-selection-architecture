@@ -8,8 +8,12 @@
         public const string SelectedContentUnit = "SelectedContentUnit";
         public const string TargetContentUnitID = "TargetContentUnitID";
         public const string ApplTest_Prolog = "ApplTest_Prolog";
-        public const string KnowledgeBaseName_Prolog = "KnowledgeBaseName_Prolog";
+        public const string ApplTestResult = "ApplTestResult";
+        public const string ApplTestBindings_Prolog = "ApplTestBindings_Prolog";
         public const string ContentPool = "ContentPool";
+
+        // fixme: haven't experimented yet with specifying specific knowledge bases on a unit-by-unit bases for evaluating prolog queries
+        //public const string KnowledgeBaseName_Prolog = "KnowledgeBaseName_Prolog";
 
         // Content slots
         // fixme: consider using a prefix or different static classes to differentiate between metadata slots and content slots.

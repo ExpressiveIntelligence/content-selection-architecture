@@ -16,10 +16,19 @@ namespace TestProlog
             //CreatePrologKBAFromFilAndQuery();
             //AssertingAFact();
             // TestExpandoObjectWithInterface();
-            TestVariableBinding();
-
+            // TestVariableBinding();
+            // QueryWithNoArgument();
+            //KnowledgeBase kb = new KnowledgeBase("global", null);
+            //PrintTypeVariable<KnowledgeBase>(kb);
         }
 
+        // Not related to test prolog. Scratch test of getting the name of the type referenced by a type variable. 
+        private static void PrintTypeVariable<T>(T t)
+        {
+            Console.WriteLine(typeof(T));
+            Console.WriteLine(t.GetType().FullName);
+
+        }
         private static void CreatePrologKBAFromFilAndQuery()
         {
             // fixme: KnowledgeBase wants a reference to a game object. This is because GameObjects can form a tree of knowledge bases. 
@@ -75,6 +84,18 @@ namespace TestProlog
         }
 
         /*
+         * Testing queries that have no arguments. 
+         */
+        private static void QueryWithNoArgument()
+        {
+            KnowledgeBase kb = new KnowledgeBase("global", null);
+            kb.IsTrueWrite("assert((test :- foo)).");
+            kb.IsTrueWrite("assert(foo).");
+            kb.IsTrueWrite("retract(foo).");
+            kb.IsTrueWrite("test.");
+        }
+
+        /*
          * Experiments with the following configuration:
          * Global Prolog KB stored on a knowledge unit.
          * Prolog query applicability tests associated with content units.
@@ -107,7 +128,7 @@ namespace TestProlog
         public static object SolveForParsed(this KnowledgeBase kb, string variableAndConstraint)
         {
             if (!(ISOPrologReader.Read(variableAndConstraint) is Structure colonExpression) || !colonExpression.IsFunctor(Symbol.Colon, 2))
-                throw new ArgumentException("Arguent to SolveFor(string) must be of the form Var:Goal.");
+                throw new ArgumentException("Argument to SolveFor(string) must be of the form Var:Goal.");
             return kb.SolveFor((LogicVariable)colonExpression.Argument(0), colonExpression.Argument(1), null, false);
 
         }

@@ -1,18 +1,25 @@
-﻿using CSA.KnowledgeSources;
-using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.CUSlots;
-using static CSA.KnowledgeUnits.KUProps;
-using Xunit;
-using CSA.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+using Xunit;
+using Xunit.Abstractions;
+
+using CSA.KnowledgeSources;
+using CSA.KnowledgeUnits;
+using static CSA.KnowledgeUnits.CUSlots;
+using static CSA.KnowledgeUnits.KUProps;
+using CSA.Core;
+using Prolog;
+using UnityEngine;
 
 namespace CSA.Tests
 {
     public class TestKnowledgeSources
     {
+
+        private readonly ITestOutputHelper output;
+
         class TestUnit1 : Unit
         {
             public string S { get; set; }
@@ -507,38 +514,37 @@ namespace CSA.Tests
              * IBlackboard: blackboard, 
              * KS_ScheduledFilterSelector: the filter selector to test            
              * ContentUnit[]: array of CUs to add to the blackboard
-             * ContentUnit[]: CUs which should be copied to the output pool
-             * string: name of the output pool            
+             * ContentUnit[]: CUs which should be copied to the output pool        
              */
 
             return new List<object[]>
             {
                 // Filter with default filter condition
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, outputPool }, 
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 } }, 
 
                 // Filter with input pool and output pool using input pool selection
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] {cu1, cu2}, outputPool }, 
+                    new ContentUnit[] {cu1, cu2} }, 
 
                 // Filter with output pool and specified filter
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu2, cu3 }, outputPool },
+                    new ContentUnit[] { cu2, cu3 } },
 
                 // Filter with input and output pools and specified filter
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu2 }, outputPool },
+                    new ContentUnit[] { cu2 } },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new ContentUnit[0], new ContentUnit[0], outputPool},
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new ContentUnit[0], new ContentUnit[0] },
 
                 // Nothing in the input pool and no filter
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu3, cu4 },
-                    new ContentUnit[0], outputPool },
+                    new ContentUnit[0] },
 
                 // Nothing in the input pool and specified filter
                 new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new ContentUnit[] { cu3, cu4 },
-                    new ContentUnit[0], outputPool },
+                    new ContentUnit[0] },
 
              };
         }
@@ -553,7 +559,7 @@ namespace CSA.Tests
          */
         static private void TestFilterLinks(ISet<(IUnit, string, LinkDirection)> links, string outputPool)
         {
-            int count = links.Count();
+            int count = links.Count;
             Assert.Equal(1, count);
             (IUnit cu, string linkType, LinkDirection dir) = links.First();
             Assert.Equal(LinkTypes.L_SelectedContentUnit, linkType);
@@ -563,10 +569,21 @@ namespace CSA.Tests
             Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
         }
 
+        static private void TestNumberOfCUsInOutputPool(int desiredNumberOfCUs, IBlackboard blackboard, string outputPool)
+        {
+            var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
+                      let cuCast = cu as ContentUnit
+                      where cuCast.HasMetadataSlot(ContentPool)
+                      where cuCast.Metadata[ContentPool].Equals(outputPool)
+                      select cuCast;
+
+            Assert.Equal(desiredNumberOfCUs, CUs.Count());
+        }
+
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledFilterSelector))]
         public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
-            ContentUnit[] filteredUnits, string outputPool)
+            ContentUnit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
@@ -581,6 +598,7 @@ namespace CSA.Tests
             // Executed the filter selector
             filterSelector.Execute();
 
+            string outputPool = filterSelector.OutputPool;
 
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
             foreach (var cu in filteredUnits)
@@ -590,16 +608,8 @@ namespace CSA.Tests
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
-            var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                      let cuCast = cu as ContentUnit
-                      where cuCast.HasMetadataSlot(ContentPool)
-                      where cuCast.Metadata[ContentPool].Equals(outputPool)
-                      select cuCast;
+            TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
 
-            Assert.Equal(filteredUnits.Length, CUs.Count());
-
-            // Verify that L_SelectedContentUnit links have been correctly added. 
-            
         }
 
         public static IEnumerable<object[]> Data_TestExecute_ScheduledIDSelector()
@@ -635,39 +645,38 @@ namespace CSA.Tests
              * KS_ScheduledFilterSelector: the filter selector to test            
              * ContentUnit[]: array of CUs to add to the blackboard
              * U_IDSelectRequest[]: array of U_IDSelectRequests to add to the blackboard            
-             * ContentUnit[]: CUs which should be copied to the output pool
-             * string: name of the output pool            
+             * ContentUnit[]: CUs which should be copied to the output pool           
              */
 
             return new List<object[]>
             {
                 // Filter with default filter condition
                 new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu1, cu3, }, outputPool }, 
+                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu1, cu3, } }, 
 
                 // Filter with input pool and output pool using input pool selection
                 new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] {cu1 }, outputPool }, 
+                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] {cu1 } }, 
 
                 // Filter with output pool and specified filter
                 new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu3 }, outputPool },
+                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu3 } },
 
                 // Filter with input and output pools and specified filter
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter), 
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0], outputPool },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0] },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new ContentUnit[0], new U_IDSelectRequest[0], 
-                    new ContentUnit[0], outputPool},
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new ContentUnit[0], new U_IDSelectRequest[0],
+                    new ContentUnit[0]},
 
                 // Nothing in the input pool and no filter
                 new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0], outputPool },
+                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0] },
 
                 // Multiple U_IDRequests
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter), 
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1, idReq2, idReq3}, new ContentUnit[] { cu2 }, outputPool },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1, idReq2, idReq3}, new ContentUnit[] { cu2 } },
 
              };
         }
@@ -675,7 +684,7 @@ namespace CSA.Tests
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledIDSelector))]
         public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
-            U_IDSelectRequest[] reqsToAdd, ContentUnit[] filteredUnits, string outputPool)
+            U_IDSelectRequest[] reqsToAdd, ContentUnit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
@@ -695,32 +704,17 @@ namespace CSA.Tests
             // Executed the filter selector
             filterSelector.Execute();
 
-            // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
-            foreach (var cu in filteredUnits)
-            {
-                ISet<(IUnit CU, string, LinkDirection)> s = blackboard.LookupLinks(cu);
-                int count = s.Count();
-                Assert.Equal(1, count);
-                ContentUnit cuCopy = s.First().CU as ContentUnit;
-                Assert.True(cuCopy.HasMetadataSlot(ContentPool));
-                Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
-            }
+            string outputPool = filterSelector.OutputPool;
 
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
             foreach (var cu in filteredUnits)
             {
                 ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
                 TestFilterLinks(s, outputPool);
-             }
+            }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
-            var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                      let cuCast = cu as ContentUnit
-                      where cuCast.HasMetadataSlot(ContentPool)
-                      where cuCast.Metadata[ContentPool].Equals(outputPool)
-                      select cuCast;
-
-            Assert.Equal(filteredUnits.Length, CUs.Count());
+            TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
 
             // Grab all of the reqs on the blackboard and verify that there are none (should have all been deleted).
             ISet<IUnit> reqs = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
@@ -731,7 +725,7 @@ namespace CSA.Tests
         {
             string inputPool = "inputPool1";
             string outputPool = "outputPool1";
-            int seed = 1; 
+            int seed = 1;
 
             IBlackboard blackboard = new Blackboard();
 
@@ -757,48 +751,49 @@ namespace CSA.Tests
             * IBlackboard: blackboard, 
             * KS_ScheduledFilterSelector: the filter selector to test            
             * ContentUnit[]: array of CUs to add to the blackboard
-            * ContentUnit[]: units to select among (that pass inputPool and testfilter filters)           
-            * string: name of the output pool     
-            * int: the number of CUs to select           
-            * int: the seed for the random number generator
+            * ContentUnit[]: units to select among (that pass inputPool and testfilter filters)              
             */
 
             return new List<object[]>
             {
                 // Filter with default filter condition and output pool using seed of 1
                 new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, seed), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] {cu1, cu2, cu3, cu4 }, KS_ScheduledUniformDistributionSelector.DefaultOutputPoolName, 1, seed }, 
+                    new ContentUnit[] {cu1, cu2, cu3, cu4 } }, 
 
                 // Filter with specified output pool, using seed of 1, requesting 1 CU
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, outputPool, seed), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, outputPool, 1, seed }, 
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, outputPool, seed),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu1, cu2, cu3, cu4 } }, 
 
                 // Filter with specified input and output pools, specified number to select and seed of 1
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu1, cu2, cu3 }, outputPool, 2, seed },
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed),
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu1, cu2, cu3 } },
 
                 // Filter with specified input and output pools, specified filter, specified number to select and seed of 1
                 new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, TestFilter, 1, seed),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu2, cu3 }, outputPool, 1, seed},
+                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu2, cu3 } },
 
                 // Empty blackboard
                 new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, 5), new ContentUnit[0],
-                    new ContentUnit[0], outputPool, 5, seed},
+                    new ContentUnit[0] },
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1), 
-                    new ContentUnit[] { cu4 }, new ContentUnit[0], outputPool, 1, seed },
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1),
+                    new ContentUnit[] { cu4 }, new ContentUnit[0] },
 
              };
         }
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledUniformDistributionSelector))]
-        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, 
-            ContentUnit[] unitsToAdd, ContentUnit[] unitsToSelectFrom, string outputPool, int numberToSelect, int seed)
+        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_ScheduledUniformDistributionSelector filterSelector,
+            ContentUnit[] unitsToAdd, ContentUnit[] unitsToSelectFrom)
         {
-            Random random = new Random(seed);
-             
+            int seed = filterSelector.Seed;
+            uint numberToSelect = filterSelector.NumberToSelect;
+            string outputPool = filterSelector.OutputPool;
+
+            System.Random random = new System.Random(seed);
+
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
 
@@ -813,7 +808,7 @@ namespace CSA.Tests
 
             // Check that the uniform distriubtion selector selected the correct numberToSelect content units
 
-            for(int i = 0; i < Math.Min(numberToSelect, unitsToSelectFrom.Length); i++)
+            for (int i = 0; i < Math.Min(numberToSelect, unitsToSelectFrom.Length); i++)
             {
                 int r = i + random.Next(unitsToSelectFrom.Length - i);
                 ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unitsToSelectFrom[r]);
@@ -821,13 +816,7 @@ namespace CSA.Tests
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as numberToSelect
-            var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                      let cuCast = cu as ContentUnit
-                      where cuCast.HasMetadataSlot(ContentPool)
-                      where cuCast.Metadata[ContentPool].Equals(outputPool)
-                      select cuCast;
-
-            Assert.Equal(Math.Min(numberToSelect, unitsToSelectFrom.Length), CUs.Count());
+            TestNumberOfCUsInOutputPool((int)Math.Min(numberToSelect, unitsToSelectFrom.Length), blackboard, outputPool);
         }
 
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPoolCleaner()
@@ -835,7 +824,7 @@ namespace CSA.Tests
             string pool1 = "pool1";
             string pool2 = "pool2";
             string pool3 = "pool3";
-         
+
             IBlackboard blackboard = new Blackboard();
 
             ContentUnit cu1 = new ContentUnit();
@@ -859,7 +848,7 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // One pool to clean
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }), 
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
                     new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
 
                 // Two pools to clean
@@ -875,7 +864,7 @@ namespace CSA.Tests
                     new ContentUnit[] { cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }), 
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
                     new ContentUnit[0], new ContentUnit[0] },
 
                 // No filter pools specified in constructor
@@ -955,10 +944,10 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
-        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU, 
+        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU,
             ContentUnit originalCU, ContentUnit[] choices)
         {
-            Debug.Assert((selectedCU != null && originalCU != null) || (selectedCU == null));
+            System.Diagnostics.Debug.Assert((selectedCU != null && originalCU != null) || (selectedCU == null));
 
             blackboard.Clear();
 
@@ -1009,13 +998,214 @@ namespace CSA.Tests
 
             if (ks.ChoicesToDisplay.Length > 0)
             {
-                Random random = new Random();
+                var random = new System.Random();
                 int r = random.Next(ks.ChoicesToDisplay.Length);
                 ks.SelectChoice(r);
                 ISet<IUnit> idSelectRequest = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
                 Assert.Equal(1, idSelectRequest.Count);
                 Assert.True(((U_IDSelectRequest)idSelectRequest.First()).TargetContentUnitID.Equals(choices[r].Metadata[TargetContentUnitID]));
             }
+        }
+
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledPrologEval()
+        {
+            string inputPool = "inputPool1";
+            string outputPool = "outputPool1";
+
+            IBlackboard blackboard = new Blackboard();
+
+            ContentUnit cu1 = new ContentUnit();
+            ContentUnit cu2 = new ContentUnit();
+            ContentUnit cu3 = new ContentUnit();
+            ContentUnit cu4 = new ContentUnit();
+
+            cu1.Metadata[ContentPool] = inputPool;
+            cu2.Metadata[ContentPool] = inputPool;
+            // cu3 and cu4 are in the global content pool (no content pool specified) 
+
+            cu1.Metadata[ContentUnitID] = "ID1";
+            cu2.Metadata[ContentUnitID] = "ID2";
+            cu3.Metadata[ContentUnitID] = "ID3";
+            cu4.Metadata[ContentUnitID] = "ID4";
+
+            // Prolog applicability tests
+            cu1.Metadata[ApplTest_Prolog] = "frustrated.";
+            cu2.Metadata[ApplTest_Prolog] = "Character:frustrated(Character).";
+            cu3.Metadata[ApplTest_Prolog] = "frustrated.";
+            // cu4 doesn't have the ApplTest_Prolog slot defined, so it shouldn't be filtered by KS_ScheduledPrologEval
+
+            U_PrologEvalRequest prologReq1 = new U_PrologEvalRequest(ApplTest_Prolog, ApplTestResult, ApplTestBindings_Prolog);
+
+            U_PrologKB prologKB = new U_PrologKB("Global");
+
+            /*
+             * For some reason the unit testing infrastructure is making a folder way down in the bin directory the current folder. So using a relative 
+             * file to the source folder for CATests.
+             */
+            prologKB.Consult("../../../PrologTest.prolog");
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard, 
+             * KS_ScheduledPrologEval[]: the ScheduledPrologEval to test            
+             * ContentUnit[]: array of CUs to add to the blackboard
+             * U_PrologEvalRequest[]: array of U_PrologEvalRequests to add to the blackboard   
+             * U_PrologKB: the prolog KB to add to the blackboard
+             * ContentUnit[]: Content units on which the prolog applicability test was evaluated.
+             * string[]: Array of assertions to make in prolog KB.            
+             * (ContentUnit, bool)[]: Array of evaluation results for ApplTestResult
+             * (ContentUnit, object)[]: Array of bindings for ApplTestBindigns_Prolog   
+             */
+
+            return new List<object[]>
+            {
+                // No specific input pool (global), no queries with bindings, assertion that makes queries true. 
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu1, cu3, cu4 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu1, cu3 }, new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[] { (cu1, true), (cu3, true) },
+                    new (ContentUnit, object)[0] },
+
+                // No specific input pool (global), no queries with bindings, no assertion to make queries true.  
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu1, cu3, cu4 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu1, cu3 }, new string[0],
+                    new (ContentUnit, bool)[] { (cu1, false), (cu3, false) },
+                    new (ContentUnit, object)[0] },
+
+                // No specific input pool (global), query with binding, assertion to make queries true.
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu2 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu2 }, new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[] { (cu2, true) },
+                    new (ContentUnit, object)[] { (cu2, Symbol.Intern("character1")) } },
+
+                // No specific input pool (global), query with binding, no assertion to make queries true.
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu2 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu2 }, new string[0],
+                    new (ContentUnit, bool)[] { (cu2, false) },
+                    new (ContentUnit, object)[0] }, 
+
+                // No specific input pool (global), some queries with bindings, some without, assertion to make queries true.
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu1, cu2, cu3 }, new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[] { (cu1, true), (cu2, true), (cu3, true) },
+                    new (ContentUnit, object)[] { (cu1, new LogicVariable("V1")), (cu2, Symbol.Intern("character1")), (cu3, new LogicVariable("V2")) } },
+
+                // No prolog eval request 
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
+                    new U_PrologEvalRequest[0], prologKB, new ContentUnit[0], new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[0],
+                    new (ContentUnit, object)[0] },
+
+                // No content units on blackboard
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool), new ContentUnit[0],
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[0], new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[0],
+                    new (ContentUnit, object)[0] },
+
+                // Specifying input pool, some queries with bindings, some without, assertion to make queries true.
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
+                    new U_PrologEvalRequest[] { prologReq1 }, prologKB, new ContentUnit[] { cu1, cu2 }, new string[] { "dissed(character1, me)." },
+                    new (ContentUnit, bool)[] { (cu1, true), (cu2, true) },
+                    new (ContentUnit, object)[] { (cu1, new LogicVariable("V1")), (cu2, Symbol.Intern("character1")) } },
+
+            };
+        }
+
+
+        [Theory]
+        [MemberData(nameof(Data_TestExecute_ScheduledPrologEval))]
+        public void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_ScheduledPrologEval prologEval, ContentUnit[] unitsToAdd,
+            U_PrologEvalRequest[] reqsToAdd, U_PrologKB prologKB, ContentUnit[] evaluatedUnits, string[] assertionsToAdd, (ContentUnit cu, bool result)[] evalResults,
+            (ContentUnit cu, object binding)[] bindings)
+        {
+            // Clear the blackboard of any previous testing state
+            blackboard.Clear();
+
+            // Add the content units to the blackboard
+            foreach (var cu in unitsToAdd)
+            {
+                blackboard.AddUnit(cu);
+            }
+
+            blackboard.AddUnit(prologKB);
+
+            if (assertionsToAdd.Length > 0)
+            {
+                foreach (string assertion in assertionsToAdd)
+                {
+                    output.WriteLine("Adding assertion: " + assertion);
+                    prologKB.Assert(assertion);
+                }
+            }
+
+            // Add the requests to the blackboad
+            foreach (var req in reqsToAdd)
+            {
+                blackboard.AddUnit(req);
+            }
+
+            prologEval.XunitOutput = output;
+
+            // Executed the filter selector
+            prologEval.Execute();
+
+            // Remove any assertions that were added for this test case
+            if (assertionsToAdd.Length > 0)
+            {
+                foreach (string assertion in assertionsToAdd)
+                {
+                    output.WriteLine("Removing assertion: " + assertion);
+                    prologKB.Retract(assertion);
+                }
+            }
+
+            string outputPool = prologEval.OutputPool;
+
+            // Iterate through each of the units which should have been evaluated and see if there's a copy of them in the output pool.
+            // Also test that the evaluation results and bindings are correct for each evaluated unit.
+            foreach (var contentUnit in evaluatedUnits)
+            {
+                output.WriteLine("Testing results and bindings for ContentUnitID: " + contentUnit.Metadata[ContentUnitID]);
+
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(contentUnit);
+                TestFilterLinks(s, outputPool);
+                if (evalResults.Length > 0)
+                {
+                    (ContentUnit cu, bool result) =
+                        Array.Find(evalResults, resultTuple => resultTuple.cu == contentUnit);
+                    Assert.NotNull(cu);
+                    (IUnit resultUnit, _, _) = s.First();
+                    ContentUnit resultCU = resultUnit as ContentUnit;
+                    Assert.True(resultCU.HasMetadataSlot(ApplTestResult), "ContentUnit missing ApplTestResult");
+                    Assert.True(resultCU.Metadata[ApplTestResult].Equals(result),
+                        "Prolog evaluation result not correct: " + resultCU.Metadata[ApplTestResult] + " != " + result);
+                }
+
+                if (bindings.Length > 0)
+                {
+                    (ContentUnit cu, object binding) =
+                        Array.Find(bindings, bindingTuple => bindingTuple.cu == contentUnit);
+                    Assert.NotNull(cu);
+                    (IUnit resultUnit, _, _) = s.First();
+                    ContentUnit resultCU = resultUnit as ContentUnit;
+                    Assert.True(resultCU.HasMetadataSlot(ApplTestBindings_Prolog), "ContentUnit missing ApplTestBindings_Prolog");
+                    var checkBinding = Term.Unify(resultCU.Metadata[ApplTestBindings_Prolog], binding);
+                    output.WriteLine("checkBinding.Next(): " + checkBinding.GetEnumerator().MoveNext());
+                    Assert.True(checkBinding.GetEnumerator().MoveNext(),
+                        "Variable binding not correct: " + resultCU.Metadata[ApplTestBindings_Prolog] + " != " + binding);
+                }
+            }
+
+            // Grab all the content units in the output pool and verify that there's the same number of them as evaluatedUnits
+            TestNumberOfCUsInOutputPool(evaluatedUnits.Length, blackboard, outputPool);
+
+
+            // Grab all of the reqs on the blackboard and verify that there are none (should have all been deleted).
+            ISet<IUnit> reqs = blackboard.LookupUnits(U_PrologEvalRequest.TypeName);
+            Assert.False(reqs.Any());
+        }
+
+        public TestKnowledgeSources(ITestOutputHelper output)
+        {
+            this.output = output;
         }
 
     }

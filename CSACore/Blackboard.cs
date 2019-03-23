@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace CSA.Core
 {
@@ -81,6 +83,52 @@ namespace CSA.Core
         public ISet<IUnit> LookupUnits(string unitType)
         {
             return dict.TryGetValue(unitType, out ISet<IUnit> units) ?  new HashSet<IUnit>(units) : new HashSet<IUnit>();
+        }
+
+        /*
+         * For singleton units on the blackboard, looks up and returns the singleton as an IUnit. If there is no unit of the type unitType on the 
+         * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
+         */
+        public IUnit LookupSingleton(string unitType)
+        {
+            if (dict.TryGetValue(unitType, out ISet<IUnit> units))
+            {
+                // Found at least one IUnit of type unitType
+                if (units.Count > 1)
+                {
+                    throw new InvalidOperationException("IBlackboard.LooupSingleton called for unit type with >1 unit instances on the blackboard.");
+                }
+                return units.First();
+            }
+            else
+            {
+                return null; // No IUnit of unitType found on the blackboard
+            }
+        }
+
+        /*
+         * For singleton units on the blackboard, looks up and returns the singleton of type T. If there is no unit of the type unitType on the 
+         * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
+         * fixme: get rid of the unitType argument and use TypeOf. Verify that typeOf and GetUnitTypeName return the same thing. 
+         * update: typeof and GetType().FullName *do* have the same value. 
+         * fixme: eliminate maually specifying type names in calls to lookupUnits throughout the code.        
+         */
+        public T LookupSingleton<T>(string unitType) where T : IUnit
+        {
+            if (dict.TryGetValue(unitType, out ISet<IUnit> units))
+            {
+                // Found at least one IUnit of type unitType
+                if (units.Count > 1)
+                {
+                    throw new InvalidOperationException("IBlackboard.LooupSingleton called for unit type with >1 unit instances on the blackboard.");
+                }
+                return (T)units.First();
+            }
+            else
+            {
+                return default(T); // No IUnit of unitType found on the blackboard
+            }
+
         }
 
         // Returns true if the argument unit is on the blackboard. 
