@@ -4,8 +4,6 @@ namespace CSA.KnowledgeUnits
 {
     public class U_PrologEvalRequest : Unit
     {
-        public static new string TypeName { get; } = new U_PrologEvalRequest("", "").GetType().FullName;
-
         // fixme: to get prolog working at first not implementing pools but will come back to this
         public string InputPool { get; }
         public string OutputPool { get; }

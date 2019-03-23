@@ -5,8 +5,6 @@ namespace CSA.Core
     // Base class for all Blackboard Units.
     public class Unit : IUnit
     {
-        public static string TypeName { get; } = new Unit().GetType().FullName;
-
         public IDictionary<string, object> Properties { get; }
 
         public Unit()

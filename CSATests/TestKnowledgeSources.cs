@@ -337,12 +337,12 @@ namespace CSA.Tests
             KSAs.ElementAt(0).Execute();
 
             // Four content units total (the original three plus a new selected one)
-            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
+            ISet<ContentUnit> cuSet = blackboard.LookupUnits<ContentUnit>();
             Assert.Equal(4, cuSet.Count);
 
             // Query for selected content units
-            var selectedList = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                               where ((ContentUnit)cu).HasMetadataSlot(SelectedContentUnit)
+            var selectedList = from cu in blackboard.LookupUnits<ContentUnit>()
+                               where cu.HasMetadataSlot(SelectedContentUnit)
                                select cu;
 
             // One content unit has been selected.
@@ -350,10 +350,10 @@ namespace CSA.Tests
             Assert.Equal(1, size);
 
             // The right content unit has been selected. 
-            Assert.Equal("foo", ((ContentUnit)selectedList.ElementAt(0)).Metadata[ContentUnitID]);
+            Assert.Equal("foo", selectedList.ElementAt(0).Metadata[ContentUnitID]);
 
             // The query has been deleted. 
-            ISet<IUnit> querySet = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+            ISet<U_IDSelectRequest> querySet = blackboard.LookupUnits<U_IDSelectRequest>();
             Assert.Equal(0, querySet.Count);
 
 
@@ -395,12 +395,12 @@ namespace CSA.Tests
             KSAs.ElementAt(0).Execute();
 
             // Three content units total (no selected unit)
-            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
+            ISet<ContentUnit> cuSet = blackboard.LookupUnits<ContentUnit>();
             Assert.Equal(3, cuSet.Count);
 
             // Query for selected content units
-            var selectedList = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                               where ((ContentUnit)cu).HasMetadataSlot(SelectedContentUnit)
+            var selectedList = from cu in blackboard.LookupUnits<ContentUnit>()
+                               where cu.HasMetadataSlot(SelectedContentUnit)
                                select cu;
 
             // No content unit selected (since "qux" matches no ID.
@@ -408,7 +408,7 @@ namespace CSA.Tests
             Assert.Equal(0, size);
 
             // The query has been deleted. 
-            ISet<IUnit> querySet = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+            ISet<U_IDSelectRequest> querySet = blackboard.LookupUnits<U_IDSelectRequest>();
             Assert.Equal(0, querySet.Count);
         }
 
@@ -571,11 +571,10 @@ namespace CSA.Tests
 
         static private void TestNumberOfCUsInOutputPool(int desiredNumberOfCUs, IBlackboard blackboard, string outputPool)
         {
-            var CUs = from cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                      let cuCast = cu as ContentUnit
-                      where cuCast.HasMetadataSlot(ContentPool)
-                      where cuCast.Metadata[ContentPool].Equals(outputPool)
-                      select cuCast;
+            var CUs = from cu in blackboard.LookupUnits<ContentUnit>()
+                      where cu.HasMetadataSlot(ContentPool)
+                      where cu.Metadata[ContentPool].Equals(outputPool)
+                      select cu;
 
             Assert.Equal(desiredNumberOfCUs, CUs.Count());
         }
@@ -717,7 +716,7 @@ namespace CSA.Tests
             TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
 
             // Grab all of the reqs on the blackboard and verify that there are none (should have all been deleted).
-            ISet<IUnit> reqs = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+            ISet<U_IDSelectRequest> reqs = blackboard.LookupUnits<U_IDSelectRequest>();
             Assert.False(reqs.Any());
         }
 
@@ -892,7 +891,7 @@ namespace CSA.Tests
             cleaner.Execute();
 
             // Check that only the remaining units are on the blackboard 
-            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
+            ISet<ContentUnit> cuSet = blackboard.LookupUnits<ContentUnit>();
             Assert.True(cuSet.SetEquals(unitsRemaining));
         }
 
@@ -1001,9 +1000,9 @@ namespace CSA.Tests
                 var random = new System.Random();
                 int r = random.Next(ks.ChoicesToDisplay.Length);
                 ks.SelectChoice(r);
-                ISet<IUnit> idSelectRequest = blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+                ISet<U_IDSelectRequest> idSelectRequest = blackboard.LookupUnits<U_IDSelectRequest>();
                 Assert.Equal(1, idSelectRequest.Count);
-                Assert.True(((U_IDSelectRequest)idSelectRequest.First()).TargetContentUnitID.Equals(choices[r].Metadata[TargetContentUnitID]));
+                Assert.True(idSelectRequest.First().TargetContentUnitID.Equals(choices[r].Metadata[TargetContentUnitID]));
             }
         }
 
@@ -1199,7 +1198,7 @@ namespace CSA.Tests
 
 
             // Grab all of the reqs on the blackboard and verify that there are none (should have all been deleted).
-            ISet<IUnit> reqs = blackboard.LookupUnits(U_PrologEvalRequest.TypeName);
+            ISet<U_PrologEvalRequest> reqs = blackboard.LookupUnits<U_PrologEvalRequest>();
             Assert.False(reqs.Any());
         }
 

@@ -5,8 +5,6 @@ namespace CSA.KnowledgeUnits
 {
     public class U_PrologKB : Unit
     {
-        public static new string TypeName { get; } = new U_PrologKB("").GetType().FullName;
-
         public KnowledgeBase KB { get; }
         public string KBName { get; }
 

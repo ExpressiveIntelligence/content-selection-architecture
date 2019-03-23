@@ -4,8 +4,6 @@ namespace CSA.Core
 {
     public class ContentUnit : Unit
     {
-        public static new string TypeName { get; } = new ContentUnit().GetType().FullName;
-
         // fixme: consider changing string to object so that hashes and comparisons are more efficient
         public IDictionary<string, object> Metadata { get; }
 

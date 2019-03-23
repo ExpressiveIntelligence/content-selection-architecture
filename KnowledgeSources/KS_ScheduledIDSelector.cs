@@ -18,7 +18,7 @@ namespace CSA.KnowledgeSources
         {
             // fixme: consider adding additional fields to request units to indicate additional filtering, so that filter logic is associated with the request rather than the KS.
             // Use LINQ to create a collection of the requested U_IDSelectRequests on the blackboard.
-            ISet<IUnit> requests = m_blackboard.LookupUnits(U_IDSelectRequest.TypeName);
+            ISet<U_IDSelectRequest> requests = m_blackboard.LookupUnits<U_IDSelectRequest>();
      
             if (requests.Any())
             {
@@ -37,12 +37,11 @@ namespace CSA.KnowledgeSources
                      */                    
                     
                     string targetContentUnitID = request.TargetContentUnitID;
-                    var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName) // lookup content units
-                                       let castCU = contentUnit as ContentUnit
-                                       where FilterConditionDel(castCU) // where the content unit satisfies some user provided filter condition 
-                                       where (castCU).HasMetadataSlot(ContentUnitID) // where the content unit has an ID
-                                       where (castCU).Metadata[ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
-                                       select castCU;
+                    var contentUnits = from contentUnit in m_blackboard.LookupUnits<ContentUnit>() // lookup content units
+                                       where FilterConditionDel(contentUnit) // where the content unit satisfies some user provided filter condition 
+                                       where (contentUnit).HasMetadataSlot(ContentUnitID) // where the content unit has an ID
+                                       where (contentUnit).Metadata[ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
+                                       select contentUnit;
 
                     bindings[i++] = new Dictionary<string, object>
                     {

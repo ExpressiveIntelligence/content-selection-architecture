@@ -20,7 +20,7 @@ namespace CSA.KnowledgeSources
         public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the requested U_IDQueries on the blackboard.
-            var requests = from request in m_blackboard.LookupUnits(U_IDSelectRequest.TypeName) // Lookup ID queries
+            var requests = from request in m_blackboard.LookupUnits<U_IDSelectRequest>() // Lookup ID queries
                           where // where the query has not been previously matched by this knowledge source precondition
                             (!request.Properties.ContainsKey(KSPreconditionMatched)) ||
                             (!((ISet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
@@ -63,13 +63,14 @@ namespace CSA.KnowledgeSources
         internal override void Execute(IDictionary<string, object> boundVars)
         {
             string targetContentUnitID = ((U_IDSelectRequest)boundVars[IDSelectRequest]).TargetContentUnitID;
-            var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName) // lookup content units
-                               where ((ContentUnit)contentUnit).HasMetadataSlot(ContentUnitID) // where the content unit has an ID
-                               where ((ContentUnit)contentUnit).Metadata[ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
+            var contentUnits = from contentUnit in m_blackboard.LookupUnits<ContentUnit>() // lookup content units
+                               where contentUnit.HasMetadataSlot(ContentUnitID) // where the content unit has an ID
+                               where contentUnit.Metadata[ContentUnitID].Equals(targetContentUnitID) // and the ID equals the target ID
                                select contentUnit;
+
             //fixme: for the purposes of getting something running quickly, I'm doing the random selection among potentially multiple content units here.
             // However, this should be done as a pooling process with some other selector selecting from the pool.
-            if (contentUnits.Count() > 0)
+            if (contentUnits.Any())
             {
                 // One or more content units matching the ContentUnitID in the U_IDQuery were found.
                 // fixme: if no matching content unit was found, perhaps the KS should post something indiciating the execution failed. 
@@ -77,7 +78,7 @@ namespace CSA.KnowledgeSources
                 // for each case. So probably better to have more general semantics for KSs to post success and failure into the trace. 
 
                 int r = m_rand.Next(contentUnits.Count());
-                ContentUnit randUnit = (ContentUnit)contentUnits.ElementAt(r);
+                ContentUnit randUnit = contentUnits.ElementAt(r);
 
                 // Need to store the selected content unit. Creating a new type to do this seems awkward (SelectedContentUnit). 
                 // Could do this with links: SelectedContentUnit link points at the correct CU. But what should it point from?

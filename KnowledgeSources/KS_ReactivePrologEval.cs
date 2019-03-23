@@ -7,6 +7,10 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
+    /*
+     * fixme: ReactivePrologEval has not been tested and is currently deprecated by ScheduledPrologEval. 
+     * I will return to making ReactivePrologEval work when I have a general solution for reactive knowledge source activation. 
+     */
     public class KS_ReactivePrologEval : ReactiveKnowledgeSource
     {
         // Name of the bound context variables
@@ -16,7 +20,7 @@ namespace CSA.KnowledgeSources
         public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the requested U_PrologEvalQueries on the blackboard.
-            var requests = from request in m_blackboard.LookupUnits(U_PrologEvalRequest.TypeName) // Lookup ID select requests
+            var requests = from request in m_blackboard.LookupUnits<U_PrologEvalRequest>() // Lookup ID select requests
                            where // where the request has not been previously matched by this knowledge source precondition
                             (!request.Properties.ContainsKey(KSPreconditionMatched)) ||
                             (!((ISet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
@@ -24,12 +28,11 @@ namespace CSA.KnowledgeSources
 
             IKnowledgeSourceActivation[] activations = new IKnowledgeSourceActivation[requests.Count()];
 
-            var prologKB = m_blackboard.LookupUnits(U_PrologKB.TypeName); // Lookup prolog kbs.
-                           
-            // There should just be one prolog KB. 
+            // Currently only support one prolog KB 
             // fixme: eventually may want to support multiple prolog KBs so will need mechanism for supporting them as well as inheritance 
-            Debug.Assert(prologKB.Count() == 1);
 
+            var prologKB = m_blackboard.LookupSingleton<U_PrologKB>(); // Lookup prolog kbs.
+                           
             // Iterate through each of the requests, creating KnowledgeSourceActivations
             int i = 0;
             foreach (var request in requests)
@@ -37,7 +40,7 @@ namespace CSA.KnowledgeSources
                 var boundVars = new Dictionary<string, object>
                 {
                     [PrologEvalRequest] = request,
-                    [PrologKB] = prologKB.First()
+                    [PrologKB] = prologKB
                 };
 
                 activations[i++] = new KnowledgeSourceActivation(this, boundVars);

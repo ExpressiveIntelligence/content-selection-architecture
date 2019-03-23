@@ -78,14 +78,12 @@ namespace CSA.Tests
 
             TestUnit1 u1 = new TestUnit1("one");
             TestUnit2 u2 = new TestUnit2(1);
-            string type1 = u1.GetType().FullName;
-            string type2 = u2.GetType().FullName;
 
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
 
-            Assert.NotNull(blackboard.LookupUnits(type1));
-            Assert.NotNull(blackboard.LookupUnits(type2));
+            Assert.NotNull(blackboard.LookupUnits<TestUnit1>());
+            Assert.NotNull(blackboard.LookupUnits<TestUnit2>());
         }
 
         [Fact]
@@ -100,17 +98,14 @@ namespace CSA.Tests
             TestUnit2 u4 = new TestUnit2(1);
             TestUnit2 u5 = new TestUnit2(2);
 
-            string type1 = u1.GetType().FullName;
-            string type2 = u4.GetType().FullName;
-
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
             blackboard.AddUnit(u3);
             blackboard.AddUnit(u4);
             blackboard.AddUnit(u5);
 
-            ISet<IUnit> set1 = blackboard.LookupUnits(type1);
-            ISet<IUnit> set2 = blackboard.LookupUnits(type2);
+            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
+            ISet<TestUnit2> set2 = blackboard.LookupUnits<TestUnit2>();
 
             Assert.Equal(3, set1.Count);
             Assert.Equal(2, set2.Count);
@@ -124,22 +119,20 @@ namespace CSA.Tests
 
             TestUnit1 u1 = new TestUnit1("one");
             TestUnit2 u2 = new TestUnit2(1);
-            string type1 = u1.GetType().FullName;
-            string type2 = u2.GetType().FullName;
 
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
 
-            Assert.Equal(1, blackboard.LookupUnits(type1).Count);
-            Assert.Equal(1, blackboard.LookupUnits(type2).Count);
+            Assert.Equal(1, blackboard.LookupUnits<TestUnit1>().Count);
+            Assert.Equal(1, blackboard.LookupUnits<TestUnit2>().Count);
 
             blackboard.RemoveUnit(u1);
-            Assert.Equal(0, blackboard.LookupUnits(type1).Count);
-            Assert.Equal(1, blackboard.LookupUnits(type2).Count);
+            Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
+            Assert.Equal(1, blackboard.LookupUnits<TestUnit2>().Count);
    
             blackboard.RemoveUnit(u2);
-            Assert.Equal(0, blackboard.LookupUnits(type1).Count);
-            Assert.Equal(0, blackboard.LookupUnits(type2).Count);
+            Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
+            Assert.Equal(0, blackboard.LookupUnits<TestUnit2>().Count);
         }
 
         [Fact]
@@ -154,17 +147,14 @@ namespace CSA.Tests
             TestUnit2 u4 = new TestUnit2(1);
             TestUnit2 u5 = new TestUnit2(2);
 
-            string type1 = u1.GetType().FullName;
-            string type2 = u4.GetType().FullName;
-
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
             blackboard.AddUnit(u3);
             blackboard.AddUnit(u4);
             blackboard.AddUnit(u5);
 
-            ISet<IUnit> set1 = blackboard.LookupUnits(type1);
-            ISet<IUnit> set2 = blackboard.LookupUnits(type2);
+            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
+            ISet<TestUnit2> set2 = blackboard.LookupUnits<TestUnit2>();
 
             Assert.Equal(3, set1.Count);
             Assert.Equal(2, set2.Count);
@@ -172,8 +162,8 @@ namespace CSA.Tests
             blackboard.RemoveUnit(u1);
             blackboard.RemoveUnit(u4);
 
-            set1 = blackboard.LookupUnits(type1);
-            set2 = blackboard.LookupUnits(type2);
+            set1 = blackboard.LookupUnits<TestUnit1>();
+            set2 = blackboard.LookupUnits<TestUnit2>();
 
             Assert.Equal(2, set1.Count);
             Assert.Equal(1, set2.Count);
@@ -191,15 +181,15 @@ namespace CSA.Tests
             string type1 = u1.GetType().FullName;
 
             blackboard.AddUnit(u1);
-            ISet<IUnit> set1 = blackboard.LookupUnits(type1);
+            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
             Assert.Equal(1, set1.Count);
 
             set1.Add(u2);
-            ISet<IUnit> set2 = blackboard.LookupUnits(type1);
+            ISet<TestUnit1> set2 = blackboard.LookupUnits<TestUnit1>();
             Assert.Equal(1, set2.Count);
 
             set2.Remove(u1);
-            ISet<IUnit> set3 = blackboard.LookupUnits(type1);
+            ISet<TestUnit1> set3 = blackboard.LookupUnits<TestUnit1>();
             Assert.Equal(1, set3.Count);
         }
 

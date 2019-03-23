@@ -36,10 +36,9 @@ namespace CSA.KnowledgeSources
 
         protected override IDictionary<string, object>[] Precondition()
         {
-            var contentUnits = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName)
-                               let castCU = contentUnit as ContentUnit
-                               where FilterConditionDel(castCU)
-                               select castCU;
+            var contentUnits = from contentUnit in m_blackboard.LookupUnits<ContentUnit>()
+                               where FilterConditionDel(contentUnit)
+                               select contentUnit;
 
             if (contentUnits.Any())
             {

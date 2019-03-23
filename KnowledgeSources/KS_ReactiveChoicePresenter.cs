@@ -33,7 +33,7 @@ namespace CSA.KnowledgeSources
         public override IKnowledgeSourceActivation[] Precondition()
         {
             // Use LINQ to create a collection of the selected content units on the blackkboard
-            var CUs = from ContentUnit cu in m_blackboard.LookupUnits(ContentUnit.TypeName)
+            var CUs = from ContentUnit cu in m_blackboard.LookupUnits<ContentUnit>()
                       where cu.HasMetadataSlot(SelectedContentUnit) // look for a selected content unit
                       where // that has not been previously matched by this precondition
                         (!cu.Properties.ContainsKey(KSPreconditionMatched)) ||

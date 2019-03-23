@@ -19,23 +19,22 @@ namespace CSA.Core
         // fixme: when deleting a unit, make sure any links associated with the unit are deleted. 
         bool RemoveUnit(IUnit u);
 
-        // Returns a set of knowledge units on the blackboard matching the unit type. 
-        ISet<IUnit> LookupUnits(string unitType);
-
         /*
-         * For singleton units on the blackboard, looks up and returns the singleton as an IUnit. If there is no unit of the type unitType on the 
-         * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
+         * Looks up and returns all the units of type T on the blackboard.
          */
-        IUnit LookupSingleton(string unitType);
+        ISet<T> LookupUnits<T>() where T : IUnit;
 
         /*
          * For singleton units on the blackboard, looks up and returns the singleton of type T. If there is no unit of the type unitType on the 
          * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
          */
-        T LookupSingleton<T>(string unitType) where T : IUnit;
+        T LookupSingleton<T>() where T : IUnit;
 
         // Returns true if the argument unit is on the blackboard. 
         bool ContainsUnit(IUnit u);
+
+        // fixme: Consider adding a ContainsAny() method
+        // bool ContainsAny<T>();
 
         // Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
         // link can be added, false otherwise. If directed == true, the link is a directed link going from the first unit to the second. 

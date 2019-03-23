@@ -27,16 +27,16 @@ namespace CSA.KnowledgeSources
              * request rather than the KS.
              */
             // Use LINQ to create a collection of the requested U_PrologEvalQueries on the blackboard.
-            var requests = m_blackboard.LookupUnits(U_PrologEvalRequest.TypeName);
+            var requests = m_blackboard.LookupUnits<U_PrologEvalRequest>();
 
             if (requests.Any())
             {
-                // There are some requests - iterate through each of the requests creating bindings for the filtered content units
+                // There are some requests - iterate through each of the requests creating bindings for each request
 
                 var bindings = new IDictionary<string, object>[requests.Count()];
 
                 int i = 0;
-                foreach (U_PrologEvalRequest request in requests)
+                foreach (var request in requests)
                 {
                     bindings[i++] = new Dictionary<string, object>
                     {
@@ -56,19 +56,14 @@ namespace CSA.KnowledgeSources
             string prologQuerySlotName = ((U_PrologEvalRequest)boundVars[PrologEvalRequest]).PrologQuerySlotName;
             string prologResultSlotName = ((U_PrologEvalRequest)boundVars[PrologEvalRequest]).PrologResultSlotName;
             string prologBoundVarSlotName = ((U_PrologEvalRequest)boundVars[PrologEvalRequest]).PrologBoundVarSlotName;
-            var contentUnitsWithQuerySlot = from contentUnit in m_blackboard.LookupUnits(ContentUnit.TypeName)
-                                            let cuCast = contentUnit as ContentUnit
-                                            where FilterConditionDel(cuCast) // where the content unit satisfies some user provided filter condition 
-                                            where cuCast.HasMetadataSlot(prologQuerySlotName) // where the content unit has the prolog query
-                                            select cuCast;
+            var contentUnitsWithQuerySlot = from contentUnit in m_blackboard.LookupUnits<ContentUnit>()
+                                            where FilterConditionDel(contentUnit) // where the content unit satisfies some user provided filter condition 
+                                            where contentUnit.HasMetadataSlot(prologQuerySlotName) // where the content unit has the prolog query
+                                            select contentUnit;
 
-            var prologKB = m_blackboard.LookupUnits(U_PrologKB.TypeName);
+            U_PrologKB prologKB = m_blackboard.LookupSingleton<U_PrologKB>();
 
             XunitOutput?.WriteLine("In PrologEval.Execute()");
-
-            Debug.Assert(prologKB.Count == 1);
-
-            U_PrologKB kb = (U_PrologKB)prologKB.First();
 
             /* 
              * fixme: the copy logic won't work with multiple prolog eval requests - a different copy will be made for each unique query slot instead
@@ -78,7 +73,7 @@ namespace CSA.KnowledgeSources
             {
                 XunitOutput?.WriteLine("Evaluting prolog eval on ContentUnit: " + contentUnit.Metadata[CUSlots.ContentUnitID]);
                 ContentUnit contentUnitCopy = CopyCUToOutputPool(contentUnit);
-                var result = kb.SolveForParsed((string)contentUnitCopy.Metadata[prologQuerySlotName]);
+                var result = prologKB.SolveForParsed((string)contentUnitCopy.Metadata[prologQuerySlotName]);
                 XunitOutput?.WriteLine("Result of evaluation: " + result);
                 contentUnitCopy.Metadata[prologResultSlotName] = result != null;
                 if (prologBoundVarSlotName != null)

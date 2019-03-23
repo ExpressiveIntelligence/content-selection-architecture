@@ -131,11 +131,11 @@ namespace CSA.Tests
             controller.Execute();
 
             // Four content units total (the original three plus a new selected one)
-            ISet<IUnit> cuSet = blackboard.LookupUnits(ContentUnit.TypeName);
+            ISet<ContentUnit> cuSet = blackboard.LookupUnits<ContentUnit>();
             Assert.Equal(4, cuSet.Count);
 
             var selectedUnit = from unit in cuSet
-                               where ((ContentUnit)unit).HasMetadataSlot(SelectedContentUnit)
+                               where unit.HasMetadataSlot(SelectedContentUnit)
                                select unit;
 
             // Exactly 1 selected content unit
@@ -143,7 +143,7 @@ namespace CSA.Tests
             Assert.Equal(1, count);
 
             // The selected content unit is "foo" (matches the query request)
-            Assert.True(((ContentUnit)selectedUnit.ElementAt(0)).Metadata[ContentUnitID].Equals("foo"));
+            Assert.True(selectedUnit.ElementAt(0).Metadata[ContentUnitID].Equals("foo"));
 
             // Since we only added one KS to controller, and there was only one matching blackboard pattern, after execution the agenda should be empty
             Assert.Empty(controller.Agenda);
@@ -228,17 +228,15 @@ namespace CSA.Tests
 
             controller.Execute();
 
-            var pool1CUs = from ContentUnit cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                           let cuCast = cu as ContentUnit
-                           where cuCast.HasMetadataSlot(ContentPool)
-                           where cuCast.Metadata[ContentPool].Equals(pool1)
-                           select cuCast;
+            var pool1CUs = from cu in blackboard.LookupUnits<ContentUnit>()
+                           where cu.HasMetadataSlot(ContentPool)
+                           where cu.Metadata[ContentPool].Equals(pool1)
+                           select cu;
 
-            var pool2CUs = from ContentUnit cu in blackboard.LookupUnits(ContentUnit.TypeName)
-                           let cuCast = cu as ContentUnit
-                           where cuCast.HasMetadataSlot(ContentPool)
-                           where cuCast.Metadata[ContentPool].Equals(pool2)
-                           select cuCast;
+            var pool2CUs = from cu in blackboard.LookupUnits<ContentUnit>()
+                           where cu.HasMetadataSlot(ContentPool)
+                           where cu.Metadata[ContentPool].Equals(pool2)
+                           select cu;
 
             int pool1Count = pool1CUs.Count();
             int pool2Count = pool2CUs.Count();

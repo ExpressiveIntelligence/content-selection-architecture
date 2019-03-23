@@ -80,42 +80,18 @@ namespace CSA.Core
         }
 
         // Returns a set of knowledge units on the blackboard matching the unit type. 
-        public ISet<IUnit> LookupUnits(string unitType)
+        public ISet<T> LookupUnits<T>() where T : IUnit
         {
-            return dict.TryGetValue(unitType, out ISet<IUnit> units) ?  new HashSet<IUnit>(units) : new HashSet<IUnit>();
-        }
-
-        /*
-         * For singleton units on the blackboard, looks up and returns the singleton as an IUnit. If there is no unit of the type unitType on the 
-         * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
-         */
-        public IUnit LookupSingleton(string unitType)
-        {
-            if (dict.TryGetValue(unitType, out ISet<IUnit> units))
-            {
-                // Found at least one IUnit of type unitType
-                if (units.Count > 1)
-                {
-                    throw new InvalidOperationException("IBlackboard.LooupSingleton called for unit type with >1 unit instances on the blackboard.");
-                }
-                return units.First();
-            }
-            else
-            {
-                return null; // No IUnit of unitType found on the blackboard
-            }
+            return dict.TryGetValue(typeof(T).FullName, out ISet<IUnit> units) ? new HashSet<T>(units.Cast<T>()) : new HashSet<T>();
         }
 
         /*
          * For singleton units on the blackboard, looks up and returns the singleton of type T. If there is no unit of the type unitType on the 
          * blackboard, returns null. If there is more than one unit of the type, unitType on the blackboard, throws an error. 
-         * fixme: get rid of the unitType argument and use TypeOf. Verify that typeOf and GetUnitTypeName return the same thing. 
-         * update: typeof and GetType().FullName *do* have the same value. 
-         * fixme: eliminate maually specifying type names in calls to lookupUnits throughout the code.        
          */
-        public T LookupSingleton<T>(string unitType) where T : IUnit
+        public T LookupSingleton<T>() where T : IUnit
         {
-            if (dict.TryGetValue(unitType, out ISet<IUnit> units))
+            if (dict.TryGetValue(typeof(T).FullName, out ISet<IUnit> units))
             {
                 // Found at least one IUnit of type unitType
                 if (units.Count > 1)
@@ -144,10 +120,9 @@ namespace CSA.Core
 
         private bool LookupUnits(IUnit unit, out ISet<IUnit> units)
         {
-            string typeName = GetUnitTypeName(unit);
             units = null;
 
-            return dict.TryGetValue(typeName, out units);
+            return dict.TryGetValue(GetUnitTypeName(unit), out units);
         }
 
         // Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
