@@ -13,7 +13,9 @@ namespace CSA.KnowledgeSources
          */
         void Execute();
 
+#if UNIT_TEST
         ITestOutputHelper XunitOutput { get; set; }
+#endif
 
     }
 }

@@ -15,7 +15,12 @@ namespace CSA.Demo
         private readonly KS_ReactiveChoicePresenter m_KSChoicePresenter;
         public IReactiveController Controller { get; }
 
-        public void AddChoicePresenterHandler(EventHandler handler)
+        /*
+         * fixme: currently have PresenterExecuteEventArgs live in KS_ScheduledChoicedPresenter. This is an awkward naming scheme when these event args
+         * are being used by the KS_ReactiveChoicePresenter. Need to come up with something neater once I've decided how I want to handle reactive vs. 
+         * scheduled knowledge sources. It may be that I will phase out the reactive version of ChoicePresenter. 
+         */
+        public void AddChoicePresenterHandler(EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs> handler)
         {
             m_KSChoicePresenter.PresenterExecute += handler;
         }

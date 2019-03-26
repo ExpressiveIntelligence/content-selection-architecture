@@ -8,7 +8,9 @@ namespace CSA.KnowledgeSources
     {
         public IDictionary<string, object> Properties { get; }
 
+#if UNIT_TEST
         public ITestOutputHelper XunitOutput { get; set; }
+#endif
 
         protected readonly IBlackboard m_blackboard;
 

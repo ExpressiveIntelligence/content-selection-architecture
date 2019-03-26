@@ -3,6 +3,7 @@ using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
 using CSA.KnowledgeUnits;
+using static CSA.KnowledgeUnits.CUSlots;
 using Prolog;
 
 namespace CSA.KnowledgeSources
@@ -17,6 +18,14 @@ namespace CSA.KnowledgeSources
         private const string PrologEvalRequest = "PrologEvalRequest";
 
         public const string DefaultOutputPoolName = "PrologQueryEvaluted";
+
+        /*
+         * Convenience utility for creating a filter method which filters by the prolog evaluation being true or false (== to the param result). 
+         */
+        public static FilterCondition FilterByPrologResult(bool result)
+        {
+            return (ContentUnit contentUnit) => contentUnit.HasMetadataSlot(ApplTestResult) && (bool)contentUnit.Metadata[ApplTestResult] == result;
+        }
 
         protected override IDictionary<string, object>[] Precondition()
         {
@@ -63,7 +72,9 @@ namespace CSA.KnowledgeSources
 
             U_PrologKB prologKB = m_blackboard.LookupSingleton<U_PrologKB>();
 
+#if UNIT_TEST
             XunitOutput?.WriteLine("In PrologEval.Execute()");
+#endif
 
             /* 
              * fixme: the copy logic won't work with multiple prolog eval requests - a different copy will be made for each unique query slot instead
@@ -71,10 +82,17 @@ namespace CSA.KnowledgeSources
              */
             foreach (var contentUnit in contentUnitsWithQuerySlot)
             {
+#if UNIT_TEST
                 XunitOutput?.WriteLine("Evaluting prolog eval on ContentUnit: " + contentUnit.Metadata[CUSlots.ContentUnitID]);
+#endif
+
                 ContentUnit contentUnitCopy = CopyCUToOutputPool(contentUnit);
                 var result = prologKB.SolveForParsed((string)contentUnitCopy.Metadata[prologQuerySlotName]);
+
+#if UNIT_TEST
                 XunitOutput?.WriteLine("Result of evaluation: " + result);
+#endif
+
                 contentUnitCopy.Metadata[prologResultSlotName] = result != null;
                 if (prologBoundVarSlotName != null)
                 {

@@ -10,25 +10,18 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_ReactiveChoicePresenter : ReactiveKnowledgeSource
+    public class KS_ReactiveChoicePresenter : ReactiveKnowledgeSource, IChoicePresenter
     {
         // Name of the bound activation variable
         private const string SelectedContentUnit = "SelectedContentUnit";
 
-        // fixme: storing the choice information on fields on the knowledge source assumes that there will always only be one activation for KS_ChoicePresenter that is executed. If multiple 
-        // activations ever occured, an event handler that was accessing this data through a reference to the KS would have stale data. 
-        // Internal fields for storing the text to display, array of Enumerable of choices, and string array of text choices. 
-        protected string m_textToDisplay;
-        protected IEnumerable<ContentUnit> m_choices; // This is used by the SelectChoice() method. 
-        protected string[] m_choicesToDisplay;
-
-        // fixme: see fixme above 
-        // Public accessors for text and choices. 
-        public string TextToDisplay => m_textToDisplay ?? "";
-        public string[] ChoicesToDisplay => m_choicesToDisplay ?? new string[0];
-
+        /*
+         * fixme: currently have PresenterExecuteEventArgs live in KS_ScheduledChoicedPresenter. This is an awkward naming scheme when these event args
+         * are being used by the KS_ReactiveChoicePresenter. Need to come up with something neater once I've decided how I want to handle reactive vs. 
+         * scheduled knowledge sources. It may be that I will phase out the reactive version of ChoicePresenter. 
+         */
         // The delegate for event handling within the Execute() method
-        public event EventHandler PresenterExecute; 
+        public event EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs> PresenterExecute;
 
         public override IKnowledgeSourceActivation[] Precondition()
         {
@@ -75,12 +68,15 @@ namespace CSA.KnowledgeSources
             return !m_blackboard.ContainsUnit((IUnit)boundVars[SelectedContentUnit]);
         }
 
+        /*
+         * fixme: this doesn't work if there are multiple filter pools (see KS_ScheduledChoicePresenter for how to handle this.
+         * Fix this when I've decided more definitively how I'm handling reactive KSs.         
+         */
         // Returns an Enumerable of choices. Choices are ContentUnits linked to this ContentUnit by Choice links.  
-        protected IEnumerable<ContentUnit> GetChoices(IDictionary<string, object> boundVars)
+        protected ContentUnit[] GetChoices(ContentUnit selectedCU)
         {
             // Gather the links of type L_SelectedContentUnit that have the SelectedContentUnit as one of the endpoints. 
-            ContentUnit selectedCU = (ContentUnit)boundVars[SelectedContentUnit];
-            var linkToOrigCU = from link in m_blackboard.LookupLinks(selectedCU)
+             var linkToOrigCU = from link in m_blackboard.LookupLinks(selectedCU)
                                where link.LinkType.Equals(LinkTypes.L_SelectedContentUnit)
                                select link;
 
@@ -95,59 +91,63 @@ namespace CSA.KnowledgeSources
                                                where link.LinkType.Equals(LinkTypes.L_Choice)
                                                select (ContentUnit)link.Node;
 
-            return choices;
+            return choices.ToArray();
 
         }
 
         // Gathers the choices for the selected content unit, stores them on fields provided on this KS, and calls any calls any registered event handlers. 
-        // fixme: should't store display info on KS but rather should pass it as args through to the event handler. 
         internal override void Execute(IDictionary<string, object> boundVars)
         {
             ContentUnit selectedCU = (ContentUnit)boundVars[SelectedContentUnit];
 
-            m_textToDisplay = (string)selectedCU.Content[Text];
+            string textToDisplay = (string)selectedCU.Content[Text];
 
-            m_choices = GetChoices(boundVars);
+            ContentUnit[] choices = GetChoices(selectedCU);
 
-            if (m_choices.Any())
+            string[] choicesToDisplay;
+
+            if (choices.Any())
             {
                 int choiceCounter = 0;
-                m_choicesToDisplay = new string[m_choices.Count()];
-                foreach (ContentUnit choice in m_choices)
+                choicesToDisplay = new string[choices.Count()];
+                foreach (ContentUnit choice in choices)
                 {
-                    m_choicesToDisplay[choiceCounter++] = (string)choice.Content[Text];
+                    choicesToDisplay[choiceCounter++] = (string)choice.Content[Text];
                 }
             }
             else
             {
                 // No choices. Create a 0 length string array so that callers don't have to worry about null checks. 
-                m_choicesToDisplay = new string[0];        
+                choicesToDisplay = new string[0];
             }
 
-            // Remove the displayed SelectedContentUnit from the blackboard.
-            m_blackboard.RemoveUnit((IUnit)boundVars[SelectedContentUnit]);
+            // Remove the displayed SelectedContentUnit from the blackboard. Do this to indicate that we have processed the selectedCU. 
+            m_blackboard.RemoveUnit(selectedCU);
 
-            OnExecute(EventArgs.Empty);
+            // Construct event args and call the event handler. 
+            var eventArgs = new KS_ScheduledChoicePresenter.PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
+            OnExecute(eventArgs);
         }
 
-        protected virtual void OnExecute(EventArgs e)
+        protected virtual void OnExecute(KS_ScheduledChoicePresenter.PresenterExecuteEventArgs eventArgs)
         {
-            PresenterExecute?.Invoke(this, EventArgs.Empty);
+            PresenterExecute?.Invoke(this, eventArgs);
         }
 
-        // Given a 0-indexed choice selection, sets the appropriate query on the blackboard.
-        // fixme: This should be removed when the choice info is not longer stored on the KS. 
-        public void SelectChoice(int choiceMade)
+        /*
+         * Given an array of choices and a 0-indexed choice selection, adds the appropriate query to the blackboard. 
+         */
+        public void SelectChoice(ContentUnit[] choices, uint choiceMade)
         {
-            if (choiceMade >= 0 && choiceMade < m_choicesToDisplay.Length)
+            if (choiceMade < choices.Length)
             {
                 // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
-                ContentUnit selectedChoice = m_choices.ElementAt(choiceMade);
+                ContentUnit selectedChoice = choices[choiceMade];
                 m_blackboard.AddUnit(new U_IDSelectRequest((string)selectedChoice.Metadata[TargetContentUnitID]));
-             }
+            }
             else
             {
-                throw new ArgumentOutOfRangeException(nameof(choiceMade), choiceMade, $"choiceMade must be between 0 and the number of choices - 1 {m_choicesToDisplay.Length - 1}");
+                throw new ArgumentOutOfRangeException(nameof(choiceMade), choiceMade, $"choiceMade must be between 0 and the number of choices - 1 {choices.Length - 1}");
             }
         }
 

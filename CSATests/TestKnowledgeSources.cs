@@ -412,7 +412,7 @@ namespace CSA.Tests
             Assert.Equal(0, querySet.Count);
         }
 
-        public static IEnumerable<object[]> Data_TestExecute_PublicChoicePresenter()
+        public static IEnumerable<object[]> Data_TestExecute_ReactiveChoicePresenter()
         {
             IBlackboard blackboard = new Blackboard();
 
@@ -452,8 +452,8 @@ namespace CSA.Tests
         }
 
         [Theory]
-        [MemberData(nameof(Data_TestExecute_PublicChoicePresenter))]
-        public void TestExecute_PublicChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
+        [MemberData(nameof(Data_TestExecute_ReactiveChoicePresenter))]
+        public void TestExecute_ReactiveChoicePresenter(IBlackboard blackboard, ContentUnit selectedCU, ContentUnit originalCU, ContentUnit[] choices)
         {
             blackboard.Clear();
             blackboard.AddUnit(selectedCU);
@@ -467,6 +467,8 @@ namespace CSA.Tests
             }
 
             KS_ReactiveChoicePresenter ks = new KS_ReactiveChoicePresenter(blackboard);
+            ks.PresenterExecute += GenerateEventHandler(selectedCU, choices, blackboard);
+
             var KSAs = ks.Precondition();
 
             int count = KSAs.Count();
@@ -474,21 +476,6 @@ namespace CSA.Tests
 
             // Execute the activated choice presenter
             KSAs.ElementAt(0).Execute();
-
-            // fixme: the tests below depend on the choice info being stored on the ks. When this is eventually changed to arguments passed into the event handler, will need to use an event 
-            // handler to make these tests. 
-            Assert.Equal(selectedCU.Content[Text], ks.TextToDisplay);
-
-            int numOfChoices = choices.Length;
-            Assert.Equal(numOfChoices, ks.ChoicesToDisplay.Length);
-
-            foreach (ContentUnit choice in choices)
-            {
-                Assert.True(Array.Exists(ks.ChoicesToDisplay, element => element.Equals(choice.Content[Text])));
-            }
-
-            // fixme: add a test for KS_ChoicePresenter.SelectChoice()
-
         }
 
         public static IEnumerable<object[]> Data_TestExecute_ScheduledFilterSelector()
@@ -941,6 +928,42 @@ namespace CSA.Tests
              };
         }
 
+        private EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs>
+            GenerateEventHandler(ContentUnit selectedCU, ContentUnit[] choices, IBlackboard blackboard)
+        {
+            return (object sender, KS_ScheduledChoicePresenter.PresenterExecuteEventArgs eventArgs) =>
+            {
+                var presenterEventArgs = eventArgs as KS_ScheduledChoicePresenter.PresenterExecuteEventArgs;
+
+                if (selectedCU != null)
+                {
+                    Assert.Equal(selectedCU.Content[Text], presenterEventArgs.TextToDisplay);
+                    int numOfChoices = choices.Length;
+                    Assert.Equal(numOfChoices, presenterEventArgs.Choices.Length);
+
+                    foreach (ContentUnit choice in choices)
+                    {
+                        Assert.True(Array.Exists(presenterEventArgs.ChoicesToDisplay, element => element.Equals(choice.Content[Text])));
+                    }
+                }
+                else
+                {
+                    Assert.Equal("", presenterEventArgs.TextToDisplay);
+                }
+
+                // Iterate through each of the choices selecting it and confirming that the correct U_IDSelectRequest is added. 
+                IChoicePresenter cp = (IChoicePresenter)sender;
+                for (uint i = 0; i < presenterEventArgs.ChoicesToDisplay.Length; i++)
+                {
+                    cp.SelectChoice(presenterEventArgs.Choices, i);
+                    U_IDSelectRequest idSelectRequest = blackboard.LookupSingleton<U_IDSelectRequest>();
+                    Assert.True(idSelectRequest.TargetContentUnitID.Equals(choices[i].Metadata[TargetContentUnitID]));
+                    blackboard.RemoveUnit(idSelectRequest); // Remove the U_IDSelect request before the next iteration. 
+                }
+
+            };
+        }
+
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
         public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU,
@@ -974,36 +997,14 @@ namespace CSA.Tests
                 blackboard.AddLink(originalCU, selectedCU, LinkTypes.L_SelectedContentUnit, true);
             }
 
+            /* 
+             * Add the event handler which tests whether the correct event args are being passed and that the KS_ScheduledChoicePresenter.SelectChoice()
+             * is adding the correct U_IDSelectRequest. 
+             */
+            ks.PresenterExecute += GenerateEventHandler(selectedCU, choices, blackboard);
+
             // Execute the choice presenter
             ks.Execute();
-
-            // fixme: the tests below depend on the choice info being stored on the ks. When this is eventually changed to arguments passed into the event handler, will need to use an event 
-            // handler to make these tests. 
-            if (selectedCU != null)
-            {
-                Assert.Equal(selectedCU.Content[Text], ks.TextToDisplay);
-                int numOfChoices = choices.Length;
-                Assert.Equal(numOfChoices, ks.ChoicesToDisplay.Length);
-
-                foreach (ContentUnit choice in choices)
-                {
-                    Assert.True(Array.Exists(ks.ChoicesToDisplay, element => element.Equals(choice.Content[Text])));
-                }
-            }
-            else
-            {
-                Assert.Equal("", ks.TextToDisplay);
-            }
-
-            if (ks.ChoicesToDisplay.Length > 0)
-            {
-                var random = new System.Random();
-                int r = random.Next(ks.ChoicesToDisplay.Length);
-                ks.SelectChoice(r);
-                ISet<U_IDSelectRequest> idSelectRequest = blackboard.LookupUnits<U_IDSelectRequest>();
-                Assert.Equal(1, idSelectRequest.Count);
-                Assert.True(idSelectRequest.First().TargetContentUnitID.Equals(choices[r].Metadata[TargetContentUnitID]));
-            }
         }
 
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPrologEval()
@@ -1141,7 +1142,9 @@ namespace CSA.Tests
                 blackboard.AddUnit(req);
             }
 
+#if UNIT_TEST
             prologEval.XunitOutput = output;
+#endif
 
             // Executed the filter selector
             prologEval.Execute();

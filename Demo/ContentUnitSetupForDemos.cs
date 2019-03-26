@@ -12,6 +12,9 @@ namespace CSA.Demo
      */
     public static class ContentUnitSetupForDemos
     {
+        /* 
+         * Adds ContentUnits to blackboard for demo1, a simple choice-based demo.
+         */
         public static void Demo1_DefineCUs(IBlackboard blackboard)
         {
             ContentUnit start = new ContentUnit();
@@ -64,6 +67,14 @@ namespace CSA.Demo
             blackboard.AddLink(start, start_Choice2, LinkTypes.L_Choice);
             blackboard.AddLink(waited, waitedChoice1, LinkTypes.L_Choice);
             blackboard.AddLink(waited, waitedChoice2, LinkTypes.L_Choice);
+        }
+
+        /*
+         * Adds ContentUnits to blackboard for demo2, a choice-based demo with prolog applicability tests for choice setups. 
+         */
+        public static void Demo2_DefineCUs(IBlackboard blackboard)
+        {
+            
         }
     }
 }

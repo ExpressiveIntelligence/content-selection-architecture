@@ -11,6 +11,8 @@
         public const string ApplTestResult = "ApplTestResult";
         public const string ApplTestBindings_Prolog = "ApplTestBindings_Prolog";
         public const string ContentPool = "ContentPool";
+        public const string FactDeleteList_Prolog = "FactDeleteList_Prolog";
+        public const string FactAddList_Prolog = "FactAddList_Prolog";
 
         // fixme: haven't experimented yet with specifying specific knowledge bases on a unit-by-unit bases for evaluating prolog queries
         //public const string KnowledgeBaseName_Prolog = "KnowledgeBaseName_Prolog";

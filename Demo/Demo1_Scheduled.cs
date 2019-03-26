@@ -3,7 +3,6 @@ using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
 using CSA.Controllers;
-using static CSA.KnowledgeSources.KSProps;
 using static CSA.Demo.ContentUnitSetupForDemos;
 
 namespace CSA.Demo
@@ -20,7 +19,7 @@ namespace CSA.Demo
         private readonly KS_ScheduledChoicePresenter m_choicePresenter;
         private readonly KS_ScheduledFilterPoolCleaner m_filterPoolCleaner;
 
-        public void AddChoicePresenterHandler(EventHandler handler)
+        public void AddChoicePresenterHandler(EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs> handler)
         {
             m_choicePresenter.PresenterExecute += handler;
         }

@@ -24,14 +24,14 @@ namespace CSA.KnowledgeSources
         protected FilterCondition FilterConditionDel;
 
         // The default filter condition does no filtering. 
-        private bool DefaultFilterCondition(ContentUnit cu)
+        private static bool DefaultFilterCondition(ContentUnit contentUnit)
         {
             return true;
         }
 
-        private bool SelectFromPool(ContentUnit cu)
+        private bool SelectFromPool(ContentUnit contentUnit)
         {
-            return cu.HasMetadataSlot(ContentPool) && cu.Metadata[ContentPool].Equals(InputPool);
+            return contentUnit.HasMetadataSlot(ContentPool) && contentUnit.Metadata[ContentPool].Equals(InputPool);
         }
 
         protected override IDictionary<string, object>[] Precondition()
