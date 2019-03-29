@@ -1,6 +1,7 @@
 ﻿using System;
 using CSA.KnowledgeSources;
 using CSA.Demo;
+using CSA.KnowledgeUnits;
 
 namespace ConsoleChoice
 {
@@ -45,15 +46,11 @@ namespace ConsoleChoice
             demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
             demo.AddSelectChoicePresenterHandler(EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges);
 
-            /*
-             * fixme: this runs forever even after the last lexeme because the instance of KS_ScheduledExecute unconditionally
-             * adds U_PrologEvalRequest each time around the loop, so the blackboard is always changed. Need to add something 
-             * to KS_ScheduledExecute where you can specify a blackboard test to to make the execution conditional. 
-             */
             while(demo.Blackboard.Changed)
             {
                 demo.Blackboard.ResetChanged();
                 demo.Controller.Execute();
+                // Console.WriteLine(demo.Blackboard.NumberOfUnits<U_PrologEvalRequest>());
             }
         }
 

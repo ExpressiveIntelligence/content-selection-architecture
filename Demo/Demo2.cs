@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
 using CSA.Controllers;
 using static CSA.Demo.ContentUnitSetupForDemos;
-using System.Collections.Generic;
 using static CSA.KnowledgeUnits.CUSlots;
 
 namespace CSA.Demo
@@ -18,7 +18,7 @@ namespace CSA.Demo
         public IScheduledController Controller { get; }
 
         private readonly KS_ScheduledIDSelector m_IDSelector;
-        // fixme: add a field for a KS that inserts a prolog eval request.
+        private readonly KS_ScheduledExecute m_addPrologEvalRequest; 
         private readonly KS_ScheduledPrologEval m_prologEval;
         private readonly KS_ScheduledFilterSelector m_filterByPrologResult;
         private readonly KS_ScheduledUniformDistributionSelector m_uniformRandomSelector;
@@ -42,6 +42,17 @@ namespace CSA.Demo
 
             m_IDSelector = new KS_ScheduledIDSelector(Blackboard);
 
+            m_addPrologEvalRequest = new KS_ScheduledExecute(
+                () => Blackboard.AddUnit(new U_PrologEvalRequest(ApplTest_Prolog, ApplTestResult)),
+                () =>
+                {
+                    var contentUnits = from ContentUnit contentUnit in Blackboard.LookupUnits<ContentUnit>()
+                                       where KS_ScheduledFilterSelector.SelectFromPool(contentUnit, KS_ScheduledIDSelector.DefaultOutputPoolName)
+                                       select contentUnit;
+
+                    return contentUnits.Any();
+                });
+
             m_prologEval = new KS_ScheduledPrologEval(Blackboard, KS_ScheduledIDSelector.DefaultOutputPoolName, KS_ScheduledPrologEval.DefaultOutputPoolName);
 
             m_filterByPrologResult = new KS_ScheduledFilterSelector(Blackboard, KS_ScheduledPrologEval.DefaultOutputPoolName,
@@ -62,12 +73,8 @@ namespace CSA.Demo
 
             Controller = new ScheduledSequenceController();
             Controller.AddKnowledgeSource(m_IDSelector);
-
             // Add U_PrologEvalRequest to blackboard using an instance of KS_ScheduledExecute (an IScheduledKnowledgeSource that is used to execute arbitrary code).
-            Controller.AddKnowledgeSource(new KS_ScheduledExecute(
-                () => Blackboard.AddUnit(new U_PrologEvalRequest(ApplTest_Prolog, ApplTestResult))
-            ));
-
+            Controller.AddKnowledgeSource(m_addPrologEvalRequest);
             Controller.AddKnowledgeSource(m_prologEval);
             Controller.AddKnowledgeSource(m_filterByPrologResult);
             Controller.AddKnowledgeSource(m_uniformRandomSelector);

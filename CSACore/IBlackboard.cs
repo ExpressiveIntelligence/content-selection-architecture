@@ -57,5 +57,12 @@ namespace CSA.Core
 
         // Resets whether the blackboard has been changed to false. Returns the current changed status before the reset.
         bool ResetChanged();
+
+        /*
+         * The methods below support debugging. 
+         */
+
+        // Returns the number of units of a given type stored in the blackboard.
+        uint NumberOfUnits<T>() where T : IUnit;
     }
 }

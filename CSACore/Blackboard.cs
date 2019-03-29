@@ -283,6 +283,15 @@ namespace CSA.Core
             return changed;
         }
 
+        /*
+         * Below are the definitions of public methods that help support debugging. 
+         */
+
+        public uint NumberOfUnits<T>() where T : IUnit
+        {
+            return (uint)LookupUnits<T>().Count();
+        }
+
         // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by properties rather than just class)
     }
 }
