@@ -20,7 +20,7 @@ namespace CSA.Demo
          * are being used by the KS_ReactiveChoicePresenter. Need to come up with something neater once I've decided how I want to handle reactive vs. 
          * scheduled knowledge sources. It may be that I will phase out the reactive version of ChoicePresenter. 
          */
-        public void AddChoicePresenterHandler(EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs> handler)
+        public void AddChoicePresenterHandler(EventHandler<PresenterExecuteEventArgs> handler)
         {
             m_KSChoicePresenter.PresenterExecute += handler;
         }

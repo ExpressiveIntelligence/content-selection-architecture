@@ -5,6 +5,10 @@ namespace CSA.KnowledgeUnits
 {
     public class U_PrologKB : Unit
     {
+        /*
+         * fixme: will need to store the knowledge base on a GameObject, so will need constructors that accept a GameObject
+         * or construct a GameObject. Need to look at Ian's Unity demo to better understand how prolog is embedded.         
+         */
         public KnowledgeBase KB { get; }
         public string KBName { get; }
 

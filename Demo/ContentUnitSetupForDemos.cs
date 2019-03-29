@@ -74,7 +74,57 @@ namespace CSA.Demo
          */
         public static void Demo2_DefineCUs(IBlackboard blackboard)
         {
-            
+            ContentUnit start = new ContentUnit();
+            start.Metadata[ContentUnitID] = "start";
+            start.Metadata[ApplTest_Prolog] = "true.";
+            start.Content[Text] = "An old gentleman stands before you. ";
+
+            ContentUnit choice_AskForHelp = new ContentUnit();
+            choice_AskForHelp.Metadata[TargetContentUnitID] = "ask for help";
+            choice_AskForHelp.Content[Text] = "Ask for help";
+
+            ContentUnit choice_introduceYourself = new ContentUnit();
+            choice_introduceYourself.Metadata[TargetContentUnitID] = "introduce yourself";
+            choice_introduceYourself.Metadata[FactAddList_Prolog] = new string[] { "introducedYourself" };
+            choice_introduceYourself.Content[Text] = "Introduce yourself";
+
+            ContentUnit askForHelp1 = new ContentUnit();
+            askForHelp1.Metadata[ContentUnitID] = "ask for help";
+            askForHelp1.Metadata[ApplTest_Prolog] = "introducedYourself.";
+            askForHelp1.Content[Text] = "'Since you introduced yourself so nicely, I'm happy to help!'";
+
+            ContentUnit askForHelp2 = new ContentUnit();
+            askForHelp2.Metadata[ContentUnitID] = "ask for help";
+            askForHelp2.Metadata[ApplTest_Prolog] = "\\+ introducedYourself.";
+            askForHelp2.Content[Text] = "Eyeing you suspiciously the old man replies 'Who are you?'";
+
+            ContentUnit introduceYourself = new ContentUnit();
+            introduceYourself.Metadata[ContentUnitID] = "introduce yourself";
+            introduceYourself.Metadata[ApplTest_Prolog] = "true.";
+            introduceYourself.Content[Text] = "'Very nice to meet you!'";
+
+            blackboard.AddUnit(start);
+            blackboard.AddUnit(choice_AskForHelp);
+            blackboard.AddUnit(choice_introduceYourself);
+            blackboard.AddUnit(askForHelp1);
+            blackboard.AddUnit(askForHelp2);
+            blackboard.AddUnit(introduceYourself);
+
+            blackboard.AddLink(start, choice_AskForHelp, LinkTypes.L_Choice);
+            blackboard.AddLink(start, choice_introduceYourself, LinkTypes.L_Choice);
+            blackboard.AddLink(askForHelp2, choice_AskForHelp, LinkTypes.L_Choice);
+            blackboard.AddLink(askForHelp2, choice_introduceYourself, LinkTypes.L_Choice);
+            blackboard.AddLink(introduceYourself, choice_AskForHelp, LinkTypes.L_Choice);
+
+            U_PrologKB prologKB = new U_PrologKB("Global");
+
+            /*
+             * fixme: is there a better way to define a predicate for prolog than asserting and retracting it?
+             */
+            prologKB.Assert("introducedYourself.");
+            prologKB.Retract("introducedYourself.");
+
+            blackboard.AddUnit(prologKB);
         }
     }
 }

@@ -22,6 +22,9 @@ namespace CSA.KnowledgeSources
         // The delegate for event handling within the Execute() method
         public event EventHandler<PresenterExecuteEventArgs> PresenterExecute;
 
+        // The delegate for event handling within the SelectChoice method
+        public event EventHandler<SelectChoiceEventArgs> PresenterSelectChoice;
+
         /*
          * Recursively searches back through L_SelectedContentUnit links until it finds the original content unit.
          */
@@ -113,11 +116,18 @@ namespace CSA.KnowledgeSources
                 // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
                 ContentUnit selectedChoice = choices[choiceMade];
                 m_blackboard.AddUnit(new U_IDSelectRequest((string)selectedChoice.Metadata[TargetContentUnitID]));
+                SelectChoiceEventArgs eventArgs = new SelectChoiceEventArgs(selectedChoice, m_blackboard);
+                OnSelectChoice(eventArgs);
             }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(choiceMade), choiceMade, $"choiceMade must be between 0 and the number of choices - 1 {choices.Length - 1}");
             }
+        }
+
+        protected virtual void OnSelectChoice(SelectChoiceEventArgs eventArgs)
+        {
+            PresenterSelectChoice?.Invoke(this, eventArgs);
         }
 
         /*
@@ -134,21 +144,5 @@ namespace CSA.KnowledgeSources
         {
         }
 
-        /* 
-         * The EventArgs class definition for passing text to display and choice information to the display callback. 
-         */
-        public class PresenterExecuteEventArgs : EventArgs
-        {
-            public string TextToDisplay { get; }
-            public string[] ChoicesToDisplay { get; }
-            public ContentUnit[] Choices { get; }
-
-            public PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, ContentUnit[] choices)
-            {
-                TextToDisplay = textToDisplay;
-                ChoicesToDisplay = choicesToDisplay;
-                Choices = choices;
-            }
-        }
     }
 }

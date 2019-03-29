@@ -928,12 +928,12 @@ namespace CSA.Tests
              };
         }
 
-        private EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs>
+        private EventHandler<PresenterExecuteEventArgs>
             GenerateEventHandler(ContentUnit selectedCU, ContentUnit[] choices, IBlackboard blackboard)
         {
-            return (object sender, KS_ScheduledChoicePresenter.PresenterExecuteEventArgs eventArgs) =>
+            return (object sender, PresenterExecuteEventArgs eventArgs) =>
             {
-                var presenterEventArgs = eventArgs as KS_ScheduledChoicePresenter.PresenterExecuteEventArgs;
+                var presenterEventArgs = eventArgs as PresenterExecuteEventArgs;
 
                 if (selectedCU != null)
                 {

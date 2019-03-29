@@ -12,7 +12,7 @@ namespace ConsoleChoice
 
             Demo1_Reactive demo = new Demo1_Reactive();
 
-            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
 
             while (demo.Blackboard.Changed)
             {
@@ -27,7 +27,7 @@ namespace ConsoleChoice
 
             Demo1_Scheduled demo = new Demo1_Scheduled();
 
-            demo.AddChoicePresenterHandler(EventHandler_ConsoleChoice.DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
 
             while(demo.Blackboard.Changed)
             {
@@ -40,10 +40,24 @@ namespace ConsoleChoice
         {
             Console.WriteLine("Starting demo2 (choice-based with prolog applicability tests).");
 
-                
+            Demo2 demo = new Demo2();
+
+            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddSelectChoicePresenterHandler(EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges);
+
+            /*
+             * fixme: this runs forever even after the last lexeme because the instance of KS_ScheduledExecute unconditionally
+             * adds U_PrologEvalRequest each time around the loop, so the blackboard is always changed. Need to add something 
+             * to KS_ScheduledExecute where you can specify a blackboard test to to make the execution conditional. 
+             */
+            while(demo.Blackboard.Changed)
+            {
+                demo.Blackboard.ResetChanged();
+                demo.Controller.Execute();
+            }
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             if (args.Length == 0)
             {
@@ -57,6 +71,9 @@ namespace ConsoleChoice
                     break;
                 case "scheduled_demo1":
                     ScheduledConsoleChoice();
+                    break;
+                case "demo2":
+                    ScheduledConsoleChoice_PrologApplTest();
                     break;
                 default:
                     throw new ArgumentException("Unrecognized argument: " + args[0]);

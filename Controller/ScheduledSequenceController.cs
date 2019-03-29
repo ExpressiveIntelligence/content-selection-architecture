@@ -10,7 +10,7 @@ namespace CSA.Controllers
                 
         public void Execute()
         {
-            foreach(ScheduledKnowledgeSource ks in knowledgeSources)
+            foreach(IScheduledKnowledgeSource ks in knowledgeSources)
             {
                 ks.Execute();
             }

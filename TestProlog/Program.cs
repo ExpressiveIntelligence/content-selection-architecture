@@ -2,7 +2,7 @@
 using System.Dynamic;
 using Prolog;
 using CSA.Core;
-
+using UnityEngine;
 
 /* 
  * A test rig for testing integration of UnityProlog (https://github.com/ianhorswill/UnityProlog) with CSA.
@@ -13,14 +13,45 @@ namespace TestProlog
     {
         public static void Main(string[] args)
         {
-            //CreatePrologKBAFromFilAndQuery();
+            //CreatePrologKBAFromFileAndQuery();
             //AssertingAFact();
             // TestExpandoObjectWithInterface();
             // TestVariableBinding();
             // QueryWithNoArgument();
             //KnowledgeBase kb = new KnowledgeBase("global", null);
             //PrintTypeVariable<KnowledgeBase>(kb);
+            // TestIncrement();   
+            TestBoolConstant();
         }
+
+        //Testing whether true and false are handled as prolog queries
+        private static void TestBoolConstant()
+        {
+            KnowledgeBase kb = new KnowledgeBase("Global", null);
+            kb.Consult("PrologTest.prolog");
+            kb.IsTrueWrite("true.");
+            kb.IsTrueWrite("false.");
+        }
+
+        /*
+         * fixme: Queries which involve chaining bindings generate an error. It looks like in the guts of SolveFor() there 
+         * are recursive calls which call GameObject.SolveFor(). So using this basic feature of prolog requires 
+         * the UnityProlog KB to be embeded in a game object. To debug this I should just develop a TextChoices unity 
+         * demo with the KB stored on a GameObject.        
+         */
+        private static void TestIncrement()
+        {
+            KnowledgeBase kb = new KnowledgeBase("Global", null);
+            kb.Consult("PrologTestWithError.prolog");
+            kb.IsTrueWrite("triesGreaterThan(1).");
+            //kb.IsTrueWrite("tries(X), X > 1.");
+            //kb.IsTrueWrite("assert(triedDoor).");
+            //kb.IsTrueWrite("incrementTries.");
+            //kb.IsTrueWrite("tries(X), X > 1.");
+            //kb.IsTrueWrite("assert(triedDoor).");
+            //kb.IsTrueWrite("tries(x), X > 1.");
+        }
+
 
         // Not related to test prolog. Scratch test of getting the name of the type referenced by a type variable. 
         private static void PrintTypeVariable<T>(T t)
@@ -29,7 +60,7 @@ namespace TestProlog
             Console.WriteLine(t.GetType().FullName);
 
         }
-        private static void CreatePrologKBAFromFilAndQuery()
+        private static void CreatePrologKBAFromFileAndQuery()
         {
             // fixme: KnowledgeBase wants a reference to a game object. This is because GameObjects can form a tree of knowledge bases. 
             // But I don't need this. Ideally we'd refactor prolog so that there is a lower abstract level that makes no reference to Unity classes.

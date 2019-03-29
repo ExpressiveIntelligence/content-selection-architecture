@@ -47,7 +47,7 @@ namespace CSA.KnowledgeSources
          */
         protected readonly IDictionary<string, object>[] m_emptyBindings;
 
-        public ScheduledKnowledgeSource(IBlackboard blackboard)
+        protected ScheduledKnowledgeSource(IBlackboard blackboard)
         {
             m_blackboard = blackboard;
             m_emptyBindings = new IDictionary<string, object>[0];

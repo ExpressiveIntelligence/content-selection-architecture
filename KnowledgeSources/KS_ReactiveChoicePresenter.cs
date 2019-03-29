@@ -15,13 +15,11 @@ namespace CSA.KnowledgeSources
         // Name of the bound activation variable
         private const string SelectedContentUnit = "SelectedContentUnit";
 
-        /*
-         * fixme: currently have PresenterExecuteEventArgs live in KS_ScheduledChoicedPresenter. This is an awkward naming scheme when these event args
-         * are being used by the KS_ReactiveChoicePresenter. Need to come up with something neater once I've decided how I want to handle reactive vs. 
-         * scheduled knowledge sources. It may be that I will phase out the reactive version of ChoicePresenter. 
-         */
         // The delegate for event handling within the Execute() method
-        public event EventHandler<KS_ScheduledChoicePresenter.PresenterExecuteEventArgs> PresenterExecute;
+        public event EventHandler<PresenterExecuteEventArgs> PresenterExecute;
+
+        // The delegate for event handling within the SelectChoice method
+        public event EventHandler<SelectChoiceEventArgs> PresenterSelectChoice;
 
         public override IKnowledgeSourceActivation[] Precondition()
         {
@@ -125,11 +123,11 @@ namespace CSA.KnowledgeSources
             m_blackboard.RemoveUnit(selectedCU);
 
             // Construct event args and call the event handler. 
-            var eventArgs = new KS_ScheduledChoicePresenter.PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
+            var eventArgs = new PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
             OnExecute(eventArgs);
         }
 
-        protected virtual void OnExecute(KS_ScheduledChoicePresenter.PresenterExecuteEventArgs eventArgs)
+        protected virtual void OnExecute(PresenterExecuteEventArgs eventArgs)
         {
             PresenterExecute?.Invoke(this, eventArgs);
         }
@@ -144,11 +142,18 @@ namespace CSA.KnowledgeSources
                 // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
                 ContentUnit selectedChoice = choices[choiceMade];
                 m_blackboard.AddUnit(new U_IDSelectRequest((string)selectedChoice.Metadata[TargetContentUnitID]));
+                SelectChoiceEventArgs eventArgs = new SelectChoiceEventArgs(selectedChoice, m_blackboard);
+                OnSelectChoice(eventArgs);
             }
             else
             {
                 throw new ArgumentOutOfRangeException(nameof(choiceMade), choiceMade, $"choiceMade must be between 0 and the number of choices - 1 {choices.Length - 1}");
             }
+        }
+
+        protected virtual void OnSelectChoice(SelectChoiceEventArgs eventArgs)
+        {
+            PresenterSelectChoice?.Invoke(this, eventArgs);
         }
 
         public KS_ReactiveChoicePresenter(IBlackboard blackboard) : base(blackboard)
