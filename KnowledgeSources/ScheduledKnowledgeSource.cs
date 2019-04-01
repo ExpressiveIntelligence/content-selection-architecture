@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+#if UNIT_TEST
 using Xunit.Abstractions;
+#endif
 using CSA.Core;
 
 namespace CSA.KnowledgeSources
