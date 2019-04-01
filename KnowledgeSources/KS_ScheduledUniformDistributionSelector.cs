@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSA.Core;
-using static CSA.KnowledgeUnits.CUSlots;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
