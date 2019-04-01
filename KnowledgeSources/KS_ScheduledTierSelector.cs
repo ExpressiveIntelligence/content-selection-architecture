@@ -9,14 +9,17 @@ namespace CSA.KnowledgeSources
     {
         public const string DefaultOutputPoolName = "SelectedByTier";
 
+        // The name of the content unit slot to use for sorting into tiers.
         public string TierSlot { get; }
 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
             ContentUnit[] contentUnits = ContentUnitsFilteredByPrecondition(boundVars).ToArray();
 
-            Array.Sort(contentUnits, (x, y) => ((IComparable)x.Metadata[TierSlot]).CompareTo(y) );
+            // Sort the content units by the TierSlot, largest to smallest. 
+            Array.Sort(contentUnits, (x, y) => ((IComparable)y.Metadata[TierSlot]).CompareTo(x.Metadata[TierSlot]) );
 
+            // Copy the highest-tier content units to the output pool 
             object slotValToInclude = contentUnits[0].Metadata[TierSlot];
             foreach(ContentUnit contentUnit in contentUnits)
             {
@@ -31,28 +34,31 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_ScheduledTierSelector(IBlackboard blackboard, string tierSlot) : base(blackboard, DefaultOutputPoolName)
+
+        public KS_ScheduledTierSelector(IBlackboard blackboard, string tierSlot) : base(blackboard, DefaultOutputPoolName, GenerateHasMetadataSlotFilter(tierSlot))
         {
             TierSlot = tierSlot;
         }
 
-        public KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool, string tierSlot) : base(blackboard, outputPool)
+        public KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool, string tierSlot) : base(blackboard, outputPool, GenerateHasMetadataSlotFilter(tierSlot))
         {
             TierSlot = tierSlot;
         }
 
-        public KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool, string outputPool, string tierSlot) : base(blackboard, inputPool, outputPool)
+        public KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool, string outputPool, string tierSlot) : 
+            base(blackboard, inputPool, outputPool, GenerateHasMetadataSlotFilter(tierSlot))
         {
             TierSlot = tierSlot;
         }
 
-        public KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool, string tierSlot, FilterCondition filter) : base(blackboard, outputPool, filter)
+        public KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter, string tierSlot) : 
+            base(blackboard, outputPool, (ContentUnit cu) => filter(cu) && GenerateHasMetadataSlotFilter(tierSlot)(cu))
         {
             TierSlot = tierSlot;
         }
 
-        public KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool, string outputPool, string tierSlot, FilterCondition filter)
-            : base(blackboard, inputPool, outputPool, filter)
+        public KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter, string tierSlot)
+            : base(blackboard, inputPool, outputPool, (ContentUnit cu) => filter(cu) && GenerateHasMetadataSlotFilter(tierSlot)(cu))
         {
             TierSlot = tierSlot;
         }

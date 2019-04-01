@@ -39,6 +39,11 @@ namespace CSA.KnowledgeSources
             return SelectFromPool(contentUnit, InputPool);
         }
 
+        public static FilterCondition GenerateHasMetadataSlotFilter(string slotName)
+        {
+            return (ContentUnit cu) => cu.HasMetadataSlot(slotName);
+        }
+
         protected override IDictionary<string, object>[] Precondition()
         {
             var contentUnits = from contentUnit in m_blackboard.LookupUnits<ContentUnit>()
