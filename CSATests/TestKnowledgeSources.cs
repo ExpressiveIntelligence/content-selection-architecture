@@ -882,6 +882,8 @@ namespace CSA.Tests
             Assert.True(cuSet.SetEquals(unitsRemaining));
         }
 
+        // fixme: add tests for the handlers defined in EventHandlers_ChoicePresenter 
+
         public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
         {
             IBlackboard blackboard = new Blackboard();
@@ -1204,6 +1206,10 @@ namespace CSA.Tests
             ISet<U_PrologEvalRequest> reqs = blackboard.LookupUnits<U_PrologEvalRequest>();
             Assert.False(reqs.Any());
         }
+
+        // fixme: add test for KS_ScheduledExecute
+
+
 
         public TestKnowledgeSources(ITestOutputHelper output)
         {

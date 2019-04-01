@@ -247,5 +247,4 @@ namespace CSA.Tests
             Assert.True(pool2CUs.First().Metadata[ContentUnitID].Equals(id));
         }
     }
-
 }

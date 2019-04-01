@@ -193,6 +193,8 @@ namespace CSA.Tests
             Assert.Equal(1, set3.Count);
         }
 
+        // fixme: add tests for directed links. 
+
         [Fact]
         public void TestAddLink_UnitsOnBlackboard()
         {
@@ -433,5 +435,11 @@ namespace CSA.Tests
             Assert.True(blackboard.ResetChanged() == changedAfterLinkDelete);
             Assert.False(blackboard.Changed);
         }
+
+        // fixme: add test for LookupUnits<T>
+
+        // fixme: add test for LookupSingleton<T>
+
+        // fixme: add test for NumberOfUnits<T>
     }
 }
