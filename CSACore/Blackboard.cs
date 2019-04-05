@@ -7,9 +7,9 @@ namespace CSA.Core
 {
     public class Blackboard : IBlackboard
     {
-        private readonly IDictionary<string, ISet<IUnit>> dict = new Dictionary<string, ISet<IUnit>>();
+        private readonly IDictionary<string, ISet<IUnit>> m_units = new Dictionary<string, ISet<IUnit>>();
 
-        private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType, LinkDirection Direction)>> links = 
+        private readonly IDictionary<IUnit, ISet<(IUnit Node, string LinkType, LinkDirection Direction)>> m_links =
             new Dictionary<IUnit, ISet<(IUnit Node, string LinkType, LinkDirection Direction)>>();
 
         protected bool m_changed = false;
@@ -17,18 +17,17 @@ namespace CSA.Core
         // True if the blackboard has been changed since the last call to ResetChanged()
         public bool Changed => m_changed;
 
-        // Adds a knoweldge unit to the blackboard.
-        // Duplicate units (by reference) not allowed on the blackboard. Using set semantics for Units sharing the same type. 
-        public void AddUnit(IUnit unit)
+        /*
+         * Adds a knoweldge unit to the blackboard.
+         * Duplicate units (by reference) not allowed on the blackboard. Using set semantics for Units sharing the same type. 
+         * Returns true if the unit was added to the blackboard (not a duplicate), false otherwise.        
+         */
+        public bool AddUnit(IUnit unit)
         {
 
             if (LookupUnits(unit, out ISet<IUnit> units))
             {
-                if (units.Add(unit))
-                {
-                    // Blackboard changed only if the unit was successfully added to the set (not a duplicate). 
-                    m_changed = true; 
-                }
+                return m_changed = units.Add(unit);
             }
             else
             {
@@ -36,10 +35,10 @@ namespace CSA.Core
                 {
                     unit
                 };
-                dict.Add(GetUnitTypeName(unit), newUnits);
+                m_units.Add(GetUnitTypeName(unit), newUnits);
 
                 // Adding a unit with a new type to the blackboard always changes it
-                m_changed = true;
+                return m_changed = true;
             }
         }
 
@@ -52,7 +51,7 @@ namespace CSA.Core
                 {
                     if (units.Count == 0)
                     {
-                        dict.Remove(GetUnitTypeName(unit));
+                        m_units.Remove(GetUnitTypeName(unit));
                     }
 
                     var linksToRemove = LookupLinks(unit);
@@ -82,7 +81,7 @@ namespace CSA.Core
         // Returns a set of knowledge units on the blackboard matching the unit type. 
         public ISet<T> LookupUnits<T>() where T : IUnit
         {
-            return dict.TryGetValue(typeof(T).FullName, out ISet<IUnit> units) ? new HashSet<T>(units.Cast<T>()) : new HashSet<T>();
+            return m_units.TryGetValue(typeof(T).FullName, out ISet<IUnit> units) ? new HashSet<T>(units.Cast<T>()) : new HashSet<T>();
         }
 
         /*
@@ -91,7 +90,7 @@ namespace CSA.Core
          */
         public T LookupSingleton<T>() where T : IUnit
         {
-            if (dict.TryGetValue(typeof(T).FullName, out ISet<IUnit> units))
+            if (m_units.TryGetValue(typeof(T).FullName, out ISet<IUnit> units))
             {
                 // Found at least one IUnit of type unitType
                 if (units.Count > 1)
@@ -120,7 +119,7 @@ namespace CSA.Core
 
         private bool LookupUnits(IUnit unit, out ISet<IUnit> units)
         {
-            return dict.TryGetValue(GetUnitTypeName(unit), out units);
+            return m_units.TryGetValue(GetUnitTypeName(unit), out units);
         }
 
         // Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
@@ -153,7 +152,7 @@ namespace CSA.Core
                 {
                     // Link is not already on the blackboard. 
 
-                    if (links.TryGetValue(unit1, out ISet<(IUnit, string, LinkDirection)> linkSet))
+                    if (m_links.TryGetValue(unit1, out ISet<(IUnit, string, LinkDirection)> linkSet))
                     {
                         bool bAdd = linkSet.Add((unit2, linkType, unit2Dir));
                         Debug.Assert(bAdd);
@@ -163,10 +162,10 @@ namespace CSA.Core
                         linkSet = new HashSet<(IUnit, string, LinkDirection)>();
                         bool bAdd = linkSet.Add((unit2, linkType, unit2Dir));
                         Debug.Assert(bAdd);
-                        links.Add(unit1, linkSet);
+                        m_links.Add(unit1, linkSet);
                     }
 
-                    if (links.TryGetValue(unit2, out linkSet))
+                    if (m_links.TryGetValue(unit2, out linkSet))
                     {
                         bool bAdd = linkSet.Add((unit1, linkType, unit1Dir));
                         Debug.Assert(bAdd);
@@ -176,7 +175,7 @@ namespace CSA.Core
                         linkSet = new HashSet<(IUnit, string, LinkDirection)>();
                         bool bAdd = linkSet.Add((unit1, linkType, unit1Dir));
                         Debug.Assert(bAdd);
-                        links.Add(unit2, linkSet);
+                        m_links.Add(unit2, linkSet);
                     }
 
                     // The blackboard is changed if we hadd a link
@@ -194,11 +193,9 @@ namespace CSA.Core
         // Removes the undirected link linkType between unit1 and unit2. Returns true if the link exists and was removed, false if the link doesn't exist. 
         public bool RemoveLink(IUnit unit1, IUnit unit2, string linkType, bool directed=false)
         {
-            ISet<(IUnit, string, LinkDirection)> linkSet1;
-            ISet<(IUnit, string, LinkDirection)> linkSet2;
 
-            bool bGet1 = links.TryGetValue(unit1, out linkSet1);
-            bool bGet2 = links.TryGetValue(unit2, out linkSet2);
+            bool bGet1 = m_links.TryGetValue(unit1, out ISet<(IUnit, string, LinkDirection)> linkSet1);
+            bool bGet2 = m_links.TryGetValue(unit2, out ISet<(IUnit, string, LinkDirection)> linkSet2);
 
             LinkDirection unit1Dir;
             LinkDirection unit2Dir;
@@ -254,10 +251,10 @@ namespace CSA.Core
         public void Clear()
         {
             // Clear changes the blackboard if there are any units on the blackboard (if there are no units there can't be any links)
-            m_changed = dict.Count > 0;
+            m_changed = m_units.Count > 0;
 
-            dict.Clear();
-            links.Clear();
+            m_units.Clear();
+            m_links.Clear();
         }
 
         /*
@@ -269,7 +266,7 @@ namespace CSA.Core
 
         public ISet<(IUnit Node, string LinkType, LinkDirection Direction)> LookupLinks(IUnit unit)
         {
-            return links.TryGetValue(unit, out ISet<(IUnit, string, LinkDirection)> linkSet) ? new HashSet<(IUnit, string, LinkDirection)>(linkSet) 
+            return m_links.TryGetValue(unit, out ISet<(IUnit, string, LinkDirection)> linkSet) ? new HashSet<(IUnit, string, LinkDirection)>(linkSet) 
                 : new HashSet<(IUnit, string, LinkDirection)>(); 
         }
 
@@ -285,9 +282,49 @@ namespace CSA.Core
          * Below are the definitions of public methods that help support debugging. 
          */
 
+        /*
+         * Returns the number of unit of type T stored on the blackboard. 
+         */
         public uint NumberOfUnits<T>() where T : IUnit
         {
             return (uint)LookupUnits<T>().Count();
+        }
+
+        /*
+         * Returns the total number of units of any type stored on the blackboard
+         */
+        public uint NumberOfUnits()
+        {
+            var unitSets = m_units.Values;
+
+            // fixme: this will need to be changed when individual units are indexed under multiple type names
+            uint totalCount = 0; 
+            foreach(ISet<IUnit> units in unitSets)
+            {
+                totalCount += (uint)units.Count;
+            }
+
+            return totalCount;
+        }
+
+        /*
+         * Returns the total number of links stored on the blackboard
+         */
+        public uint NumberOfLinks()
+        {
+            var linkSets = m_links.Values;
+
+            // fixme: will need to do something different when individual units are indexed under multiple type names
+            uint totalCount = 0;
+            foreach(ISet<(IUnit, string, LinkDirection)> links in linkSets)
+            {
+                totalCount += (uint)links.Count;
+            }
+
+            // The total count should always be an even number since each link appears in two different link sets (unit1->unit2 and unit2->unit1), whether directed or undirected
+            Debug.Assert(totalCount % 2 == 0);
+
+            return totalCount / 2; 
         }
 
         // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by properties rather than just class)

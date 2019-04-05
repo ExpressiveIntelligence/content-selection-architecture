@@ -12,11 +12,13 @@ namespace CSA.Core
     public interface IBlackboard
     {
 
-        // Adds a knoweldge unit to the blackboard.
-        void AddUnit(IUnit u);
+        /* Adds a knoweldge unit to the blackboard.
+         * Returns true if the unit isn't a duplicate and was successfully added to the blackboard, false otherwise. 
+         */
+        bool AddUnit(IUnit u);
 
         // Removes a knowledge unit from the blackboard. 
-        // fixme: when deleting a unit, make sure any links associated with the unit are deleted. 
+        // Returns false if the unit to remove is not on the blackboard. 
         bool RemoveUnit(IUnit u);
 
         /*
@@ -36,8 +38,11 @@ namespace CSA.Core
         // fixme: Consider adding a ContainsAny() method
         // bool ContainsAny<T>();
 
-        // Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
-        // link can be added, false otherwise. If directed == true, the link is a directed link going from the first unit to the second. 
+        /*
+         * Adds an undirected link between unit1 and unit2 with link linkType. Returns true if both unit1 and unit2 exist on the blackboard so the
+         * link can be added, false otherwise. If directed == true, the link is a directed link going from the first unit to the second. 
+         * Returns true if both unit1 and unit2 exist on the blackboard so the link can be added, false otherwise.       
+         */
         // fixme: consider making linkTypes full-fledged classes that can store additional information
         bool AddLink(IUnit unit1, IUnit unit2, string linkType, bool directed = false);
 
@@ -64,5 +69,15 @@ namespace CSA.Core
 
         // Returns the number of units of a given type stored in the blackboard.
         uint NumberOfUnits<T>() where T : IUnit;
+
+        /*
+         * Returns the total number of units of any type stored on the blackboard
+         */
+        uint NumberOfUnits();
+
+        /*
+         * Returns the total number of links stored on the blackboard
+         */
+        uint NumberOfLinks();
     }
 }

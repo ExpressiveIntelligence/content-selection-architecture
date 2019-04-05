@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -11,7 +10,6 @@ using static CSA.KnowledgeUnits.CUSlots;
 using static CSA.KnowledgeUnits.KUProps;
 using CSA.Core;
 using Prolog;
-using UnityEngine;
 
 namespace CSA.Tests
 {

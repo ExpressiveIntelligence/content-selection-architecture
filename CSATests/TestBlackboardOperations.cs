@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CSA.Core;
+using static CSA.KnowledgeUnits.LinkTypes;
 using Xunit;
 
 namespace CSA.Tests
@@ -28,6 +29,8 @@ namespace CSA.Tests
                 I = i_init;
             }
         }
+
+        // fixme: Blackboard.AddUnit now returns a bool. Add this to tests. 
 
         [Fact]
         public void TestAddContains()
@@ -129,7 +132,7 @@ namespace CSA.Tests
             blackboard.RemoveUnit(u1);
             Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
             Assert.Equal(1, blackboard.LookupUnits<TestUnit2>().Count);
-   
+
             blackboard.RemoveUnit(u2);
             Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
             Assert.Equal(0, blackboard.LookupUnits<TestUnit2>().Count);
@@ -195,12 +198,188 @@ namespace CSA.Tests
 
         // fixme: add tests for directed links. 
 
+        public static IEnumerable<object[]> Data_TestLink_Blackboard()
+        {
+            IBlackboard blackboard = new Blackboard();
+
+            IUnit[] units = {
+                new Unit(),
+                new ContentUnit(),
+                new Unit(),
+                new TestUnit1("foo")
+            };
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard,            
+             * IUnit[]: array of units to add
+             * (Unit, Unit, string, bool, bool)[]: array of links to add plus retval   
+             * IUnit[]: array of units to delete
+             * (Unit, Unit, string, bool, bool): array of links to delete plus retval 
+             * IUnit[]: array of units remaining
+             * (Unit, Unit, string, bool)[]: array of links remaining
+             */
+
+            return new List<object[]>
+            {
+                // Empty blackboard, no operations
+                new object[] { blackboard, new IUnit[0], new (IUnit, IUnit, string, bool, bool)[0], new IUnit[0], new (IUnit, IUnit, string, bool, bool)[0],
+                    new IUnit[0], new (IUnit, IUnit, string, bool)[0] },
+
+                // Empty blackboard, link operations with false retval
+                new object[] { blackboard, new IUnit[0],
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, false),
+                        (units[1], units[2], L_Choice, false, false)
+                    },
+                    new IUnit[0],
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, false),
+                        (units[1], units[2], L_Choice, false, false)
+                    },
+                    new IUnit[0], new (IUnit, IUnit, string, bool)[0] }, 
+
+                // Blackboard with tree with three nodes. Removal of one leaf should not remove the other two nodes or their link
+                new object[] { blackboard,
+                    new IUnit[] { units[0], units[1], units[2] },
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, true),
+                        (units[0], units[2], L_Tree, false, true)
+                    },
+                    new IUnit[] { units[2] },
+                    new (IUnit, IUnit, string, bool, bool)[0],
+                    new IUnit[] { units[0], units[1] },
+                    new (IUnit, IUnit, string, bool)[]
+                    {
+                       (units[0], units[1], L_Tree, true),
+                    }
+                },
+
+                // Blackboard with tree with four nodes. Removal of the root node removes two of the links
+                new object[] { blackboard,
+                    new IUnit[] { units[0], units[1], units[2], units[3] },
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, true),
+                        (units[0], units[2], L_Tree, true, true),
+                        (units[1], units[3], L_Tree, true, true)
+                    },
+                    new IUnit[] { units[0] },
+                    new (IUnit, IUnit, string, bool, bool)[0],
+                    new IUnit[] { units[1], units[2], units[3] },
+                    new (IUnit, IUnit, string, bool)[]
+                    {
+                        (units[1], units[3], L_Tree, true)
+                    }
+                },
+
+                // Blackboard with three nodes all linked to one node. Removal of the one node removes all the links. 
+                // Subsequent removal of links should return false.
+                new object[] { blackboard,
+                    new IUnit[] { units[0], units[1], units[2], units[3] },
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, true),
+                        (units[0], units[2], L_Tree, true, true),
+                        (units[0], units[3], L_Tree, true, true)
+                    },
+                    new IUnit[] { units[0] },
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_Tree, true, false),
+                        (units[0], units[2], L_Tree, true, false),
+                        (units[0], units[3], L_Tree, true, false)
+
+                    },
+                    new IUnit[] { units[1], units[2], units[3] },
+                    new (IUnit, IUnit, string, bool)[0]
+                },
+
+                // Blackboard with two nodes connected to each other with two directed links. Removing one link should leave the other 
+                new object[] { blackboard,
+                    new IUnit[] { units[0], units[1] },
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_SelectedContentUnit, true, true),
+                        (units[1], units[0], L_Tree, true, true),
+                    },
+                    new IUnit[0],
+                    new (IUnit, IUnit, string, bool, bool)[]
+                    {
+                        (units[0], units[1], L_SelectedContentUnit, true, true),
+                    },
+                    new IUnit[] { units[0], units[1] } ,
+                    new (IUnit, IUnit, string, bool)[]
+                    {
+                        (units[1], units[0], L_Tree, true)
+                    }
+                },
+
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(Data_TestLink_Blackboard))]
+        public void TestLink_Blackboard(IBlackboard blackboard, IUnit[] unitsToAdd, (IUnit, IUnit, string, bool, bool)[] linksToAdd, IUnit[] unitsToRemove,
+            (IUnit, IUnit, string, bool, bool)[] linksToRemove, IUnit[] unitsRemaining, (IUnit, IUnit, string, bool)[] linksRemaining)
+        {
+            // Clear the blackboard of previous tests. 
+            blackboard.Clear();
+
+            // Add the units 
+            TestUtilities.AddUnits(blackboard, unitsToAdd);
+
+            // Add each of the links 
+            foreach ((IUnit unit1, IUnit unit2, string linkType, bool directed, bool retval) in linksToAdd)
+            {
+                bool added = blackboard.AddLink(unit1, unit2, linkType, directed);
+                Assert.True(added == retval);
+            }
+
+            // Remove some units. Depending on which units are removed, this may remove some of the links
+            TestUtilities.RemoveUnits(blackboard, unitsToRemove);
+
+            // Remove some links. Depending on which links are removed, this may remove some units
+            foreach ((IUnit unit1, IUnit unit2, string linkType, bool directed, bool retval) in linksToRemove)
+            {
+                bool removed = blackboard.RemoveLink(unit1, unit2, linkType, directed);
+                Assert.True(removed == retval);
+            }
+
+            // Check that each unit that is supposed to be remaining is on the blackboard
+            foreach (IUnit unit in unitsRemaining)
+            {
+                Assert.True(blackboard.ContainsUnit(unit));
+            }
+
+            // Check that the total number of units on the blackboard is equal to the number of units that are supposed to be remaining
+            Assert.Equal(unitsRemaining.Length, (int)blackboard.NumberOfUnits());
+
+            // Check that each link remaning appears on the blackboard both in unit1 and unit2's link sets. 
+            foreach ((IUnit unit1, IUnit unit2, string linkType, bool directed) in linksRemaining)
+            {
+                ISet<(IUnit, string, LinkDirection)> unit1Links = blackboard.LookupLinks(unit1);
+                ISet<(IUnit, string, LinkDirection)> unit2Links = blackboard.LookupLinks(unit2);
+
+                LinkDirection unit1Dir = directed ? LinkDirection.Start : LinkDirection.Undirected;
+                LinkDirection unit2Dir = directed ? LinkDirection.End : LinkDirection.Undirected;
+
+                Assert.True(unit1Links.Contains((unit2, linkType, unit2Dir)));
+                Assert.True(unit2Links.Contains((unit1, linkType, unit1Dir)));
+            }
+
+            // Check that the total number of links on the blackboard is equal to the number of links that are supposed to be remaining
+            Assert.Equal(linksRemaining.Length, (int)blackboard.NumberOfLinks());
+        }
+
         [Fact]
         public void TestAddLink_UnitsOnBlackboard()
         {
             IBlackboard blackboard = new Blackboard();
             IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz") };
-            foreach(var unit in units)
+            foreach (var unit in units)
             {
                 blackboard.AddUnit(unit);
             }
@@ -322,7 +501,7 @@ namespace CSA.Tests
             linkSet1 = blackboard.LookupLinks(units[0]);
             linkSet2 = blackboard.LookupLinks(units[1]);
             var linkSet3 = blackboard.LookupLinks(units[2]);
-            Assert.Equal(0, linkSet1.Count); 
+            Assert.Equal(0, linkSet1.Count);
             Assert.Equal(0, linkSet2.Count);
             Assert.Equal(1, linkSet3.Count);
         }
@@ -390,16 +569,16 @@ namespace CSA.Tests
             IBlackboard blackboard,
             IUnit[] unitsToAdd,
             bool changedAfterUnitAdd,
-            (IUnit node1, IUnit node2, string linkType)[] linksToAdd, 
+            (IUnit node1, IUnit node2, string linkType)[] linksToAdd,
             bool changedAfterLinkAdd,
-            IUnit[] unitsToDelete, 
+            IUnit[] unitsToDelete,
             bool changedAfterUnitDelete,
             (IUnit node1, IUnit node2, string linkType)[] linksToDelete,
             bool changedAfterLinkDelete)
         {
             blackboard.Clear();
 
-            foreach(IUnit unit in unitsToAdd)
+            foreach (IUnit unit in unitsToAdd)
             {
                 blackboard.AddUnit(unit);
             }
@@ -408,7 +587,7 @@ namespace CSA.Tests
             Assert.True(blackboard.ResetChanged() == changedAfterUnitAdd);
             Assert.False(blackboard.Changed);
 
-            foreach((IUnit node1, IUnit node2, string linkType) link in linksToAdd)
+            foreach ((IUnit node1, IUnit node2, string linkType) link in linksToAdd)
             {
                 blackboard.AddLink(link.node1, link.node2, link.linkType);
             }
@@ -417,7 +596,7 @@ namespace CSA.Tests
             Assert.True(blackboard.ResetChanged() == changedAfterLinkAdd);
             Assert.False(blackboard.Changed);
 
-            foreach(IUnit unit in unitsToDelete)
+            foreach (IUnit unit in unitsToDelete)
             {
                 blackboard.RemoveUnit(unit);
             }
@@ -426,7 +605,7 @@ namespace CSA.Tests
             Assert.True(blackboard.ResetChanged() == changedAfterUnitDelete);
             Assert.False(blackboard.Changed);
 
-            foreach((IUnit node1, IUnit node2, string linkType) link in linksToDelete)
+            foreach ((IUnit node1, IUnit node2, string linkType) link in linksToDelete)
             {
                 blackboard.RemoveLink(link.node1, link.node2, link.linkType);
             }
