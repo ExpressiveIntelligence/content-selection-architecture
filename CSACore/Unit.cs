@@ -7,6 +7,11 @@ namespace CSA.Core
     {
         public IDictionary<string, object> Properties { get; }
 
+        public bool HasProperty(string propName)
+        {
+            return Properties.ContainsKey(propName);
+        }
+
         public Unit()
         {
             Properties = new Dictionary<string, object>();
@@ -15,6 +20,6 @@ namespace CSA.Core
         public Unit(IUnit u)
         {
             Properties = new Dictionary<string, object>(u.Properties);
-        }    
+        }
     }
 }

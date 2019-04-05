@@ -15,7 +15,7 @@ namespace CSA.Demo
         private const string FilteredPrologResultPool = "FilteredPrologResultPool";
 
         public IBlackboard Blackboard { get; }
-        public IScheduledController Controller { get; }
+        public ScheduledSequenceController Controller { get; }
 
         private readonly KS_ScheduledIDSelector m_IDSelector;
         private readonly KS_ScheduledExecute m_addPrologEvalRequest; 

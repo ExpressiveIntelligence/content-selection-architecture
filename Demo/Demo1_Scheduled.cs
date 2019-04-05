@@ -12,7 +12,7 @@ namespace CSA.Demo
         private const string FinalOutputPool = KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
 
         public IBlackboard Blackboard { get; }
-        public IScheduledController Controller { get; }
+        public ScheduledSequenceController Controller { get; }
 
         private readonly KS_ScheduledIDSelector m_IDSelector;
         private readonly KS_ScheduledUniformDistributionSelector m_uniformRandomSelector;

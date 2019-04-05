@@ -9,10 +9,12 @@ namespace CSA.Controllers
          */
         void Execute();
 
-        void AddKnowledgeSource(IScheduledKnowledgeSource ks);
+        // fixme: not sure yet what common methods I'll want on IScheduledController. Commented these out so that I don't
+        // have to define them for CFGExpansionController. 
+        // void AddKnowledgeSource(IScheduledKnowledgeSource ks);
 
-        void RemoveKnowledgeSource(IScheduledKnowledgeSource ks);
+        // void RemoveKnowledgeSource(IScheduledKnowledgeSource ks);
 
-        bool RegisteredKnowledgeSource(IScheduledKnowledgeSource ks);
+        // bool RegisteredKnowledgeSource(IScheduledKnowledgeSource ks);
     }
 }

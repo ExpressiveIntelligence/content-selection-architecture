@@ -120,8 +120,6 @@ namespace CSA.Core
 
         private bool LookupUnits(IUnit unit, out ISet<IUnit> units)
         {
-            units = null;
-
             return dict.TryGetValue(GetUnitTypeName(unit), out units);
         }
 

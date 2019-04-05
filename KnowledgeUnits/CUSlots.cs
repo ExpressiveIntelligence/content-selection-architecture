@@ -14,6 +14,7 @@
         public const string FactDeleteList_Prolog = "FactDeleteList_Prolog";
         public const string FactAddList_Prolog = "FactAddList_Prolog";
         public const string Specificity = "Specificity";
+        public const string GrammarRuleRHS = "GrammarRuleRHS"; // fixme: may want to generalize this to something like TreeChildren for general tree expansion 
 
         // fixme: haven't experimented yet with specifying specific knowledge bases on a unit-by-unit bases for evaluating prolog queries
         //public const string KnowledgeBaseName_Prolog = "KnowledgeBaseName_Prolog";
