@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSATests", "CSATests\CSATes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controllers", "Controller\Controllers.csproj", "{3942EBD4-EB8B-410E-8729-85D8F8C51568}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleChoice", "ConsoleChoice\ConsoleChoice.csproj", "{CCD7C41C-E068-4F58-BAE6-0AF91CCBCD8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleDemo", "ConsoleChoice\ConsoleDemo.csproj", "{CCD7C41C-E068-4F58-BAE6-0AF91CCBCD8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{5B7CD35B-994B-493C-ADA3-125FD533E571}"
 EndProject

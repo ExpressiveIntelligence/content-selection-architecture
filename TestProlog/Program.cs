@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Dynamic;
+using System.Collections.Generic;
 using Prolog;
 using CSA.Core;
+using static CSA.KnowledgeUnits.CUSlots;
 using UnityEngine;
 
 /* 
@@ -184,5 +186,194 @@ namespace TestProlog
             int Foo { get; set; }
             object Bar { get; set; }
         }
+
+        /*
+         * Test using object composition to provide typed access to metadata and content slots.
+         */
+        /* public interface IMetadata_ID
+        {
+            string ContentUnitID { get; set; }
+        }
+
+        public interface IMetadata_TargetID
+        {
+            string TargetContentUnitID { get; set; }
+        }
+
+        public interface IMetadata_ApplicabilityTestResult
+        {
+            bool ApplTestResult { get; set; }
+        }
+
+        public interface IMetadata_UnityPrologApplTest
+        {
+            string ApplTest_UnityProlog { get; set; }
+            object ApplTestBindings_UnityProlog { get; set; } 
+        }
+
+        public class Metadata_ID : IMetadata_ID
+        {
+            public string ContentUnitID { get; set; }
+        }
+
+        public class Metatdata_TargetID : IMetadata_TargetID
+        {
+            public string TargetContentUnitID { get; set; }
+        }
+
+        public class Metadata_ApplicabilityTestResult : IMetadata_ApplicabilityTestResult
+        {
+            public bool ApplTestResult { get; set; }
+        }
+
+        // Boo. This approach is going to end up with the problem of defining a combinatorial collection of classes which I want to avoid. 
+        public class ContentUnit_ID_ApplTestResult : IMetadata_ID, IMetadata_ApplicabilityTestResult
+        {
+            private readonly Metadata_ID m_id = new Metadata_ID();
+            private readonly Metadata_ApplicabilityTestResult m_applResult = new Metadata_ApplicabilityTestResult();
+
+            public string ContentUnitID { get => m_id.ContentUnitID; set => m_id.ContentUnitID = value; }
+            public bool ApplTestResult { get => m_applResult.ApplTestResult; set => m_applResult.ApplTestResult = value; }
+        } */
+
+        /*
+         * Let's explore now whether extension methods combined with using a dictionary will do what we need
+         */
+
+        /*
+         * IMetadata must have a Metadata dictionary. This is implemented by ContentUnit
+         */
+        public interface IMetadata
+        {
+            IDictionary<string, object> Metadata { get; }
+        }
+
+        /*
+         * An IMetadata_ID has a string ID. Interface implemented by extension methods (trick for multiple inheritance).
+         */
+        public interface IMetadata_ID : IMetadata
+        {
+        }
+
+        public static string GetID(this IMetadata_ID contentUnit)
+        {
+            return (string)contentUnit.Metadata[ContentUnitID];
+        }
+
+        public static void SetID(this IMetadata_ID contentUnit, string id)
+        {
+            contentUnit.Metadata[ContentUnitID] = id;
+        }
+
+        /*
+         * An IMetatadata_TargetID has a string target ID. Interface implemented by extension methods (trick for multiple inheritance).
+         */
+        public interface IMetadata_TargetID : IMetadata 
+        {
+        }
+
+        public static string GetTargetID(this IMetadata_TargetID contentUnit)
+        {
+            return (string)contentUnit.Metadata[TargetContentUnitID];
+        }
+
+        public static void SetTargetID(this IMetadata_TargetID contentUnit, string id)
+        {
+            contentUnit.Metadata[TargetContentUnitID] = id;
+        }
+
+        /*
+         * An IMetadata_ApplicabilityTestResult has a boolean applicability test result (appl test might be prolog, or simpler if test). 
+         * Interface implemented by extension methods (trick for multiple inheritance).       
+         */
+        public interface IMetadata_ApplicabilityTestResult : IMetadata
+        {
+        }
+
+        public static bool GetApplTestResult(this IMetadata_ApplicabilityTestResult contentUnit)
+        {
+            return (bool)contentUnit.Metadata[ApplTestResult];
+        }
+
+        public static void SetApplTestResult(this IMetadata_ApplicabilityTestResult contentUnit, bool result)
+        {
+            contentUnit.Metadata[ApplTestResult] = result;
+        }
+
+        /*
+         * An IMetadata_UnityPrologApplTest has a string applicability test (will be parsed into a query by UnityProlog) and a object representing a variable binding.
+         * Interface implemented by extension methods (trick for multiple inheritance).        
+         */
+        public interface IMetadata_UnityPrologApplTest : IMetadata
+        {
+        }
+
+        public static string GetApplTest_UnityProlog(this IMetadata_UnityPrologApplTest contentUnit)
+        {
+            return (string)contentUnit.Metadata[ApplTest_Prolog];
+        }
+
+        public static void SetApplTest_UnityProlog(this IMetadata_UnityPrologApplTest contentUnit, string test)
+        {
+            contentUnit.Metadata[ApplTest_Prolog] = test;
+        }
+
+        public static object GetApplTestBindings_UnityProlog(this IMetadata_UnityPrologApplTest contentUnit)
+        {
+            return contentUnit.Metadata[ApplTestBindings_Prolog];
+        }
+
+        public static void SetApplTestBindings_UnityProlog(this IMetadata_UnityPrologApplTest contentUnit, object binding)
+        {
+            contentUnit.Metadata[ApplTestBindings_Prolog] = binding;
+        }
+
+        /*
+         * Defining a ContentUnit with an ID, applicability test result, and prolog applicability test. 
+         */
+        public class ContentUnit_ID_Prolog : ContentUnit, IMetadata_ID, IMetadata_ApplicabilityTestResult, IMetadata_UnityPrologApplTest
+        {
+            public ContentUnit_ID_Prolog() : base()
+            {
+            }
+
+            public ContentUnit_ID_Prolog(ContentUnit_ID_Prolog contentUnit) : base(contentUnit)
+            { 
+            }
+        }
+
+        /*
+         * Defining a ContentUnit with a target ID
+         */
+        public class ContentUnit_Choice_TargetID : ContentUnit, IMetadata_TargetID
+        {
+            public ContentUnit_Choice_TargetID() : base()
+            {
+            }
+
+            public ContentUnit_Choice_TargetID(ContentUnit_Choice_TargetID contentUnit) : base(contentUnit)
+            {
+            }
+        }
+
+        /*
+         * Yay, it looks like this approach to faking multiple inheritance for content units is going to work! 
+         * fixme: for now let's get the simple CFG demo working, then move code base over to supporting this approach to multiple inheritance.        
+         */
+        public static void MultipleInheritanceTest()
+        {
+            ContentUnit_ID_Prolog contentUnit = new ContentUnit_ID_Prolog();
+
+            contentUnit.SetID("start");
+            contentUnit.SetApplTest_UnityProlog("available.");
+
+            string id = contentUnit.GetID();
+
+            IMetadata_ID contentUnit2 = new ContentUnit_ID_Prolog();
+            contentUnit2.SetID("foo");
+
+            ContentUnit_ID_Prolog contentUnit3 = new ContentUnit_ID_Prolog(contentUnit);
+        }
+
     }
 }

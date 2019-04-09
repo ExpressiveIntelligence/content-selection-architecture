@@ -93,7 +93,7 @@ namespace CSA.KnowledgeSources
         protected override void Execute(IDictionary<string, object> boundVars)
         {
             var contentUnits = ContentUnitsFilteredByPrecondition(boundVars);
-            foreach(ContentUnit contentUnit in contentUnits)
+            foreach (ContentUnit contentUnit in contentUnits)
             {
                 CopyCUToOutputPool(contentUnit);
             }

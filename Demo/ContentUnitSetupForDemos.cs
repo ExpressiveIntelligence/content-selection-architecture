@@ -1,9 +1,7 @@
 ﻿using CSA.Core;
 using CSA.KnowledgeUnits;
-using CSA.KnowledgeSources;
-using CSA.Controllers;
-using static CSA.KnowledgeSources.KSProps;
 using static CSA.KnowledgeUnits.CUSlots;
+using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.Demo
 {
@@ -125,6 +123,78 @@ namespace CSA.Demo
             prologKB.Retract("introducedYourself.");
 
             blackboard.AddUnit(prologKB);
+        }
+
+        /*
+         * Adds ContentUnits to blackboard for demo3, a simple context-free-grammar demo, no rule specificities,
+         * no pushing or poping.         
+         */
+
+        public static IUnit Demo3_DefineCUs(IBlackboard blackboard, string grammarPool)
+        {
+            // Start symbol
+            Unit startSymbol = new Unit();
+            startSymbol.Properties[GrammarNonTerminal] = "Start";
+            startSymbol.Properties[WithinTreeLevelCount] = 1;
+            startSymbol.Properties[IsTreeNode] = true;
+            startSymbol.Properties[IsLeafNode] = true;
+
+            /*
+             * Grammar rules
+             */
+
+            // Start rule
+            ContentUnit startRule = new ContentUnit();
+            startRule.Metadata[ContentUnitID] = "Start";
+            startRule.Metadata[ContentPool] = grammarPool;
+
+            // Define the RHS of start rule
+            Unit[] startRHS = { new Unit(), new Unit() };
+            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
+            startRHS[0].Properties[GrammarTerminal] = "Hello"; 
+
+            startRHS[1].Properties[GrammarNonTerminal] = "Place";
+
+            startRule.Metadata[GrammarRuleRHS] = startRHS;
+
+            // Place rule
+            ContentUnit placeRule1 = new ContentUnit();
+            placeRule1.Metadata[ContentUnitID] = "Place";
+            placeRule1.Metadata[ContentPool] = grammarPool;
+
+            // Define RHS for placeRule1
+            Unit[] placeRule1RHS = { new Unit() };
+            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
+            placeRule1RHS[0].Properties[GrammarTerminal] = "world";
+
+            placeRule1.Metadata[GrammarRuleRHS] = placeRule1RHS;
+
+            ContentUnit placeRule2 = new ContentUnit();
+            placeRule2.Metadata[ContentUnitID] = "Place";
+            placeRule2.Metadata[ContentPool] = grammarPool;
+
+            // Define RHS for placeRule2
+            Unit[] placeRule2RHS = { new Unit() };
+            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
+            placeRule2RHS[0].Properties[GrammarTerminal] = "universe";
+
+            placeRule2.Metadata[GrammarRuleRHS] = placeRule2RHS;
+
+            _ = blackboard.AddUnit(startSymbol);
+            AddGrammarRule(blackboard, startRule);
+            AddGrammarRule(blackboard, placeRule1);
+            AddGrammarRule(blackboard, placeRule2);
+
+            return startSymbol;
+        }
+
+        private static void AddGrammarRule(IBlackboard blackboard, ContentUnit rule)
+        {
+            blackboard.AddUnit(rule);
+            /* foreach (Unit unit in (Unit[])rule.Metadata[GrammarRuleRHS])
+            {
+                _ = blackboard.AddUnit(unit);
+            } */
         }
     }
 }

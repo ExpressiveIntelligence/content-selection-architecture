@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 
 namespace CSA.Core
 {
@@ -10,6 +11,22 @@ namespace CSA.Core
         public bool HasProperty(string propName)
         {
             return Properties.ContainsKey(propName);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+
+            sb.AppendLine("Unit:");
+
+            // Properties
+            sb.AppendLine("\tProperties:");
+            foreach (KeyValuePair<string, object> kvp in Properties)
+            {
+                sb.AppendLine("\t\t" + kvp.Key + " = " + kvp.Value);
+            }
+
+            return sb.ToString();
         }
 
         public Unit()

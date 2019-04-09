@@ -1,13 +1,12 @@
 ﻿using System;
 using CSA.KnowledgeSources;
 using CSA.Demo;
-using CSA.KnowledgeUnits;
 
-namespace ConsoleChoice
+namespace ConsoleDemo
 {
     class Program
     {
-        static void ReactiveConsoleChoice()
+        private static void ReactiveConsoleChoice()
         {
             Console.WriteLine("Starting reactive demo1 (simple choice-based).");
 
@@ -22,7 +21,7 @@ namespace ConsoleChoice
             }
         }
 
-        static void ScheduledConsoleChoice()
+        private static void ScheduledConsoleChoice()
         {
             Console.WriteLine("Starting scheduled demo1 (simple choice-based).");
 
@@ -37,7 +36,7 @@ namespace ConsoleChoice
             }
         }
 
-        static void ScheduledConsoleChoice_PrologApplTest()
+        private static void ScheduledConsoleChoice_PrologApplTest()
         {
             Console.WriteLine("Starting demo2 (choice-based with prolog applicability tests).");
 
@@ -46,7 +45,7 @@ namespace ConsoleChoice
             demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
             demo.AddSelectChoicePresenterHandler(EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges);
 
-            while(demo.Blackboard.Changed)
+            while (demo.Blackboard.Changed)
             {
                 demo.Blackboard.ResetChanged();
                 demo.Controller.Execute();
@@ -54,11 +53,25 @@ namespace ConsoleChoice
             }
         }
 
+        private static void SimpleScheduledCFGExpansion()
+        {
+            Console.WriteLine("Starting demo3 (simple CFG expansion).");
+
+            Demo3 demo = new Demo3();
+
+            while (demo.Blackboard.Changed)
+            {
+                demo.Blackboard.ResetChanged();
+                demo.Controller.Execute();
+            }
+
+        }
+
         public static void Main(string[] args)
         {
             if (args.Length == 0)
             {
-                throw new ArgumentException("Call with argument 'reactive' or 'scheduled'");
+                throw new ArgumentException("Call with an argument to specify which demo to run.");
             }
 
             switch (args[0])
@@ -71,6 +84,9 @@ namespace ConsoleChoice
                     break;
                 case "demo2":
                     ScheduledConsoleChoice_PrologApplTest();
+                    break;
+                case "demo3":
+                    SimpleScheduledCFGExpansion();
                     break;
                 default:
                     throw new ArgumentException("Unrecognized argument: " + args[0]);
