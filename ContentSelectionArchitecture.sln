@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitySupport", "UnitySupport\UnitySupport.csproj", "{8A598A30-41B0-4C25-96ED-EF06B2CE7908}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProlog", "TestProlog\TestProlog.csproj", "{60D48F6D-1A21-4C03-8BFC-58C112E32E00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestScratchpad", "TestProlog\TestScratchpad.csproj", "{60D48F6D-1A21-4C03-8BFC-58C112E32E00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

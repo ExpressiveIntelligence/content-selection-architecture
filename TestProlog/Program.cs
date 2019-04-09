@@ -9,7 +9,7 @@ using UnityEngine;
 /* 
  * A test rig for testing integration of UnityProlog (https://github.com/ianhorswill/UnityProlog) with CSA.
  * */
-namespace TestProlog
+namespace TestScratchpad
 {
     static class Program
     {
