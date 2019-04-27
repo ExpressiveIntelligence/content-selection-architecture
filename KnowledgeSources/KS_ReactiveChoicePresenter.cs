@@ -27,8 +27,8 @@ namespace CSA.KnowledgeSources
             var CUs = from ContentUnit cu in m_blackboard.LookupUnits<ContentUnit>()
                       where cu.HasMetadataSlot(SelectedContentUnit) // look for a selected content unit
                       where // that has not been previously matched by this precondition
-                        (!cu.Properties.ContainsKey(KSPreconditionMatched)) ||
-                        (!((ISet<ReactiveKnowledgeSource>)cu.Properties[KSPreconditionMatched]).Contains(this))
+                        (!cu.Slots.ContainsKey(KSPreconditionMatched)) ||
+                        (!((ISet<ReactiveKnowledgeSource>)cu.Slots[KSPreconditionMatched]).Contains(this))
                       select cu;
 
             // Iterate through each of the selected content units, creating KnowledgeSourceActivations
@@ -47,13 +47,13 @@ namespace CSA.KnowledgeSources
                 // fixme: this bit of boilerplate code for marking a knowledge unit as having already participated in a matched precondition 
                 // should be baked into the infrastructure somewhere so knowledge source implementers don't always have to do this. 
                 // A good place to add this would be on Unit (and declare a method on IUnit).
-                if (cu.Properties.ContainsKey(KSPreconditionMatched))
+                if (cu.Slots.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<ReactiveKnowledgeSource>)cu.Properties[KSPreconditionMatched]).Add(this);
+                    ((HashSet<ReactiveKnowledgeSource>)cu.Slots[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    cu.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
+                    cu.Slots[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
                 }
             }
 

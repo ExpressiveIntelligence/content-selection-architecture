@@ -62,26 +62,26 @@ namespace CSA.Controllers
         {
             this.blackboard = blackboard;
 
-            Debug.Assert(rootNode.HasProperty(GrammarNonTerminal));
+            Debug.Assert(rootNode.HasSlot(GrammarNonTerminal));
             RootNode = rootNode;
-            RootNode.Properties[IsTreeNode] = true;
-            RootNode.Properties[IsLeafNode] = true;
-            RootNode.Properties[WithinTreeLevelCount] = 1;
+            RootNode.Slots[IsTreeNode] = true;
+            RootNode.Slots[IsLeafNode] = true;
+            RootNode.Slots[WithinTreeLevelCount] = 1;
 
             
             m_addIDRequest = new KS_ScheduledExecute(
                 () =>
                 {
                     var nonTerminalLeafNodes = from Unit node in blackboard.LookupUnits<Unit>()
-                                               where node.HasProperty(IsLeafNode) && (bool)node.Properties[IsLeafNode] && node.HasProperty(GrammarNonTerminal)
+                                               where node.HasSlot(IsLeafNode) && (bool)node.Slots[IsLeafNode] && node.HasSlot(GrammarNonTerminal)
                                                select node;
 
                     if (nonTerminalLeafNodes.Any())
                     {
                         Unit[] sortedLeafNodes = nonTerminalLeafNodes.ToArray();
-                        Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Properties[WithinTreeLevelCount]).CompareTo(y.Properties[WithinTreeLevelCount]));
-                        blackboard.AddUnit(new U_IDSelectRequest((string)sortedLeafNodes[0].Properties[GrammarNonTerminal]));
-                        sortedLeafNodes[0].Properties[CurrentSymbolExpansion] = true;
+                        Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Slots[WithinTreeLevelCount]).CompareTo(y.Slots[WithinTreeLevelCount]));
+                        blackboard.AddUnit(new U_IDSelectRequest((string)sortedLeafNodes[0].Slots[GrammarNonTerminal]));
+                        sortedLeafNodes[0].Slots[CurrentSymbolExpansion] = true;
                     }
                 }
             );
@@ -113,18 +113,18 @@ namespace CSA.Controllers
                         Debug.Assert(rule.Count() == 1); // Only one rule is picked to expand a symbol
 
                         var nodeToExpandQuery = from unit in blackboard.LookupUnits<Unit>()
-                                                where unit.HasProperty(CurrentSymbolExpansion) && (bool)unit.Properties[CurrentSymbolExpansion]
+                                                where unit.HasSlot(CurrentSymbolExpansion) && (bool)unit.Slots[CurrentSymbolExpansion]
                                                 select unit;
 
                         Debug.Assert(nodeToExpandQuery.Count() == 1);
 
                         Unit nodeToExpand = nodeToExpandQuery.First();
-                        nodeToExpand.Properties[IsLeafNode] = false;
-                        nodeToExpand.Properties[CurrentSymbolExpansion] = false;
+                        nodeToExpand.Slots[IsLeafNode] = false;
+                        nodeToExpand.Slots[CurrentSymbolExpansion] = false;
 
                         ContentUnit ruleCopy = new ContentUnit(rule.First());
-                        ruleCopy.Properties[IsTreeNode] = true;
-                        ruleCopy.Properties[IsLeafNode] = false;
+                        ruleCopy.Slots[IsTreeNode] = true;
+                        ruleCopy.Slots[IsLeafNode] = false;
                         blackboard.AddUnit(ruleCopy);
                         bool result = blackboard.AddLink(nodeToExpand, ruleCopy, L_Tree, true);
                         Debug.Assert(result);
@@ -134,9 +134,9 @@ namespace CSA.Controllers
                         {
                             // The GrammarNonterminal and GrammarTerminal properties are defined on the Units in Metadata[GrammarRuleRHS]
                             blackboard.AddUnit(child);
-                            child.Properties[IsTreeNode] = true;
-                            child.Properties[IsLeafNode] = true;
-                            child.Properties[WithinTreeLevelCount] = i++;
+                            child.Slots[IsTreeNode] = true;
+                            child.Slots[IsLeafNode] = true;
+                            child.Slots[WithinTreeLevelCount] = i++;
                             result = blackboard.AddLink(ruleCopy, child, L_Tree, true);
                             Debug.Assert(result);
                         }
@@ -150,15 +150,15 @@ namespace CSA.Controllers
                 () =>
                 {
                     var leafNodes = from Unit node in blackboard.LookupUnits<Unit>()
-                                    where node.HasProperty(IsLeafNode) && (bool)node.Properties[IsLeafNode]
+                                    where node.HasSlot(IsLeafNode) && (bool)node.Slots[IsLeafNode]
                                     select node;
 
                     // If all the leaf nodes in the tree are terminal nodes then we're done
-                    if (leafNodes.All(node => node.HasProperty(GrammarTerminal)))
+                    if (leafNodes.All(node => node.HasSlot(GrammarTerminal)))
                     {
                         // Sort the leaf nodes by their level within the three 
                         Unit[] sortedLeafNodes = leafNodes.ToArray();
-                        Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Properties[WithinTreeLevelCount]).CompareTo(y.Properties[WithinTreeLevelCount]));
+                        Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Slots[WithinTreeLevelCount]).CompareTo(y.Slots[WithinTreeLevelCount]));
 
                         U_GeneratedSequence generatedSequence = new U_GeneratedSequence(sortedLeafNodes);
                         _ = blackboard.AddUnit(generatedSequence);
@@ -168,11 +168,11 @@ namespace CSA.Controllers
                          * type names. Once I've figured out a final representation for tree nodes, fix this. 
                          */
                         var units_treeNodes = from Unit node in blackboard.LookupUnits<Unit>()
-                                              where node.HasProperty(IsTreeNode) && (bool)node.Properties[IsTreeNode]
+                                              where node.HasSlot(IsTreeNode) && (bool)node.Slots[IsTreeNode]
                                               select node;
 
                         var contentUnits_treeNodes = from ContentUnit node in blackboard.LookupUnits<ContentUnit>()
-                                                     where node.HasProperty(IsTreeNode) && (bool)node.Properties[IsTreeNode]
+                                                     where node.HasSlot(IsTreeNode) && (bool)node.Slots[IsTreeNode]
                                                      select node;
                         foreach (Unit u in units_treeNodes)
                         {

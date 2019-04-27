@@ -3,8 +3,8 @@
 namespace CSA.Core
 {
     public interface IUnit { 
-        IDictionary<string, object> Properties { get; }
+        IDictionary<string, object> Slots { get; }
 
-        bool HasProperty(string propName);
-     }
+        bool HasSlot(string slotName);
+    }
 }

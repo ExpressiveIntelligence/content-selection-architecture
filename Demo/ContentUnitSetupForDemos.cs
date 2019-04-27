@@ -134,10 +134,10 @@ namespace CSA.Demo
         {
             // Start symbol
             Unit startSymbol = new Unit();
-            startSymbol.Properties[GrammarNonTerminal] = "Start";
-            startSymbol.Properties[WithinTreeLevelCount] = 1;
-            startSymbol.Properties[IsTreeNode] = true;
-            startSymbol.Properties[IsLeafNode] = true;
+            startSymbol.Slots[GrammarNonTerminal] = "Start";
+            startSymbol.Slots[WithinTreeLevelCount] = 1;
+            startSymbol.Slots[IsTreeNode] = true;
+            startSymbol.Slots[IsLeafNode] = true;
 
             /*
              * Grammar rules
@@ -151,9 +151,9 @@ namespace CSA.Demo
             // Define the RHS of start rule
             Unit[] startRHS = { new Unit(), new Unit() };
             // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            startRHS[0].Properties[GrammarTerminal] = "Hello"; 
+            startRHS[0].Slots[GrammarTerminal] = "Hello"; 
 
-            startRHS[1].Properties[GrammarNonTerminal] = "Place";
+            startRHS[1].Slots[GrammarNonTerminal] = "Place";
 
             startRule.Metadata[GrammarRuleRHS] = startRHS;
 
@@ -165,7 +165,7 @@ namespace CSA.Demo
             // Define RHS for placeRule1
             Unit[] placeRule1RHS = { new Unit() };
             // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            placeRule1RHS[0].Properties[GrammarTerminal] = "world";
+            placeRule1RHS[0].Slots[GrammarTerminal] = "world";
 
             placeRule1.Metadata[GrammarRuleRHS] = placeRule1RHS;
 
@@ -176,7 +176,7 @@ namespace CSA.Demo
             // Define RHS for placeRule2
             Unit[] placeRule2RHS = { new Unit() };
             // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            placeRule2RHS[0].Properties[GrammarTerminal] = "universe";
+            placeRule2RHS[0].Slots[GrammarTerminal] = "universe";
 
             placeRule2.Metadata[GrammarRuleRHS] = placeRule2RHS;
 

@@ -107,7 +107,7 @@ namespace CSA.Tests
                 // If they should be marked as previously matched, set KSPreconditionMatched
                 if (previouslyMatched)
                 {
-                    unitToAdd.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { ks };
+                    unitToAdd.Slots[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { ks };
                 }
             }
 
@@ -129,8 +129,8 @@ namespace CSA.Tests
             {
                 foreach (IUnit u in unitsToAdd)
                 {
-                    Assert.True(u.Properties.ContainsKey(KSPreconditionMatched));
-                    bool containsKS = ((HashSet<ReactiveKnowledgeSource>)u.Properties[KSPreconditionMatched]).Contains(ks);
+                    Assert.True(u.Slots.ContainsKey(KSPreconditionMatched));
+                    bool containsKS = ((HashSet<ReactiveKnowledgeSource>)u.Slots[KSPreconditionMatched]).Contains(ks);
                     Assert.True(containsKS);
                 }
             }

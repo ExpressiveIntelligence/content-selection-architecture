@@ -6,11 +6,11 @@ namespace CSA.Core
     // Base class for all Blackboard Units.
     public class Unit : IUnit
     {
-        public IDictionary<string, object> Properties { get; }
+        public IDictionary<string, object> Slots { get; }
 
-        public bool HasProperty(string propName)
+        public bool HasSlot(string propName)
         {
-            return Properties.ContainsKey(propName);
+            return Slots.ContainsKey(propName);
         }
 
         public override string ToString()
@@ -21,7 +21,7 @@ namespace CSA.Core
 
             // Properties
             sb.AppendLine("\tProperties:");
-            foreach (KeyValuePair<string, object> kvp in Properties)
+            foreach (KeyValuePair<string, object> kvp in Slots)
             {
                 sb.AppendLine("\t\t" + kvp.Key + " = " + kvp.Value);
             }
@@ -31,12 +31,12 @@ namespace CSA.Core
 
         public Unit()
         {
-            Properties = new Dictionary<string, object>();
+            Slots = new Dictionary<string, object>();
         }
 
         public Unit(IUnit u)
         {
-            Properties = new Dictionary<string, object>(u.Properties);
+            Slots = new Dictionary<string, object>(u.Slots);
         }
     }
 }

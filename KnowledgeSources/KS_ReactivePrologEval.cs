@@ -22,8 +22,8 @@ namespace CSA.KnowledgeSources
             // Use LINQ to create a collection of the requested U_PrologEvalQueries on the blackboard.
             var requests = from request in m_blackboard.LookupUnits<U_PrologEvalRequest>() // Lookup ID select requests
                            where // where the request has not been previously matched by this knowledge source precondition
-                            (!request.Properties.ContainsKey(KSPreconditionMatched)) ||
-                            (!((ISet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Contains(this))
+                            (!request.Slots.ContainsKey(KSPreconditionMatched)) ||
+                            (!((ISet<ReactiveKnowledgeSource>)request.Slots[KSPreconditionMatched]).Contains(this))
                           select request;
 
             IKnowledgeSourceActivation[] activations = new IKnowledgeSourceActivation[requests.Count()];
@@ -48,13 +48,13 @@ namespace CSA.KnowledgeSources
                 // fixme: this bit of boilerplate code for marking a knowledge unit as having already participated in a matched precondition 
                 // should be baked into the infrastructure somewhere so knowledge source implementers don't always have to do this. 
                 // A good place to add this would be on Unit (and declare a method on IUnit).
-                if (request.Properties.ContainsKey(KSPreconditionMatched))
+                if (request.Slots.ContainsKey(KSPreconditionMatched))
                 {
-                    ((HashSet<ReactiveKnowledgeSource>)request.Properties[KSPreconditionMatched]).Add(this);
+                    ((HashSet<ReactiveKnowledgeSource>)request.Slots[KSPreconditionMatched]).Add(this);
                 }
                 else
                 {
-                    request.Properties[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
+                    request.Slots[KSPreconditionMatched] = new HashSet<ReactiveKnowledgeSource> { this };
                 }
             }
 
