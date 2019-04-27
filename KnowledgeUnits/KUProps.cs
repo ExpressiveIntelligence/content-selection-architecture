@@ -11,7 +11,7 @@
         public const string WithinTreeLevelCount = "WithinTreeLevelCount";
         public const string CurrentSymbolExpansion = "CurrentSymbolExpansion";
 
-        // fixme: possibly move to enum indicating grammar terminal and non-terminal. But this might changed based on the move to multiple-inheritance (extension methods) for ContentUnits
+        // fixme: possibly move to enum indicating grammar terminal and non-terminal. But this might change based on the move to multiple-inheritance (extension methods) for ContentUnits
         // public enum GrammarSymbolType { Grammar_NonTerminal, Grammar_Terminal };
     }
 }

@@ -2,7 +2,8 @@
 
 namespace CSA.Core
 {
-    public interface IUnit { 
+    public interface IUnit
+    {
         IDictionary<string, object> Slots { get; }
 
         bool HasSlot(string slotName);

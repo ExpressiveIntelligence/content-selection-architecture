@@ -316,7 +316,7 @@ namespace CSA.Core
 
             // fixme: will need to do something different when individual units are indexed under multiple type names
             uint totalCount = 0;
-            foreach(ISet<(IUnit, string, LinkDirection)> links in linkSets)
+            foreach (ISet<(IUnit, string, LinkDirection)> links in linkSets)
             {
                 totalCount += (uint)links.Count;
             }

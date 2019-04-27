@@ -28,7 +28,7 @@ namespace CSA.KnowledgeSources
          */
         protected readonly IKnowledgeSourceActivation[] m_emptyActivations;
 
-        public ReactiveKnowledgeSource(IBlackboard blackboard)
+        protected ReactiveKnowledgeSource(IBlackboard blackboard)
         {
             m_blackboard = blackboard;
             m_previousMatchSets = new List<HashSet<IUnit>>();
