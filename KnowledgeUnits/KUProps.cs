@@ -11,6 +11,9 @@
         public const string WithinTreeLevelCount = "WithinTreeLevelCount";
         public const string CurrentSymbolExpansion = "CurrentSymbolExpansion";
 
+        // fixme: putting knowledge unit reference names here for now. Will be likely getting rid of KUProps - move references names to appropriate file. 
+        public const string CurrentTreeNodeExpansion = "CurrentTreeNodeExpansion";
+
         // fixme: possibly move to enum indicating grammar terminal and non-terminal. But this might change based on the move to multiple-inheritance (extension methods) for ContentUnits
         // public enum GrammarSymbolType { Grammar_NonTerminal, Grammar_Terminal };
     }

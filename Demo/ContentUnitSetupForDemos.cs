@@ -130,55 +130,50 @@ namespace CSA.Demo
          * no pushing or poping.         
          */
 
-        public static IUnit Demo3_DefineCUs(IBlackboard blackboard, string grammarPool)
+        public static Unit Demo3_DefineCUs(IBlackboard blackboard, string grammarPool)
         {
             // Start symbol
             Unit startSymbol = new Unit();
-            startSymbol.Slots[GrammarNonTerminal] = "Start";
-            startSymbol.Slots[WithinTreeLevelCount] = 1;
-            startSymbol.Slots[IsTreeNode] = true;
-            startSymbol.Slots[IsLeafNode] = true;
+            startSymbol.AddComponent(new KC_IDSelectionRequest("Start", true));
+            startSymbol.AddComponent(new KC_TreeNode(null));
+            startSymbol.AddComponent(new KC_ContentPool(grammarPool, true));
 
             /*
              * Grammar rules
              */
 
             // Start rule
-            ContentUnit startRule = new ContentUnit();
-            startRule.Metadata[ContentUnitID] = "Start";
-            startRule.Metadata[ContentPool] = grammarPool;
+            Unit startRule = new Unit();
+            startRule.AddComponent(new KC_UnitID("Start", true));
+            startRule.AddComponent(new KC_ContentPool(grammarPool, true));
 
             // Define the RHS of start rule
             Unit[] startRHS = { new Unit(), new Unit() };
-            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            startRHS[0].Slots[GrammarTerminal] = "Hello"; 
+            startRHS[0].AddComponent(new KC_Text("Hello", true));
+            startRHS[1].AddComponent(new KC_IDSelectionRequest("Place", true));
 
-            startRHS[1].Slots[GrammarNonTerminal] = "Place";
-
-            startRule.Metadata[GrammarRuleRHS] = startRHS;
+            startRule.AddComponent(new KC_Decomposition(startRHS, true));
 
             // Place rule
-            ContentUnit placeRule1 = new ContentUnit();
-            placeRule1.Metadata[ContentUnitID] = "Place";
-            placeRule1.Metadata[ContentPool] = grammarPool;
+            Unit placeRule1 = new Unit();
+            placeRule1.AddComponent(new KC_UnitID("Place", true));
+            placeRule1.AddComponent(new KC_ContentPool(grammarPool, true));
 
             // Define RHS for placeRule1
             Unit[] placeRule1RHS = { new Unit() };
-            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            placeRule1RHS[0].Slots[GrammarTerminal] = "world";
+            placeRule1RHS[0].AddComponent(new KC_Text("world", true));
 
-            placeRule1.Metadata[GrammarRuleRHS] = placeRule1RHS;
+            placeRule1.AddComponent(new KC_Decomposition(placeRule1RHS, true));
 
-            ContentUnit placeRule2 = new ContentUnit();
-            placeRule2.Metadata[ContentUnitID] = "Place";
-            placeRule2.Metadata[ContentPool] = grammarPool;
+            Unit placeRule2 = new Unit();
+            placeRule2.AddComponent(new KC_UnitID("Place", true));
+            placeRule2.AddComponent(new KC_ContentPool(grammarPool, true));
 
             // Define RHS for placeRule2
             Unit[] placeRule2RHS = { new Unit() };
-            // fixme: replace this with a template in the rule, so only non-terminals are in the tree 
-            placeRule2RHS[0].Slots[GrammarTerminal] = "universe";
+            placeRule2RHS[0].AddComponent(new KC_Text("universe", true));
 
-            placeRule2.Metadata[GrammarRuleRHS] = placeRule2RHS;
+            placeRule2.AddComponent(new KC_Decomposition(placeRule2RHS, true));
 
             _ = blackboard.AddUnit(startSymbol);
             AddGrammarRule(blackboard, startRule);
@@ -188,7 +183,7 @@ namespace CSA.Demo
             return startSymbol;
         }
 
-        private static void AddGrammarRule(IBlackboard blackboard, ContentUnit rule)
+        private static void AddGrammarRule(IBlackboard blackboard, Unit rule)
         {
             blackboard.AddUnit(rule);
             /* foreach (Unit unit in (Unit[])rule.Metadata[GrammarRuleRHS])

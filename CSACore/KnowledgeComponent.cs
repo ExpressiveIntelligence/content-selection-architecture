@@ -6,7 +6,7 @@
      */
     public class KnowledgeComponent
     {
-        public Unit ContainingUnit { get; set; }
+        public Unit ContainingUnit { get; internal set; }
 
         // fixme: keep the constructor for now until I decide what else might live in component.
         public KnowledgeComponent()

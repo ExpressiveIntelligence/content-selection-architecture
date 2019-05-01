@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace CSA.Core
 {
@@ -38,48 +40,99 @@ namespace CSA.Core
          * from component type name to a set of components.         
          */
 
-        protected IDictionary<string, object> m_components;
+        protected IDictionary<string, ISet<KnowledgeComponent>> m_components;
 
-        /*
         public bool AddComponent(KnowledgeComponent component)
         {
 
             if (LookupUnits(component, out ISet<KnowledgeComponent> components))
             {
-                return components.Add(component);
+                if (components.Add(component))
+                {
+                    component.ContainingUnit = this;
+                    return true;
+                }
+                return false;
             }
-            else
-            {
-                ISet<KnowledgeComponent> newComponents = new HashSet<KnowledgeComponent>
+
+            // If a set for this component type has not been defined yet, create the set and add the component
+            ISet<KnowledgeComponent> newComponents = new HashSet<KnowledgeComponent>
                 {
                     component
                 };
-                m_components.Add(GetUnitTypeName(component), newComponents);
-                return true;
+            m_components.Add(GetUnitTypeName(component), newComponents);
+            return true;
+        }
+
+        public bool RemoveComponent(KnowledgeComponent component)
+        {
+            if (LookupUnits(component, out ISet<KnowledgeComponent> components))
+            {
+                if (components.Remove(component))
+                {
+                    component.ContainingUnit = null;
+                    if (components.Count == 0)
+                    {
+                        m_components.Remove(GetUnitTypeName(component));
+                    }
+                    return true;
+                }
+            }
+            return false;
+        } 
+
+        public T GetComponent<T>() where T : KnowledgeComponent
+        {
+            if (m_components.TryGetValue(typeof(T).FullName, out ISet<KnowledgeComponent> components))
+            {
+                // Found at least one KnowledgeComponent of type T
+                if (components.Count > 1)
+                {
+                    throw new InvalidOperationException("Unit.GetComponent called for KnowledgeComponent type with >1 components added to the unit.");
+                }
+                return (T)components.First();
+            }
+            else
+            {
+                return default(T); // No KnowledgeComponent of type T found in the Unit
             }
         }
 
+        public ISet<T> GetComponents<T>() where T : KnowledgeComponent
+        {
+            return m_components.TryGetValue(typeof(T).FullName, out ISet<KnowledgeComponent> components) ? new HashSet<T>(components.Cast<T>()) : new HashSet<T>();
+        }
+
+        public bool HasComponent<T>() where T : KnowledgeComponent
+        {
+            return m_components.TryGetValue(typeof(T).FullName, out var _);
+        }
+
+        public IDictionary<string, ISet<KnowledgeComponent>> CopyComponents()
+        {
+            return new Dictionary<string, ISet<KnowledgeComponent>>(m_components);
+        }
 
         private bool LookupUnits(KnowledgeComponent component, out ISet<KnowledgeComponent> components)
         {
-            return m_components.TryGetValue(GetUnitTypeName(component), out c);
+            return m_components.TryGetValue(GetUnitTypeName(component), out components);
         }
 
         protected string GetUnitTypeName(KnowledgeComponent component)
         {
             return component.GetType().FullName;
         }
-        */
+
         public Unit()
         {
             Slots = new Dictionary<string, object>();
-            //m_components = new Dictionary<string, object>();
+            m_components = new Dictionary<string, ISet<KnowledgeComponent>>();
         }
 
         public Unit(IUnit u)
         {
             Slots = new Dictionary<string, object>(u.Slots);
-           //m_components = u.CopyComponents(); 
+            m_components = u.CopyComponents();
         }
     }
 }

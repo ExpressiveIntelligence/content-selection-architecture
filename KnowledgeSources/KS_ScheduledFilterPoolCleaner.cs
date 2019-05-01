@@ -32,7 +32,7 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_ScheduledFilterPoolCleaner(IBlackboard blackboard, string[] inputPools) : 
+        public KS_ScheduledFilterPoolCleaner(IBlackboard blackboard, string[] inputPools) :
             base(blackboard, null, (cu) => SelectFromInputPools(inputPools, cu))
         {
         }

@@ -14,7 +14,7 @@ namespace CSA.Demo
         public Demo3()
         {
             Blackboard = new Blackboard();
-            IUnit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_DefineCUs(Blackboard, grammarPool);
+            Unit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_DefineCUs(Blackboard, grammarPool);
             Controller = new CFGExpansionController(expansionTreeRootNode, grammarPool, Blackboard);
          }
     }
