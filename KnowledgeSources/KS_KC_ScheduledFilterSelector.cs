@@ -74,7 +74,11 @@ namespace CSA.KnowledgeSources
         protected Unit CopyUnitToOutputPool(Unit unit)
         {
             Unit newUnit = new Unit(unit);
-            newUnit.SetContentPool(OutputPool);
+
+            // Remove the previous readonly ContentPool component and add a new one with the new pool
+            newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
+            newUnit.AddComponent(new KC_ContentPool(OutputPool, true));
+
             m_blackboard.AddUnit(newUnit);
             m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedContentUnit, true); // fixme: need a more general link type for copies between pools
             return newUnit;

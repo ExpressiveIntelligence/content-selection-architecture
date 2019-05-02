@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace CSA.Core
         public bool AddComponent(KnowledgeComponent component)
         {
 
-            if (LookupUnits(component, out ISet<KnowledgeComponent> components))
+            if (LookupComponents(component, out ISet<KnowledgeComponent> components))
             {
                 if (components.Add(component))
                 {
@@ -66,7 +67,7 @@ namespace CSA.Core
 
         public bool RemoveComponent(KnowledgeComponent component)
         {
-            if (LookupUnits(component, out ISet<KnowledgeComponent> components))
+            if (LookupComponents(component, out ISet<KnowledgeComponent> components))
             {
                 if (components.Remove(component))
                 {
@@ -90,6 +91,7 @@ namespace CSA.Core
                 {
                     throw new InvalidOperationException("Unit.GetComponent called for KnowledgeComponent type with >1 components added to the unit.");
                 }
+                Debug.Assert(components.Count == 1);
                 return (T)components.First();
             }
             else
@@ -110,10 +112,15 @@ namespace CSA.Core
 
         public IDictionary<string, ISet<KnowledgeComponent>> CopyComponents()
         {
-            return new Dictionary<string, ISet<KnowledgeComponent>>(m_components);
+            Dictionary<string, ISet<KnowledgeComponent>> newComponents = new Dictionary<string, ISet<KnowledgeComponent>>();
+            foreach(var kvp in m_components)
+            {
+                newComponents[kvp.Key] = new HashSet<KnowledgeComponent>(kvp.Value);
+            }
+            return newComponents;
         }
 
-        private bool LookupUnits(KnowledgeComponent component, out ISet<KnowledgeComponent> components)
+        private bool LookupComponents(KnowledgeComponent component, out ISet<KnowledgeComponent> components)
         {
             return m_components.TryGetValue(GetUnitTypeName(component), out components);
         }

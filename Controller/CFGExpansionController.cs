@@ -28,7 +28,33 @@ namespace CSA.Controllers
         private readonly KS_ScheduledExecute m_addGeneratedSequence;
 
         // fixme: this is a hack just to keep the execute from adding more than one U_GeneratedSequence to the blackboard
-        private bool finished = false; 
+        private bool finished = false;
+
+        /*
+         * Prints out the generated grammar tree starting with the root node.
+         */
+        private void PrintTree()
+        {
+            Console.WriteLine(RootNode);
+            foreach(var child in RootNode.GetTreeChildren())
+            {
+                PrintTreeHelper(1, child.ContainingUnit);
+            }
+        }
+
+        private void PrintTreeHelper(uint indent, Unit node)
+        { 
+            for (int i = 0; i < indent; i++)
+            {
+                Console.Write(" ");
+            }
+
+            Console.WriteLine(node);
+            foreach(var child in node.GetTreeChildren())
+            {
+                PrintTreeHelper(indent + 1, child.ContainingUnit);
+            }
+        }
 
         /*
          * Executes one tree node update. Must be repeatedly called in an loop in order to fully expand a grammar request.
@@ -39,6 +65,7 @@ namespace CSA.Controllers
         {
             if (!finished)
             {
+                PrintTree();
                 m_addIDRequest.Execute();
                 m_lookupGrammarRules.Execute();
                 m_chooseGrammarRule.Execute();
