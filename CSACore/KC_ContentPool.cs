@@ -31,17 +31,17 @@ namespace CSA.Core
     {
         public static string GetContentPool(this Unit unit)
         {
-            return unit.GetStringValue();
+            return unit.GetStringValue<KC_ContentPool>();
         }
 
         public static void SetContentPool(this Unit unit, string unitID)
         {
-            unit.SetStringValue(unitID);
+            unit.SetStringValue<KC_ContentPool>(unitID);
         }
 
         public static bool ContentPoolEquals(this Unit unit, string contentPool)
         {
-            return unit.StringValueEquals(contentPool);
+            return unit.StringValueEquals<KC_ContentPool>(contentPool);
         }
     }
 }

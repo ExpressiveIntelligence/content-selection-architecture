@@ -42,24 +42,24 @@ namespace CSA.Core
 
     public static class KC_Immutable_Extensions
     {
-        public static bool GetImmutable(this Unit unit)
+        public static bool GetImmutable<T>(this Unit unit) where T : KC_Immutable
         {
-            if (unit.HasComponent<KC_Immutable>())
+            if (unit.HasComponent<T>())
             {
-                return unit.GetComponent<KC_Immutable>().Immutable;
+                return unit.GetComponent<T>().Immutable;
             }
-            throw new InvalidOperationException("GetImmutable called on unit that does not have a KC_Immutable component.");
+            throw new InvalidOperationException("GetImmutable<T> called on unit that does not have a component with KC_Immutable parent.");
         }
 
-        public static void SetImmutable(this Unit unit, bool immutable)
+        public static void SetImmutable<T>(this Unit unit, bool immutable) where T : KC_Immutable
         {
-            if (unit.HasComponent<KC_Immutable>())
+            if (unit.HasComponent<T>())
             {
-                unit.GetComponent<KC_Immutable>().Immutable = immutable;
+                unit.GetComponent<T>().Immutable = immutable;
             }
             else
             {
-                throw new InvalidOperationException("SetImmutable called on unit that does not have a KC_Immutable component.");
+                throw new InvalidOperationException("SetImmutable<T> called on unit that does not have a component with KC_Immutable parent.");
             }
         }
     }

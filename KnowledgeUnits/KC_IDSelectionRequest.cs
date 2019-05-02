@@ -58,17 +58,17 @@ namespace CSA.KnowledgeUnits
 
         public static string GetTargetUnitID(this Unit unit)
         {
-            return unit.GetStringValue();
+            return unit.GetStringValue<KC_IDSelectionRequest>();
         }
 
         public static void SetTargetUnitID(this Unit unit, string id)
         {
-            unit.SetStringValue(id);
+            unit.SetStringValue<KC_IDSelectionRequest>(id);
         }
 
         public static bool TargetUnitIDEquals(this Unit unit, string unitID)
         {
-            return unit.StringValueEquals(unitID);
+            return unit.StringValueEquals<KC_IDSelectionRequest>(unitID);
         }
     }
 }

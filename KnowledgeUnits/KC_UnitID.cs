@@ -32,17 +32,17 @@ namespace CSA.KnowledgeUnits
     {
         public static string GetUnitID(this Unit unit)
         {
-            return unit.GetStringValue();
+            return unit.GetStringValue<KC_UnitID>();
         }
 
         public static void SetUnitID(this Unit unit, string unitID)
         {
-            unit.SetStringValue(unitID);
+            unit.SetStringValue<KC_UnitID>(unitID);
         }
 
         public static bool UnitIDEquals(this Unit unit, string unitID)
         {
-            return unit.StringValueEquals(unitID);
+            return unit.StringValueEquals<KC_UnitID>(unitID);
         }
 
     }

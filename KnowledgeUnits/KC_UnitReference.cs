@@ -48,28 +48,17 @@ namespace CSA.KnowledgeUnits
     {
         public static string GetReferenceName(this Unit unit)
         {
-            if (unit.HasComponent<KC_UnitReference>())
-            {
-                return unit.GetComponent<KC_UnitReference>().Name;
-            }
-            throw new InvalidOperationException("GetReferenceName() called on Unit without a KC_UnitReference componenent.");
+            return unit.GetStringValue<KC_UnitReference>();
         }
 
         public static void SetReferenceName(this Unit unit, string name)
         {
-            if (unit.HasComponent<KC_UnitReference>())
-            {
-                unit.GetComponent<KC_UnitReference>().Name = name;
-            }
-            else
-            {
-                throw new InvalidOperationException("SetReferenceName() called on Unit without a KC_UnitReference componenent.");
-            }
+            unit.SetStringValue<KC_UnitReference>(name);
         }
 
         public static bool ReferenceNameEquals(this Unit unit, string refName)
         {
-            return unit.StringValueEquals(refName);
+            return unit.StringValueEquals<KC_UnitReference>(refName);
         }
 
         public static Unit GetUnitReference(this Unit unit)

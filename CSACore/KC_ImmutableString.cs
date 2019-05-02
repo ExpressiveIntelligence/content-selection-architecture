@@ -43,30 +43,30 @@ namespace CSA.Core
 
     public static class KC_ImmutableString_Extensions
     {
-        public static string GetStringValue(this Unit unit)
+        public static string GetStringValue<T>(this Unit unit) where T : KC_ImmutableString
         {
-            if (unit.HasComponent<KC_ImmutableString>())
+            if (unit.HasComponent<T>())
             {
-                return unit.GetComponent<KC_ImmutableString>().StringValue;
+                return unit.GetComponent<T>().StringValue;
             }
-            throw new InvalidOperationException("GetStringValue called on unit that does not have a KC_ImmutableString component.");
+            throw new InvalidOperationException("GetStringValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_ImmutableString parent.");
         }
 
-        public static void SetStringValue(this Unit unit, string stringToStore)
+        public static void SetStringValue<T>(this Unit unit, string stringToStore) where T : KC_ImmutableString
         {
-            if (unit.HasComponent<KC_ImmutableString>())
+            if (unit.HasComponent<T>())
             {
-                unit.GetComponent<KC_ImmutableString>().StringValue = stringToStore;
+                unit.GetComponent<T>().StringValue = stringToStore;
             }
             else
             {
-                throw new InvalidOperationException("SetStringValue called on unit that does not have a KC_ImmutableString component.");
+                throw new InvalidOperationException("SetStringValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_ImmutableString parent.");
             }
         }
 
-        public static bool StringValueEquals(this Unit unit, string s)
+        public static bool StringValueEquals<T>(this Unit unit, string s) where T : KC_ImmutableString
         {
-            return unit.GetStringValue().Equals(s);
+            return unit.GetStringValue<T>().Equals(s);
         }
     }
 
