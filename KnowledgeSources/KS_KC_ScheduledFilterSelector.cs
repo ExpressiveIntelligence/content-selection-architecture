@@ -80,9 +80,9 @@ namespace CSA.KnowledgeSources
             return newUnit;
         }
 
-        protected IEnumerable<ContentUnit> UnitsFilteredByPrecondition(IDictionary<string, object> boundVars)
+        protected IEnumerable<Unit> UnitsFilteredByPrecondition(IDictionary<string, object> boundVars)
         {
-            return (IEnumerable<ContentUnit>)boundVars[FilteredUnits];
+            return (IEnumerable<Unit>)boundVars[FilteredUnits];
         }
 
         /*

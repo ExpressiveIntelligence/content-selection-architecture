@@ -22,7 +22,7 @@ namespace CSA.KnowledgeSources
 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            IEnumerable<ContentUnit> units = UnitsFilteredByPrecondition(boundVars);
+            IEnumerable<Unit> units = UnitsFilteredByPrecondition(boundVars);
             foreach (var unit in units)
             {
                 m_blackboard.RemoveUnit(unit);
