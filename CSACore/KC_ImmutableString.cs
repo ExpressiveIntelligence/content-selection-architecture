@@ -58,7 +58,10 @@ namespace CSA.Core
             {
                 unit.GetComponent<KC_ImmutableString>().StringValue = stringToStore;
             }
-            throw new InvalidOperationException("SetStringValue called on unit that does not have a KC_ImmutableString component.");
+            else
+            {
+                throw new InvalidOperationException("SetStringValue called on unit that does not have a KC_ImmutableString component.");
+            }
         }
 
         public static bool StringValueEquals(this Unit unit, string s)

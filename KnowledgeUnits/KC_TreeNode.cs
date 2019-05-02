@@ -97,7 +97,10 @@ namespace CSA.KnowledgeUnits
             {
                 parent.AddChild(unit.GetComponent<KC_TreeNode>());
             }
-            throw new InvalidOperationException("SetTreeParent() called on Unit without a KC_TreeNode componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetTreeParent() called on Unit without a KC_TreeNode componenent.");
+            }
         }
 
         public static IList<KC_TreeNode> GetTreeChildren(this Unit unit)
@@ -117,14 +120,17 @@ namespace CSA.KnowledgeUnits
 
                 // First remove any existing children. 
                 thisNode.RemoveChildren();
-                
+
                 // Now add each new child to the node
-                foreach(KC_TreeNode child in children)
+                foreach (KC_TreeNode child in children)
                 {
                     thisNode.AddChild(child);
                 }
             }
-            throw new InvalidOperationException("SetTreeChildren() called on Unit without a KC_TreeNode componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetTreeChildren() called on Unit without a KC_TreeNode componenent.");
+            }
         }
 
         public static void AddTreeChild(this Unit unit, KC_TreeNode child)
@@ -133,7 +139,10 @@ namespace CSA.KnowledgeUnits
             {
                 unit.GetComponent<KC_TreeNode>().AddChild(child);
             }
-            throw new InvalidOperationException("AddTreeChild() called on Unit without a KC_TreeNode componenent.");
+            else
+            {
+                throw new InvalidOperationException("AddTreeChild() called on Unit without a KC_TreeNode componenent.");
+            }
         }
 
         public static void RemoveTreeChild(this Unit unit, KC_TreeNode child)
@@ -142,7 +151,10 @@ namespace CSA.KnowledgeUnits
             {
                 unit.GetComponent<KC_TreeNode>().RemoveChild(child);
             }
-            throw new InvalidOperationException("RemoveTreeChild() called on Unit without a KC_TreeNode componenent.");
+            else
+            {
+                throw new InvalidOperationException("RemoveTreeChild() called on Unit without a KC_TreeNode componenent.");
+            }
         }
 
         public static bool IsTreeLeaf(this Unit unit)

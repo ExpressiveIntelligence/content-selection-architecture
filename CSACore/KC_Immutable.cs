@@ -57,7 +57,10 @@ namespace CSA.Core
             {
                 unit.GetComponent<KC_Immutable>().Immutable = immutable;
             }
-            throw new InvalidOperationException("SetImmutable called on unit that does not have a KC_Immutable component.");
+            else
+            {
+                throw new InvalidOperationException("SetImmutable called on unit that does not have a KC_Immutable component.");
+            }
         }
     }
 }

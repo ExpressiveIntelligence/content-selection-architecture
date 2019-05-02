@@ -40,10 +40,6 @@ namespace CSA.KnowledgeUnits
             unit.SetStringValue(unitID);
         }
 
-        /*
-         * fixme: add an equality test method for the UnitID. 
-         * bool UnitIDEquals(string unitID)        
-         */
         public static bool UnitIDEquals(this Unit unit, string unitID)
         {
             return unit.StringValueEquals(unitID);

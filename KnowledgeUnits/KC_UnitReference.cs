@@ -61,7 +61,10 @@ namespace CSA.KnowledgeUnits
             {
                 unit.GetComponent<KC_UnitReference>().Name = name;
             }
-            throw new InvalidOperationException("SetReferenceName() called on Unit without a KC_UnitReference componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetReferenceName() called on Unit without a KC_UnitReference componenent.");
+            }
         }
 
         public static bool ReferenceNameEquals(this Unit unit, string refName)
@@ -78,13 +81,16 @@ namespace CSA.KnowledgeUnits
             throw new InvalidOperationException("GetUnitReference() called on Unit without a KC_UnitReference componenent.");
         }
 
-        public static string SetUnitReference(this Unit unit, Unit reference)
+        public static void SetUnitReference(this Unit unit, Unit reference)
         {
             if (unit.HasComponent<KC_UnitReference>())
             {
                 unit.GetComponent<KC_UnitReference>().Reference = reference;
             }
-            throw new InvalidOperationException("SetUnitReference() called on Unit without a KC_UnitReference componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetUnitReference() called on Unit without a KC_UnitReference componenent.");
+            }
         }
     }
 }

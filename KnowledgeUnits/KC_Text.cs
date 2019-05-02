@@ -39,5 +39,10 @@ namespace CSA.KnowledgeUnits
         {
             unit.SetStringValue(text);
         }
+
+        public static bool TextEquals(this Unit unit, string s)
+        {
+            return unit.StringValueEquals(s);
+        }
     }
 }

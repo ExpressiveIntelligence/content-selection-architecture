@@ -50,7 +50,10 @@ namespace CSA.KnowledgeUnits
             {
                 unit.GetComponent<KC_IDSelectionRequest>().ActiveRequest = active;
             }
-            throw new InvalidOperationException("SetActiveRequest() called on Unit without a KC_IDSelectionRequest componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetActiveRequest() called on Unit without a KC_IDSelectionRequest componenent.");
+            }
         }
 
         public static string GetTargetUnitID(this Unit unit)

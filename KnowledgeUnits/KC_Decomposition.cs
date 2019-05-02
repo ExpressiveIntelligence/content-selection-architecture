@@ -73,7 +73,10 @@ namespace CSA.KnowledgeUnits
             {
                 unit.GetComponent<KC_Decomposition>().Decomposition = decomposition;
             }
-            throw new InvalidOperationException("SetDecomposition() called on Unit without a KC_Decomposition componenent.");
+            else
+            {
+                throw new InvalidOperationException("SetDecomposition() called on Unit without a KC_Decomposition componenent.");
+            }
         }
     }
 }
