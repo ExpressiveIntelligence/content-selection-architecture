@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CSA.Core;
 
 namespace CSA.KnowledgeUnits
@@ -7,7 +8,7 @@ namespace CSA.KnowledgeUnits
      * KnowledgeComponent for storing an named reference to a knowledge unit. Used to create global variables on the blackboard. 
      */
 
-    public class KC_UnitReference : KC_ImmutableString
+    public class KC_UnitReference : KC_ReadOnlyString
     {
         public Unit Reference { get; set; }
 
@@ -17,6 +18,23 @@ namespace CSA.KnowledgeUnits
 
             set => StringValue = value;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(Name: " + StringValue + ", Ref: " + Reference);
+            if (ReadOnly)
+            {
+                sb.Append(", readonly)");
+            }
+            else
+            {
+                sb.Append(")");
+            }
+            return sb.ToString();
+        }
+
+        public override object Clone() => new KC_UnitReference(this);
 
         public KC_UnitReference()
         {
@@ -33,14 +51,20 @@ namespace CSA.KnowledgeUnits
             Reference = reference;
         }
 
-        public KC_UnitReference(string name, bool immutable) : base(name, immutable)
+        public KC_UnitReference(string name, bool readOnly) : base(name, readOnly)
         {
             Reference = null;
         }
 
-        public KC_UnitReference(string name, bool immutable, Unit reference) : base(name, immutable)
+        public KC_UnitReference(string name, bool readOnly, Unit reference) : base(name, readOnly)
         {
             Reference = reference;
+        }
+
+        protected KC_UnitReference(KC_UnitReference toCopy) : base(toCopy)
+        {
+            // When cloning a unit reference, it points to the same Unit as cloned unit reference with the same reference name. 
+            Reference = toCopy.Reference;
         }
     }
 

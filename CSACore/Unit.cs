@@ -26,13 +26,23 @@ namespace CSA.Core
 
             sb.AppendLine("Unit:");
 
+            // fixme: commenting out printing properties for now. Eventually properties will be completely replaced by KnowledgeComponents. 
             // Properties
-            sb.AppendLine("\tProperties:");
+            /* sb.AppendLine("\tProperties:");
             foreach (KeyValuePair<string, object> kvp in Slots)
             {
                 sb.AppendLine("\t\t" + kvp.Key + " = " + kvp.Value);
-            }
+            } */
 
+            foreach(ISet<KnowledgeComponent> value in m_components.Values)
+            {
+                sb.Append("   [" + value.First().GetType().Name + ": ");
+                foreach(KnowledgeComponent component in value)
+                {
+                    sb.Append(component);
+                }
+                sb.AppendLine("]");
+            }
             return sb.ToString();
         }
 
@@ -62,6 +72,7 @@ namespace CSA.Core
                     component
                 };
             m_components.Add(GetUnitTypeName(component), newComponents);
+            component.ContainingUnit = this;
             return true;
         }
 
@@ -110,16 +121,6 @@ namespace CSA.Core
             return m_components.TryGetValue(typeof(T).FullName, out var _);
         }
 
-        public IDictionary<string, ISet<KnowledgeComponent>> CopyComponents()
-        {
-            Dictionary<string, ISet<KnowledgeComponent>> newComponents = new Dictionary<string, ISet<KnowledgeComponent>>();
-            foreach(var kvp in m_components)
-            {
-                newComponents[kvp.Key] = new HashSet<KnowledgeComponent>(kvp.Value);
-            }
-            return newComponents;
-        }
-
         private bool LookupComponents(KnowledgeComponent component, out ISet<KnowledgeComponent> components)
         {
             return m_components.TryGetValue(GetUnitTypeName(component), out components);
@@ -136,10 +137,19 @@ namespace CSA.Core
             m_components = new Dictionary<string, ISet<KnowledgeComponent>>();
         }
 
-        public Unit(IUnit u)
+        public Unit(Unit u)
         {
             Slots = new Dictionary<string, object>(u.Slots);
-            m_components = u.CopyComponents();
+            m_components = new Dictionary<string, ISet<KnowledgeComponent>>();
+
+            // Iterate through all the components in the Unit being copied, adding 
+            foreach(var compSet in u.m_components.Values)
+            {
+                foreach(var component in compSet)
+                {
+                    AddComponent((KnowledgeComponent)component.Clone());
+                }
+            }
         }
     }
 }

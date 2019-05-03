@@ -1,11 +1,12 @@
-﻿using CSA.Core;
+﻿using System.Text;
+using CSA.Core;
 
 namespace CSA.KnowledgeUnits
 {
     /*
      * KnowledgeComponent for storing a string. Typically used as textual content.  
      */
-    public class KC_Text : KC_ImmutableString
+    public class KC_Text : KC_ReadOnlyString
     {
 
         public string Text
@@ -15,6 +16,23 @@ namespace CSA.KnowledgeUnits
             set => StringValue = value;
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(Text: " + StringValue);
+            if (ReadOnly)
+            {
+                sb.Append(", readonly)");
+            }
+            else
+            {
+                sb.Append(")");
+            }
+            return sb.ToString();
+        }
+
+        public override object Clone() => new KC_Text(this);
+
         public KC_Text()
         {
         }
@@ -23,7 +41,11 @@ namespace CSA.KnowledgeUnits
         {
         }
 
-        public KC_Text(string text, bool immutable) : base(text, immutable)
+        public KC_Text(string text, bool readOnly) : base(text, readOnly)
+        {
+        }
+
+        protected KC_Text(KC_Text toCopy) : base(toCopy)
         {
         }
     }

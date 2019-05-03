@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Dynamic;
+using System.Diagnostics;
 using System.Collections.Generic;
 using Prolog;
 using CSA.Core;
+using CSA.KnowledgeUnits;
 using static CSA.KnowledgeUnits.CUSlots;
 using UnityEngine;
 
@@ -23,7 +25,23 @@ namespace TestScratchpad
             //KnowledgeBase kb = new KnowledgeBase("global", null);
             //PrintTypeVariable<KnowledgeBase>(kb);
             // TestIncrement();   
-            TestBoolConstant();
+            // TestBoolConstant();
+            TestContainingUnit();
+        }
+
+        // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
+        private static void TestContainingUnit()
+        {
+            Unit unit1 = new Unit();
+            unit1.AddComponent(new KC_UnitID("foo", true));
+
+            System.Diagnostics.Debug.Assert(unit1.GetComponent<KC_UnitID>().ContainingUnit == unit1);
+
+            Unit unit2 = new Unit(unit1);
+
+            System.Diagnostics.Debug.Assert(unit2.GetComponent<KC_UnitID>().ContainingUnit == unit2);
+            System.Diagnostics.Debug.Assert(unit2.GetReadOnly<KC_UnitID>());
+            System.Diagnostics.Debug.Assert(unit2.UnitIDEquals("foo"));
         }
 
         //Testing whether true and false are handled as prolog queries

@@ -1,44 +1,53 @@
 ﻿using System;
+using System.Text;
 using CSA.Core;
 
 namespace CSA.KnowledgeUnits
 {
-    public class KC_Decomposition : KC_Immutable
+    public class KC_Decomposition : KC_ReadOnly
     {
-        private Unit[] m_decomposition; 
+        private Unit[] m_decomposition;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(Decomposition: ");
+            if (ReadOnly)
+            {
+                sb.AppendLine("(readonly)");
+            }
+            else
+            {
+                sb.AppendLine("");
+            }
+            foreach(var unit in m_decomposition)
+            {
+                sb.AppendLine("   " + unit);
+            }
+            return sb.ToString();
+        }
 
         public Unit[] Decomposition
         {
-            get
-            {
-                // if the KC_Decomposition isn't immutable, just return the decompostion. This means any changes to the individual members of the decomposition are permanent.
-                if (!Immutable)
-                {
-                    return m_decomposition;
-                }
-
-                // This KC_Decomposition is immutable, return an array of copies of the Units of the decomposition so that changes to Units aren't permanent. 
-                Unit[] decompositionCopy = new Unit[m_decomposition.Length];
-                for (int i = 0; i < m_decomposition.Length; i++)
-                {
-                    decompositionCopy[i] = new Unit(m_decomposition[i]);
-                }
-                return decompositionCopy;
-            }
+            // Since m_decomposition is an array, it is already immutable. Don't need to test whether component is readOnly or not. 
+            // fixme: not doing a deep copy of Units, so they still could be changed. Should implement readOnly on Units as well. 
+            get => m_decomposition;
 
             set
             {
-                if (!Immutable)
+                if (!ReadOnly)
                 {
                     m_decomposition = value;
                 }
                 else
                 {
-                    throw new InvalidOperationException("Attempt to set the Decomposition properity of an immutable KC_Decomposition");
+                    throw new InvalidOperationException("Attempt to set the Decomposition properity of a readOnly KC_Decomposition");
 
                 }
             }
         }
+
+        public override object Clone() => new KC_Decomposition(this);
 
         public KC_Decomposition()
         {
@@ -50,9 +59,15 @@ namespace CSA.KnowledgeUnits
             m_decomposition = decomposition;
         }
 
-        public KC_Decomposition(Unit[] decomposition, bool immutable) : base(immutable)
+        public KC_Decomposition(Unit[] decomposition, bool readOnly) : base(readOnly)
         {
             m_decomposition = decomposition;
+        }
+
+        protected KC_Decomposition(KC_Decomposition toCopy) : base (toCopy)
+        {
+            // Since m_decomposition is an array, copying reference to the same array rather than creating an array copy.  
+            m_decomposition = toCopy.m_decomposition;
         }
     }
 

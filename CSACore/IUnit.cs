@@ -13,6 +13,5 @@ namespace CSA.Core
         T GetComponent<T>() where T : KnowledgeComponent;
         ISet<T> GetComponents<T>() where T : KnowledgeComponent;
         bool HasComponent<T>() where T : KnowledgeComponent;
-        IDictionary<string, ISet<KnowledgeComponent>> CopyComponents();
     }
 }

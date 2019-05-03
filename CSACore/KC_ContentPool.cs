@@ -1,11 +1,11 @@
-﻿using System;
+﻿using System.Text;
 
 namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing a string content pool ID.
      */
-    public class KC_ContentPool : KC_ImmutableString
+    public class KC_ContentPool : KC_ReadOnlyString
     {
         public string ContentPool
         {
@@ -13,6 +13,23 @@ namespace CSA.Core
 
             set => StringValue = value; 
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(ContentPool: " + StringValue);
+            if (ReadOnly)
+            {
+                sb.Append(", readonly)");
+            }
+            else
+            {
+                sb.Append(")");
+            }
+            return sb.ToString(); 
+        }
+
+        public override object Clone() => new KC_ContentPool(this);
 
         public KC_ContentPool()
         {
@@ -22,7 +39,11 @@ namespace CSA.Core
         {
         }
 
-        public KC_ContentPool(string contentPool, bool immutable) : base(contentPool, immutable)
+        public KC_ContentPool(string contentPool, bool readOnly) : base(contentPool, readOnly)
+        {
+        }
+
+        protected KC_ContentPool(KC_ContentPool toCopy) : base(toCopy)
         {
         }
     }

@@ -13,9 +13,9 @@ namespace CSA.KnowledgeUnits
         public KC_TreeNode Parent { get; protected set; }
         public IList<KC_TreeNode> Children { get; protected set; }
 
-        public bool IsLeaf() => Children.Count == 0;
+        public bool IsLeaf => Children.Count == 0;
 
-        public bool IsRoot() => Parent == null;
+        public bool IsRoot => Parent == null;
 
         public void AddChild(KC_TreeNode child)
         {
@@ -33,6 +33,8 @@ namespace CSA.KnowledgeUnits
                 child.Parent = this;
             }
         }
+
+        public override object Clone() => new KC_TreeNode();
 
         public void RemoveChild(KC_TreeNode child)
         {
@@ -54,6 +56,25 @@ namespace CSA.KnowledgeUnits
 
             // Clear the child list.
             Children.Clear();
+        }
+
+        public override string ToString()
+        {
+            return "(IsLeaf: " + IsLeaf + ", IsRoot: " + IsRoot + ", ChildCount: " + Children.Count + ")";
+        }
+
+        /* 
+         * This is the copy constructor used by clone. Since copies of KC_TreeNode don't copy the parent and children, and there are no base copy constructors, 
+         * the "copy" constructor doesn't need an argument. For readability it would still be nice to include one, but then there's a signature collision with
+         * KC_TreeNode(parent). 
+         */
+        protected KC_TreeNode() : base()
+        {
+            /* When copying a KC_TreeNode, leave parent null and children empty. If we're copying a KC_TreeNode, it's because we're copying a unit, and it wouldn't 
+             * make sense to have the new KC_TreeNode still pointing to the old units. 
+             */
+            Parent = null;
+            Children = new List<KC_TreeNode>();
         }
 
         public KC_TreeNode(KC_TreeNode parent)
@@ -161,7 +182,7 @@ namespace CSA.KnowledgeUnits
         {
             if (unit.HasComponent<KC_TreeNode>())
             {
-                return unit.GetComponent<KC_TreeNode>().IsLeaf();
+                return unit.GetComponent<KC_TreeNode>().IsLeaf;
             }
             throw new InvalidOperationException("IsTreeLeaf() called on Unit without a KC_TreeNode componenent.");
         }
@@ -170,7 +191,7 @@ namespace CSA.KnowledgeUnits
         {
             if (unit.HasComponent<KC_TreeNode>())
             {
-                return unit.GetComponent<KC_TreeNode>().IsRoot();
+                return unit.GetComponent<KC_TreeNode>().IsRoot;
             }
             throw new InvalidOperationException("IsTreeRoot() called on Unit without a KC_TreeNode componenent.");
         }

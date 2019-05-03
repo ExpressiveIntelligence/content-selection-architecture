@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Text;
 using CSA.Core;
 
 namespace CSA.KnowledgeUnits
@@ -6,7 +6,7 @@ namespace CSA.KnowledgeUnits
     /*
      * KnowledgeComponent for storing an unit ID. 
      */
-    public class KC_UnitID : KC_ImmutableString
+    public class KC_UnitID : KC_ReadOnlyString
     {
         public string UnitID
         {
@@ -14,6 +14,23 @@ namespace CSA.KnowledgeUnits
 
             set => StringValue = value;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(UnitID: " + StringValue);
+            if (ReadOnly)
+            {
+                sb.Append(", readonly)");
+            }
+            else
+            {
+                sb.Append(")");
+            }
+            return sb.ToString();
+        }
+
+        public override object Clone() => new KC_UnitID(this);
 
         public KC_UnitID()
         {
@@ -23,7 +40,11 @@ namespace CSA.KnowledgeUnits
         {
         }
 
-        public KC_UnitID(string targetID, bool immutable) : base(targetID, immutable)
+        public KC_UnitID(string targetID, bool readOnly) : base(targetID, readOnly)
+        {
+        }
+
+        protected KC_UnitID(KC_UnitID toCopy) : base(toCopy)
         {
         }
     }

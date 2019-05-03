@@ -1,17 +1,24 @@
-﻿namespace CSA.Core
+﻿using System;
+
+namespace CSA.Core
 {
     /*
      * Components define groups of related Properties and Methods that can be added to a unit. Knowledge sources trigger
      * on the presence of an appropriate component    
      */
-    public class KnowledgeComponent
+    public abstract class KnowledgeComponent : ICloneable
     {
         public Unit ContainingUnit { get; internal set; }
 
-        // fixme: keep the constructor for now until I decide what else might live in component.
-        public KnowledgeComponent()
+        /*
+         * When cloning KnowledgeComponent, ContainingUnit should be set equal to null (which it will be by default constructor) so that it's not pointing at the  
+         * Unit being cloned. It will be set to the correct unit by AddComponent (called in the copy constructor of Unit). 
+         */
+        public abstract object Clone();
+
+        protected KnowledgeComponent()
         {
-            
+            ContainingUnit = null;
         }
     }
 }

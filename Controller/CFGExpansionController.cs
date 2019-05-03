@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using CSA.Core;
@@ -43,16 +45,32 @@ namespace CSA.Controllers
         }
 
         private void PrintTreeHelper(uint indent, Unit node)
-        { 
-            for (int i = 0; i < indent; i++)
-            {
-                Console.Write(" ");
-            }
-
-            Console.WriteLine(node);
+        {
+            Console.WriteLine(IndentLines(indent, node.ToString()));
             foreach(var child in node.GetTreeChildren())
             {
                 PrintTreeHelper(indent + 1, child.ContainingUnit);
+            }
+        }
+
+        private string IndentLines(uint indent, string s)
+        {
+            StringReader reader = new StringReader(s);
+            StringBuilder sb = new StringBuilder(100);
+            string line; 
+            while ((line = reader.ReadLine()) != null)
+            {
+                Indent(indent, sb);
+                sb.AppendLine(line);
+            }
+            return sb.ToString();
+        }
+
+        private void Indent(uint indent, StringBuilder sb)
+        {
+            for(uint i = 0; i < indent; i++)
+            {
+                sb.Append("  ");
             }
         }
 

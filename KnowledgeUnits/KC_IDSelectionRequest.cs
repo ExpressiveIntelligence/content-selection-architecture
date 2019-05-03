@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CSA.Core;
 
 namespace CSA.KnowledgeUnits
@@ -6,7 +7,7 @@ namespace CSA.KnowledgeUnits
     /*
      * KnowledgeComponent for storing an ID selection request. 
      */
-    public class KC_IDSelectionRequest : KC_ImmutableString
+    public class KC_IDSelectionRequest : KC_ReadOnlyString
     {
         public bool ActiveRequest { get; set; }
 
@@ -16,6 +17,23 @@ namespace CSA.KnowledgeUnits
 
             set => StringValue = value;
         }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder(100);
+            sb.Append("(TargetUnitID: " + StringValue + ", ActiveRequest: " + ActiveRequest);
+            if (ReadOnly)
+            {
+                sb.Append(", readonly)");
+            }
+            else
+            {
+                sb.Append(")");
+            }
+            return sb.ToString();
+        }
+
+        public override object Clone() => new KC_IDSelectionRequest(this);
 
         public KC_IDSelectionRequest()
         {
@@ -27,9 +45,14 @@ namespace CSA.KnowledgeUnits
             ActiveRequest = false;
         }
 
-        public KC_IDSelectionRequest(string targetID, bool immutable) : base(targetID, immutable)
+        public KC_IDSelectionRequest(string targetID, bool readOnly) : base(targetID, readOnly)
         {
             ActiveRequest = false;
+        }
+
+        protected KC_IDSelectionRequest(KC_IDSelectionRequest toCopy) : base(toCopy)
+        {
+            ActiveRequest = toCopy.ActiveRequest;
         }
     }
 
