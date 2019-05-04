@@ -57,14 +57,17 @@ namespace ConsoleDemo
         {
             Console.WriteLine("Starting demo3 (simple CFG expansion).");
 
-            Demo3 demo = new Demo3();
-
-            while (demo.Blackboard.Changed)
+            for (int i = 0; i < 10; i++)
             {
-                demo.Blackboard.ResetChanged();
-                demo.Controller.Execute();
-            }
+                Demo3 demo = new Demo3();
 
+                while (demo.Blackboard.Changed)
+                {
+                    demo.Blackboard.ResetChanged();
+                    demo.Controller.Execute();
+                }
+                Console.WriteLine();
+            }
         }
 
         public static void Main(string[] args)

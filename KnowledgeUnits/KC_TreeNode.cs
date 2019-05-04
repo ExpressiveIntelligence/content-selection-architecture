@@ -80,7 +80,8 @@ namespace CSA.KnowledgeUnits
         public KC_TreeNode(KC_TreeNode parent)
         {
             //  Set the parent and add this node to the children of the parent.
-            Parent = parent;
+            // fixme: remove
+            // Parent = parent;
             parent?.AddChild(this);
 
             Children = new List<KC_TreeNode>();
@@ -89,7 +90,8 @@ namespace CSA.KnowledgeUnits
         public KC_TreeNode(KC_TreeNode parent, IList<KC_TreeNode> children)
         {
             // Set the Parent and add this node to the children of the parent
-            Parent = parent;
+            // fixme: remove
+            // Parent = parent;
             parent?.AddChild(this);
 
             // Set the Children and set the parent of each of the children to this node

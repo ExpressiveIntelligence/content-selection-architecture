@@ -27,7 +27,9 @@ namespace CSA.Core
 
             if (LookupUnits(unit, out ISet<IUnit> units))
             {
-                return m_changed = units.Add(unit);
+                bool added = units.Add(unit);
+                m_changed = m_changed || added;
+                return added;
             }
             else
             {

@@ -22,15 +22,15 @@ namespace CSA.Controllers
         private readonly IBlackboard blackboard;
 
         // fixme: currently hardcoding the knowledge sources
-        private readonly KS_ScheduledExecute m_addIDRequest;
+        private readonly KS_ScheduledExecute m_pickLeftmostNodeToExpand;
         private readonly KS_KC_ScheduledIDSelector m_lookupGrammarRules;
         private readonly KS_KC_ScheduledUniformDistributionSelector m_chooseGrammarRule;
-        private readonly KS_ScheduledExecute m_addRuleToTree;
+        private readonly KS_ScheduledExecute m_treeExpander;
         private readonly KS_KC_ScheduledFilterPoolCleaner m_cleanSelectionPools;
         private readonly KS_ScheduledExecute m_addGeneratedSequence;
 
         // fixme: this is a hack just to keep the execute from adding more than one U_GeneratedSequence to the blackboard
-        private bool finished = false;
+        // private bool finished = false;
 
         /*
          * Prints out the generated grammar tree starting with the root node.
@@ -81,24 +81,24 @@ namespace CSA.Controllers
          */
         public void Execute()
         {
-            if (!finished)
+            var nonTerminalLeafNodes = from Unit node in blackboard.LookupUnits<Unit>()
+                                           where node.HasComponent<KC_TreeNode>() && node.IsTreeLeaf()
+                                           where node.HasComponent<KC_IDSelectionRequest>()
+                                           select node;
+
+            // fixme: generated sequence gets spit out twice
+            if (nonTerminalLeafNodes.Any())
             {
                 PrintTree();
-                m_addIDRequest.Execute();
+                m_pickLeftmostNodeToExpand.Execute();
                 m_lookupGrammarRules.Execute();
                 m_chooseGrammarRule.Execute();
-                m_addRuleToTree.Execute();
+                m_treeExpander.Execute();
                 m_cleanSelectionPools.Execute();
-                if (!blackboard.Changed)
-                {
-                    finished = true;
-                    m_addGeneratedSequence.Execute();
-                    U_GeneratedSequence sequence = blackboard.LookupSingleton<U_GeneratedSequence>();
-                    foreach (IUnit unit in sequence.Sequence)
-                    {
-                        Console.WriteLine(unit);
-                    }
-                }
+            }
+            else
+            {
+                m_addGeneratedSequence.Execute();
             }
         }
 
@@ -123,7 +123,7 @@ namespace CSA.Controllers
 
             RootNode = rootNode;
             
-            m_addIDRequest = new KS_ScheduledExecute(
+            m_pickLeftmostNodeToExpand = new KS_ScheduledExecute(
                 () =>
                 {
                     var nonTerminalLeafNodes = from Unit node in blackboard.LookupUnits<Unit>()
@@ -134,15 +134,15 @@ namespace CSA.Controllers
                     if (nonTerminalLeafNodes.Any())
                     {
                         nonTerminalLeafNodes.First().SetActiveRequest(true);
+
+                        /*
+                         * Save a reference to the current tree node we're expanding on the blackboard. 
+                         */
+                        Unit leafExpansionRef = new Unit();
+                        leafExpansionRef.AddComponent(new KC_UnitReference(CurrentTreeNodeExpansion, true, nonTerminalLeafNodes.First()));
+                        blackboard.AddUnit(leafExpansionRef);
                     }
 
-                    /*
-                     * Save a reference to the current tree node we're expanding on the blackboard. 
-                     */
-                    Unit leafExpansionRef = new Unit();
-                    leafExpansionRef.AddComponent(new KC_UnitReference(CurrentTreeNodeExpansion, true, nonTerminalLeafNodes.First()));
-                    blackboard.AddUnit(leafExpansionRef);
-    
                     // fixme: used to sort by the WithinTreeLevelCount to ensure that non-terminals were expanded left to right. Come back to this if it becomes an issue. 
                     /* if (nonTerminalLeafNodes.Any())
                     {
@@ -162,7 +162,7 @@ namespace CSA.Controllers
             string uniformDistOutputPool = "uniformDistOutputPool";
             m_chooseGrammarRule = new KS_KC_ScheduledUniformDistributionSelector(blackboard, idOutputPool, uniformDistOutputPool, 1);
 
-            m_addRuleToTree = new KS_ScheduledExecute(
+            m_treeExpander = new KS_ScheduledExecute(
                 () =>
                 {
                     var rule = from unit in blackboard.LookupUnits<Unit>()
@@ -175,7 +175,7 @@ namespace CSA.Controllers
                     var nodeToExpandQuery = from unit in blackboard.LookupUnits<Unit>()
                                             where unit.HasComponent<KC_UnitReference>()
                                             select unit;
-                    Unit nodeToExpand = nodeToExpandQuery.First();
+                    Unit nodeToExpandRef = nodeToExpandQuery.First();
 
                     if (rule.Any())
                     {
@@ -183,29 +183,35 @@ namespace CSA.Controllers
 
                         Debug.Assert(nodeToExpandQuery.Count() == 1); // Should be only one reference we're expanding. 
 
+                        Unit selectedRule = rule.First();
+                        Unit ruleNode = new Unit(selectedRule);
+                        // Remove the KC_Decomposition (not needed) and KC_ContentPool (will cause node to be prematurely cleaned up) components
+                        ruleNode.RemoveComponent(ruleNode.GetComponent<KC_Decomposition>());
+                        ruleNode.RemoveComponent(ruleNode.GetComponent<KC_ContentPool>());
 
-                        Unit ruleCopy = new Unit(rule.First());
                         // fixme: consider defining conversion operators so this looks like
                         // new KC_TreeNode((KC_TreeNode)nodeToExpand);
-                        ruleCopy.AddComponent(new KC_TreeNode(nodeToExpand.GetComponent<KC_TreeNode>()));
-                        blackboard.AddUnit(ruleCopy);
+                        ruleNode.AddComponent(new KC_TreeNode(nodeToExpandRef.GetUnitReference().GetComponent<KC_TreeNode>()));
+                        blackboard.AddUnit(ruleNode);
 
                         // For each of the Units in the decomposition, add them to the tree as children of ruleCopy. 
-                        foreach (Unit child in ruleCopy.GetDecomposition())
+                        foreach (Unit child in selectedRule.GetDecomposition())
                         {
-                            blackboard.AddUnit(child);
-                            child.AddComponent(new KC_TreeNode(ruleCopy.GetComponent<KC_TreeNode>()));
+                            // Make a copy of Unit in the decomposition and add it to the tree. 
+                            Unit childNode = new Unit(child);
+                            blackboard.AddUnit(childNode);
+                            childNode.AddComponent(new KC_TreeNode(ruleNode.GetComponent<KC_TreeNode>()));
                         }
                     }
                     else
                     {
                         // No rule was found. Create a pseudo-decomposition consisting of just the TargetUnitID in ## (borrowing from Tracery). 
                         Unit noRuleTextDecomp = new Unit();
-                        noRuleTextDecomp.AddComponent(new KC_TreeNode(nodeToExpand.GetComponent<KC_TreeNode>()));
-                        noRuleTextDecomp.AddComponent(new KC_Text("#" + nodeToExpand.GetTargetUnitID() + "#", true));
+                        noRuleTextDecomp.AddComponent(new KC_TreeNode(nodeToExpandRef.GetComponent<KC_TreeNode>()));
+                        noRuleTextDecomp.AddComponent(new KC_Text("#" + nodeToExpandRef.GetTargetUnitID() + "#", true));
                         blackboard.AddUnit(noRuleTextDecomp);
                     }
-                    blackboard.RemoveUnit(nodeToExpand); // Remove the reference to the leaf node to expand (it has been expanded).
+                    blackboard.RemoveUnit(nodeToExpandRef); // Remove the reference to the leaf node to expand (it has been expanded).
                 }
             );
 

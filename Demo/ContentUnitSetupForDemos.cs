@@ -130,7 +130,7 @@ namespace CSA.Demo
          * no pushing or poping.         
          */
 
-        public static Unit Demo3_DefineCUs(IBlackboard blackboard, string grammarPool)
+        public static Unit Demo3_1_DefineCUs(IBlackboard blackboard, string grammarPool)
         {
             // Start symbol
             Unit startSymbol = new Unit();
@@ -175,21 +175,172 @@ namespace CSA.Demo
 
             placeRule2.AddComponent(new KC_Decomposition(placeRule2RHS, true));
 
-            _ = blackboard.AddUnit(startSymbol);
-            AddGrammarRule(blackboard, startRule);
-            AddGrammarRule(blackboard, placeRule1);
-            AddGrammarRule(blackboard, placeRule2);
+            blackboard.AddUnit(startSymbol);
+            blackboard.AddUnit(startRule);
+            blackboard.AddUnit(placeRule1);
+            blackboard.AddUnit(placeRule2);
 
             return startSymbol;
         }
 
-        private static void AddGrammarRule(IBlackboard blackboard, Unit rule)
+        /*
+         * Adds ContentUnits to blackboard for demo3, a simple context-free-grammar demo, no rule specificities,
+         * no pushing or poping. Uses this grammar from the 12B assignment. 
+         * animal:cat,emu,okapi
+         * emotion:happy,sad,elated,curious,sleepy
+         * color:red,green,blue
+         * name:emily,luis,otavio,anna,charlie
+         * character:#name# the #adjective# #animal#
+         * place:school,the beach,the zoo,Burning Man
+         * adjective:#color#,#emotion#,
+         * origin:once #character# and #character# went to #place#
+         */
+        public static Unit Demo3_2_DefineCUs(IBlackboard blackboard, string grammarPool)
         {
-            blackboard.AddUnit(rule);
-            /* foreach (Unit unit in (Unit[])rule.Metadata[GrammarRuleRHS])
+            // Start symbol
+            Unit startSymbol = new Unit();
+            startSymbol.AddComponent(new KC_IDSelectionRequest("Origin", true));
+            startSymbol.AddComponent(new KC_TreeNode(null));
+            startSymbol.AddComponent(new KC_ContentPool(grammarPool, true));
+
+            /*
+             * Grammar rules
+             */
+
+            /* Origin rule
+             * Origin --> Once #Character# and #Character# went to #Place#
+             */
+            Unit startRule = MakeRuleUnit("Origin", grammarPool, blackboard);
+
+            // Define the RHS of Origin rule
+            Unit[] startRHS = MakeUnitArray(6);
+            startRHS[0].AddComponent(new KC_Text("Once", true));
+            startRHS[1].AddComponent(new KC_IDSelectionRequest("Character", true));
+            startRHS[2].AddComponent(new KC_Text("and", true));
+            startRHS[3].AddComponent(new KC_IDSelectionRequest("Character", true));
+            startRHS[4].AddComponent(new KC_Text("went to", true));
+            startRHS[5].AddComponent(new KC_IDSelectionRequest("Place", true));
+            startRule.AddComponent(new KC_Decomposition(startRHS, true));
+
+            /*
+             * Adjective rules
+             * Adjective --> #Color#
+             * Adjective --> #Place#
+             */
+            /* Unit adjectiveRule1 = MakeRuleUnit("Adjective", grammarPool, blackboard);
+
+            // Define RHS of Adjective1 rule
+            Unit[] adjectiveRule1RHS = MakeUnitArray(1);
+            adjectiveRule1.AddComponent(new KC_Decomposition(adjectiveRule1RHS, true));
+
+            Unit adjectiveRule2 = MakeRuleUnit("Adjective", grammarPool, blackboard);
+
+            // Define RHS of Adjective2 rule
+            Unit[] adjectiveRule2RHS = MakeUnitArray(1);
+            adjectiveRule2.AddComponent(new KC_Decomposition(adjectiveRule2RHS, true));
+            */
+            /*
+             * Place rules 
+             * Place --> school
+             * Place --> the beach
+             * Place --> the zoo
+             * Place --> Burning Man
+             */
+            string[] terminals1 = { "school", "the beach", "the zoo", "Burning Man" };
+            MakeTerminalSingletons("Place", grammarPool, terminals1, blackboard);
+
+            /*
+             * Character rule
+             * Character --> #name# the #adjective# #animal#
+             */
+            /* Unit characterRule = MakeRuleUnit("Character", grammarPool, blackboard);
+
+            // Define RHS of Character rule
+            Unit[] characterRuleRHS = MakeUnitArray(4);
+            characterRuleRHS[0].AddComponent(new KC_IDSelectionRequest("Name", true));
+            characterRuleRHS[1].AddComponent(new KC_Text("the", true));
+            characterRuleRHS[2].AddComponent(new KC_IDSelectionRequest("Adjective", true));
+            characterRuleRHS[3].AddComponent(new KC_IDSelectionRequest("Animal", true));
+            characterRule.AddComponent(new KC_Decomposition(characterRuleRHS, true));
+            */
+            /*
+             * Name rules
+             * Name --> emily 
+             * Name --> luis
+             * Name --> otavio
+             * Name --> anna
+             * Name --> charlie            
+             */
+            /*string[] terminals2 = { "emily", "luis", "otavio", "anna", "charlie" };
+            MakeTerminalSingletons("Name", grammarPool, terminals2, blackboard);
+            */
+            /*
+             * Color rules
+             * Color --> red
+             * Color --> green
+             * Color --> blue           
+             */
+            /* string[] terminals3 = { "red", "green", "blue" };
+            MakeTerminalSingletons("Color", grammarPool, terminals3, blackboard);
+            */
+            /*
+             * Emotion rules
+             * Emotion --> happy
+             * Emotion --> sad
+             * Emotion --> curious
+             * Emotion --> sleepy          
+             */
+            /* string[] terminals4 = { "happy", "sad", "curious", "sleepy" };
+            MakeTerminalSingletons("Emotion", grammarPool, terminals4, blackboard);
+            */
+            /*
+             * Animal rules
+             * Animal --> cat
+             * Animal --> emu
+             * Animal --> okapi                       
+             */
+            /* string[] terminals5 = { "cat", "emu", "okapi" };
+            MakeTerminalSingletons("Animal", grammarPool, terminals5, blackboard);
+            */
+            blackboard.AddUnit(startSymbol);
+            /* blackboard.AddUnit(startRule);
+            blackboard.AddUnit(adjectiveRule1);
+            blackboard.AddUnit(adjectiveRule2);
+            blackboard.AddUnit(characterRule);
+            */
+            return startSymbol;
+        }
+
+
+        private static Unit MakeRuleUnit(string ruleID, string pool, IBlackboard blackboard)
+        {
+            Unit u = new Unit();
+            u.AddComponent(new KC_UnitID(ruleID, true));
+            u.AddComponent(new KC_ContentPool(pool, true));
+            blackboard.AddUnit(u);
+            return u;
+        }
+
+        private static void MakeTerminalSingletons(string ruleID, string pool, string[] terminals, IBlackboard blackboard)
+        {
+            foreach(string terminal in terminals)
             {
-                _ = blackboard.AddUnit(unit);
-            } */
+                Unit rule = MakeRuleUnit(ruleID, pool, blackboard);
+                Unit[] ruleRHS = MakeUnitArray(1);
+                ruleRHS[0].AddComponent(new KC_Text(terminal, true));
+                rule.AddComponent(new KC_Decomposition(ruleRHS, true));
+                blackboard.AddUnit(rule);
+            }
+        }
+
+        private static Unit[] MakeUnitArray(uint len)
+        {
+            Unit[] units = new Unit[len];
+            for(int i =0; i < len; i++)
+            {
+                units[i] = new Unit();
+            }
+            return units;
         }
     }
 }
