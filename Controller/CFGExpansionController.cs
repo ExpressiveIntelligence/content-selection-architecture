@@ -89,7 +89,7 @@ namespace CSA.Controllers
             // fixme: generated sequence gets spit out twice
             if (nonTerminalLeafNodes.Any())
             {
-                PrintTree();
+                // PrintTree();
                 m_pickLeftmostNodeToExpand.Execute();
                 m_lookupGrammarRules.Execute();
                 m_chooseGrammarRule.Execute();
@@ -207,8 +207,8 @@ namespace CSA.Controllers
                     {
                         // No rule was found. Create a pseudo-decomposition consisting of just the TargetUnitID in ## (borrowing from Tracery). 
                         Unit noRuleTextDecomp = new Unit();
-                        noRuleTextDecomp.AddComponent(new KC_TreeNode(nodeToExpandRef.GetComponent<KC_TreeNode>()));
-                        noRuleTextDecomp.AddComponent(new KC_Text("#" + nodeToExpandRef.GetTargetUnitID() + "#", true));
+                        noRuleTextDecomp.AddComponent(new KC_TreeNode(nodeToExpandRef.GetUnitReference().GetComponent<KC_TreeNode>()));
+                        noRuleTextDecomp.AddComponent(new KC_Text("#" + nodeToExpandRef.GetUnitReference().GetTargetUnitID() + "#", true));
                         blackboard.AddUnit(noRuleTextDecomp);
                     }
                     blackboard.RemoveUnit(nodeToExpandRef); // Remove the reference to the leaf node to expand (it has been expanded).

@@ -57,15 +57,19 @@ namespace ConsoleDemo
         {
             Console.WriteLine("Starting demo3 (simple CFG expansion).");
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Demo3 demo = new Demo3();
+                uint unitCount1 = demo.Blackboard.NumberOfUnits();
+                Console.WriteLine("Number of units before execution = " + unitCount1);
 
                 while (demo.Blackboard.Changed)
                 {
                     demo.Blackboard.ResetChanged();
                     demo.Controller.Execute();
                 }
+                uint unitCount2 = demo.Blackboard.NumberOfUnits();
+                Console.WriteLine("Number of units after execution = " + unitCount2);
                 Console.WriteLine();
             }
         }

@@ -225,20 +225,22 @@ namespace CSA.Demo
             /*
              * Adjective rules
              * Adjective --> #Color#
-             * Adjective --> #Place#
+             * Adjective --> #Emotion#
              */
-            /* Unit adjectiveRule1 = MakeRuleUnit("Adjective", grammarPool, blackboard);
+            Unit adjectiveRule1 = MakeRuleUnit("Adjective", grammarPool, blackboard);
 
             // Define RHS of Adjective1 rule
             Unit[] adjectiveRule1RHS = MakeUnitArray(1);
+            adjectiveRule1RHS[0].AddComponent(new KC_IDSelectionRequest("Color", true));
             adjectiveRule1.AddComponent(new KC_Decomposition(adjectiveRule1RHS, true));
 
             Unit adjectiveRule2 = MakeRuleUnit("Adjective", grammarPool, blackboard);
 
             // Define RHS of Adjective2 rule
             Unit[] adjectiveRule2RHS = MakeUnitArray(1);
+            adjectiveRule2RHS[0].AddComponent(new KC_IDSelectionRequest("Emotion", true));
             adjectiveRule2.AddComponent(new KC_Decomposition(adjectiveRule2RHS, true));
-            */
+
             /*
              * Place rules 
              * Place --> school
@@ -253,7 +255,7 @@ namespace CSA.Demo
              * Character rule
              * Character --> #name# the #adjective# #animal#
              */
-            /* Unit characterRule = MakeRuleUnit("Character", grammarPool, blackboard);
+            Unit characterRule = MakeRuleUnit("Character", grammarPool, blackboard);
 
             // Define RHS of Character rule
             Unit[] characterRuleRHS = MakeUnitArray(4);
@@ -262,7 +264,7 @@ namespace CSA.Demo
             characterRuleRHS[2].AddComponent(new KC_IDSelectionRequest("Adjective", true));
             characterRuleRHS[3].AddComponent(new KC_IDSelectionRequest("Animal", true));
             characterRule.AddComponent(new KC_Decomposition(characterRuleRHS, true));
-            */
+
             /*
              * Name rules
              * Name --> emily 
@@ -271,18 +273,18 @@ namespace CSA.Demo
              * Name --> anna
              * Name --> charlie            
              */
-            /*string[] terminals2 = { "emily", "luis", "otavio", "anna", "charlie" };
+            string[] terminals2 = { "emily", "luis", "otavio", "anna", "charlie" };
             MakeTerminalSingletons("Name", grammarPool, terminals2, blackboard);
-            */
+
             /*
              * Color rules
              * Color --> red
              * Color --> green
              * Color --> blue           
              */
-            /* string[] terminals3 = { "red", "green", "blue" };
+            string[] terminals3 = { "red", "green", "blue" };
             MakeTerminalSingletons("Color", grammarPool, terminals3, blackboard);
-            */
+
             /*
              * Emotion rules
              * Emotion --> happy
@@ -290,24 +292,19 @@ namespace CSA.Demo
              * Emotion --> curious
              * Emotion --> sleepy          
              */
-            /* string[] terminals4 = { "happy", "sad", "curious", "sleepy" };
+            string[] terminals4 = { "happy", "sad", "curious", "sleepy" };
             MakeTerminalSingletons("Emotion", grammarPool, terminals4, blackboard);
-            */
+
             /*
              * Animal rules
              * Animal --> cat
              * Animal --> emu
              * Animal --> okapi                       
              */
-            /* string[] terminals5 = { "cat", "emu", "okapi" };
+            string[] terminals5 = { "cat", "emu", "okapi" };
             MakeTerminalSingletons("Animal", grammarPool, terminals5, blackboard);
-            */
+
             blackboard.AddUnit(startSymbol);
-            /* blackboard.AddUnit(startRule);
-            blackboard.AddUnit(adjectiveRule1);
-            blackboard.AddUnit(adjectiveRule2);
-            blackboard.AddUnit(characterRule);
-            */
             return startSymbol;
         }
 
@@ -329,7 +326,6 @@ namespace CSA.Demo
                 Unit[] ruleRHS = MakeUnitArray(1);
                 ruleRHS[0].AddComponent(new KC_Text(terminal, true));
                 rule.AddComponent(new KC_Decomposition(ruleRHS, true));
-                blackboard.AddUnit(rule);
             }
         }
 
