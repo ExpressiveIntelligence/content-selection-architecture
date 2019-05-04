@@ -130,7 +130,7 @@ namespace CSA.Demo
          * no pushing or poping.         
          */
 
-        public static Unit Demo3_1_DefineCUs(IBlackboard blackboard, string grammarPool)
+        public static Unit Demo3_1_DefineUnits(IBlackboard blackboard, string grammarPool)
         {
             // Start symbol
             Unit startSymbol = new Unit();
@@ -195,7 +195,7 @@ namespace CSA.Demo
          * adjective:#color#,#emotion#,
          * origin:once #character# and #character# went to #place#
          */
-        public static Unit Demo3_2_DefineCUs(IBlackboard blackboard, string grammarPool)
+        public static Unit Demo3_2_DefineUnits(IBlackboard blackboard, string grammarPool)
         {
             // Start symbol
             Unit startSymbol = new Unit();
