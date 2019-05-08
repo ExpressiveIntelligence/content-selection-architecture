@@ -28,6 +28,7 @@ namespace CSA.KnowledgeSources
         /*
          * Recursively searches back through L_SelectedContentUnit links until it finds the original content unit.
          */
+         // fixme: remove this when this class is converted to KS_KC_ScheduledChoicePresenter - it will be inherited from ContentPoolCollector.
         protected ContentUnit FindOriginalContentUnit(ContentUnit cu)
         {
             var linkToPreviousCUInFilterChain = from link in m_blackboard.LookupLinks(cu)

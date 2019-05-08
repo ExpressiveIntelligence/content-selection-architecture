@@ -29,12 +29,6 @@ namespace CSA.Core
             }
         }
 
-        // Called by inheriting classes to copy fields (can't do this with clone and a constructor because you can't call constructors on abstract classes). 
-        /* protected virtual void CopyBaseFields(KC_ReadOnly kc)
-        {
-            m_readOnly = kc.ReadOnly;
-        } */
-
         protected KC_ReadOnly()
         {
             m_readOnly = false;

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using CSA.Core;
 using static CSA.KnowledgeUnits.CUSlots;
-using Prolog;
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources

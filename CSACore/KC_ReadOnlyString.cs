@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace CSA.Core
 {
     public abstract class KC_ReadOnlyString : KC_ReadOnly
@@ -24,16 +25,6 @@ namespace CSA.Core
                 }
             }
         }
-
-        /*
-         * Don't need CopyBaseFields on KC_ReadOnlyString because the string will always be copied by protected copy constructors on derived concrete classes.
-         * So we just need CopyBaseFields on KC_ReadOnly. 
-         */
-        /* protected virtual void CopyBaseFields(KC_ReadOnlyString kc)
-        {
-            base.CopyBaseFields(kc);
-            m_storedString = kc.StringValue;
-        } */
 
         protected KC_ReadOnlyString()
         {

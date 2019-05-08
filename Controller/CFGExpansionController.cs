@@ -122,7 +122,15 @@ namespace CSA.Controllers
             this.blackboard = blackboard;
 
             RootNode = rootNode;
-            
+
+            /* 
+             * Replace with three filters: KS_SelectTreeLeaves, which creates a content pool containing all the tree leaves meeting some condition,
+             * KS_ScheduledTierSelector, which, given a component with a sortable value, selects the lowest (in this case it will be order in which a leaf is added to tree), and 
+             * KS_ProcessTreeNode, which in this case will activate the ID request and save a reference to the node. KS_ScheduledTierSelector will become abstract, with
+             * several children: KS_ScheduledHighestTierSelector, KS_ScheduledLowestTierSelector, KS_UniformTopNTierSelector, KS_UniformBottomNTierSelector, 
+             * KS_ExponentialDistTierSelector.
+             * This decoupling allows other logic to be used in the choice of leaf to expand (such as computing a heuristic for picking a node to expand).
+             */
             m_pickLeftmostNodeToExpand = new KS_ScheduledExecute(
                 () =>
                 {
@@ -142,15 +150,6 @@ namespace CSA.Controllers
                         leafExpansionRef.AddComponent(new KC_UnitReference(CurrentTreeNodeExpansion, true, nonTerminalLeafNodes.First()));
                         blackboard.AddUnit(leafExpansionRef);
                     }
-
-                    // fixme: used to sort by the WithinTreeLevelCount to ensure that non-terminals were expanded left to right. Come back to this if it becomes an issue. 
-                    /* if (nonTerminalLeafNodes.Any())
-                    {
-                        Unit[] sortedLeafNodes = nonTerminalLeafNodes.ToArray();
-                        Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Slots[WithinTreeLevelCount]).CompareTo(y.Slots[WithinTreeLevelCount]));
-                        blackboard.AddUnit(new U_IDSelectRequest((string)sortedLeafNodes[0].Slots[GrammarNonTerminal]));
-                        sortedLeafNodes[0].Slots[CurrentSymbolExpansion] = true;
-                    } */
                 }
             );
 
@@ -162,6 +161,11 @@ namespace CSA.Controllers
             string uniformDistOutputPool = "uniformDistOutputPool";
             m_chooseGrammarRule = new KS_KC_ScheduledUniformDistributionSelector(blackboard, idOutputPool, uniformDistOutputPool, 1);
 
+            /*
+             * Replace with KS_ExpandTreeNode. An instance of KS_ExpandTreeNode has:
+             * 1) The name of a content pool a unit with a decomposition.
+             * 2) The name of a KC_UnitReference containing a pointer to the node to expand. 
+             */
             m_treeExpander = new KS_ScheduledExecute(
                 () =>
                 {
@@ -227,7 +231,9 @@ namespace CSA.Controllers
                 return leafNodes.All(node => !node.HasComponent<KC_IDSelectionRequest>());
             }
 
-
+            /*
+             * Replace with KS_LinearizeTreeLeaves.
+             */
             void GenSequenceExec()
             {
                 // Walk the tree to find the leafs from left to right. 
@@ -253,46 +259,6 @@ namespace CSA.Controllers
             }
 
             m_addGeneratedSequence = new KS_ScheduledExecute(GenSequenceExec, GenSequencePrecond);
-
-            // fixme: old code for linearizing the leaves of the tree. 
-            /* () =>
-            {
-                var leafNodes = from Unit node in blackboard.LookupUnits<Unit>()
-                                where node.HasComponent<KC_TreeNode>() && node.IsTreeLeaf()
-                                select node;
-
-                // If all the leaf nodes in the tree are terminal nodes then we're done
-                if (leafNodes.All(node => node.HasSlot(GrammarTerminal)))
-                {
-                    // Sort the leaf nodes by their level within the three 
-                    Unit[] sortedLeafNodes = leafNodes.ToArray();
-                    Array.Sort(sortedLeafNodes, (x, y) => ((IComparable)x.Slots[WithinTreeLevelCount]).CompareTo(y.Slots[WithinTreeLevelCount]));
-
-                    U_GeneratedSequence generatedSequence = new U_GeneratedSequence(sortedLeafNodes);
-                    _ = blackboard.AddUnit(generatedSequence);
-
-
-                    // Remove all the nodes in the tree
-                    // fixme: doing this awkward thing where I grab all the Units separately from all the ContentUnits, since I don't index Units under all of their 
-                    // type names. Once I've figured out a final representation for tree nodes, fix this. 
-                    //
-                    var units_treeNodes = from Unit node in blackboard.LookupUnits<Unit>()
-                                          where node.HasSlot(IsTreeNode) && (bool)node.Slots[IsTreeNode]
-                                          select node;
-
-                    var contentUnits_treeNodes = from ContentUnit node in blackboard.LookupUnits<ContentUnit>()
-                                                 where node.HasSlot(IsTreeNode) && (bool)node.Slots[IsTreeNode]
-                                                 select node;
-                    foreach (Unit u in units_treeNodes)
-                    {
-                        _ = blackboard.RemoveUnit(u);
-                    }
-
-                    foreach (ContentUnit cu in contentUnits_treeNodes)
-                    {
-                        _ = blackboard.RemoveUnit(cu);
-                    }
-            } */
         }
     }
 }
