@@ -19,11 +19,12 @@ namespace CSA.Demo
         public Demo3()
         {
             Blackboard = new Blackboard();
-            // Unit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_1_DefineUnits(Blackboard, grammarPool);
-            Unit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_2_DefineUnits(Blackboard, grammarPool);
+            Unit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_1_DefineUnits(Blackboard, grammarPool);
+            // Unit expansionTreeRootNode = ContentUnitSetupForDemos.Demo3_2_DefineUnits(Blackboard, grammarPool);
 
             Controller = new ScheduledSequenceController();
 
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledPrintTree(Blackboard));
             Controller.AddKnowledgeSource(new KS_KC_SelectTreeLeaves(Blackboard));
             Controller.AddKnowledgeSource(new KS_KC_HighestTierSelector<KC_Order>(
                 Blackboard, 

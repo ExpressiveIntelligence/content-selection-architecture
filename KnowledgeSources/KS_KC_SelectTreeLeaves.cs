@@ -12,7 +12,7 @@ namespace CSA.KnowledgeSources
     public class KS_KC_SelectTreeLeaves : KS_KC_ScheduledFilterSelector
     {
 
-        // fixme: remove this string constant when the Dictionary is replaced with an array of object.
+        // fixme: remove this string constant when the Dictionary is replaced with an array of object or tuple. 
         public const string DefaultOutputPoolName = "SelectedLeafNodes";
 
         // Default filter pool name

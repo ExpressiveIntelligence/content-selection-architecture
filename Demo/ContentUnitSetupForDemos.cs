@@ -137,6 +137,11 @@ namespace CSA.Demo
             startSymbol.AddComponent(new KC_IDSelectionRequest("Start", true));
             startSymbol.AddComponent(new KC_TreeNode(null));
             startSymbol.AddComponent(new KC_ContentPool(grammarPool, true));
+            startSymbol.AddComponent(new KC_Order(0, true));
+
+            // OrderCounter
+            Unit orderCounter = new Unit();
+            orderCounter.AddComponent(new KC_OrderCounter(0));
 
             /*
              * Grammar rules
@@ -176,6 +181,7 @@ namespace CSA.Demo
             placeRule2.AddComponent(new KC_Decomposition(placeRule2RHS, true));
 
             blackboard.AddUnit(startSymbol);
+            blackboard.AddUnit(orderCounter);
             blackboard.AddUnit(startRule);
             blackboard.AddUnit(placeRule1);
             blackboard.AddUnit(placeRule2);
@@ -202,6 +208,11 @@ namespace CSA.Demo
             startSymbol.AddComponent(new KC_IDSelectionRequest("Origin", true));
             startSymbol.AddComponent(new KC_TreeNode(null));
             startSymbol.AddComponent(new KC_ContentPool(grammarPool, true));
+            startSymbol.AddComponent(new KC_Order(0, true));
+
+            // OrderCounter
+            Unit orderCounter = new Unit();
+            orderCounter.AddComponent(new KC_OrderCounter(0));
 
             /*
              * Grammar rules
@@ -305,6 +316,7 @@ namespace CSA.Demo
             MakeTerminalSingletons("Animal", grammarPool, terminals5, blackboard);
 
             blackboard.AddUnit(startSymbol);
+            blackboard.AddUnit(orderCounter);
             return startSymbol;
         }
 
