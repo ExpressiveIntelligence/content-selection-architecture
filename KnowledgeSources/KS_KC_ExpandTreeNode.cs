@@ -11,6 +11,7 @@ namespace CSA.KnowledgeSources
     {
         protected const string Decomposition = "Decomposition";
         protected const string NodeToExpand = "NodeToExpand";
+        protected const string OrderCounter = "OrderCounter";
 
         protected override IDictionary<string, object>[] Precondition()
         {
@@ -36,6 +37,14 @@ namespace CSA.KnowledgeSources
                                    where unit.HasComponent<KC_UnitReference>() && unit.ReferenceNameEquals(CurrentTreeNodeExpansion)
                                    select unit.GetUnitReference();
 
+                /*
+                 * Grab a reference to the order counter. Currently assume there's only one order counter. 
+                 * fixme: consider adding a name to the order counter so there can be multipe counters.                 
+                 */ 
+                var orderCounterQuery = from unit in m_blackboard.LookupUnits<Unit>()
+                                        where unit.HasComponent<KC_OrderCounter>()
+                                        select unit;
+
                 if (nodeToExpand.Any())
                 {
                     // At least one node to expand was found - continue. 
@@ -43,12 +52,21 @@ namespace CSA.KnowledgeSources
                     // There should just be one nodeToExpandRef
                     Debug.Assert(nodeToExpand.Count() == 1);
 
+                    // Currently assuming there are 0 or 1 order counters. 
+                    Debug.Assert(!orderCounterQuery.Any() || orderCounterQuery.Count() == 1);
+
+                    // Store the first order counter unit found (assumption is there is only one) or null if none were found.
+                    Unit orderCounterUnit = orderCounterQuery.FirstOrDefault();
+
                     // Create the new bindings with the decomposition and the node to expand.
                     IDictionary<string, object>[] bindings = new Dictionary<string, object>[1];
+
+
                     bindings[0] = new Dictionary<string, object>
                     {
                         [Decomposition] = filteredDecomps.First(),
-                        [NodeToExpand] = nodeToExpand
+                        [NodeToExpand] = nodeToExpand,
+                        [OrderCounter] = orderCounterUnit
                     };
 
                     return bindings;
@@ -58,10 +76,13 @@ namespace CSA.KnowledgeSources
             return m_emptyBindings;
         }
 
+        // fixme: Add an KC_Order to the nodes being added. In the general case may not need this - figure out how to refactor it later when other tree expansion 
+        // examples exist. 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
             Unit nodeToExpand = (Unit)boundVars[NodeToExpand];
             Unit decomposition = (Unit)boundVars[Decomposition];
+            Unit orderCounter = (Unit)boundVars[OrderCounter];
 
             Unit ruleNode = new Unit(decomposition);
             // Remove the KC_Decomposition (not needed) and KC_ContentPool (will cause node to be prematurely cleaned up) components
@@ -72,6 +93,12 @@ namespace CSA.KnowledgeSources
             // fixme: consider defining conversion operators so this looks like
             // new KC_TreeNode((KC_TreeNode)nodeToExpand);
             ruleNode.AddComponent(new KC_TreeNode(nodeToExpand.GetComponent<KC_TreeNode>()));
+            if (orderCounter != null)
+            {
+                int order = orderCounter.IncOrderCounter();
+                ruleNode.AddComponent(new KC_Order(order, true));
+            }
+
             m_blackboard.AddUnit(ruleNode);
 
             // For each of the Units in the decomposition, add them to the tree as children of ruleCopy. 
@@ -81,6 +108,11 @@ namespace CSA.KnowledgeSources
                 Unit childNode = new Unit(child);
                 m_blackboard.AddUnit(childNode);
                 childNode.AddComponent(new KC_TreeNode(ruleNode.GetComponent<KC_TreeNode>()));
+                if (orderCounter != null)
+                {
+                    int order = orderCounter.IncOrderCounter();
+                    childNode.AddComponent(new KC_Order(order, true));
+                }
             }
         }
 
