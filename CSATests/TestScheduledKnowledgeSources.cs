@@ -16,6 +16,7 @@ namespace CSA.Tests
     {
         private readonly ITestOutputHelper output;
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
         public static IEnumerable<object[]> Data_TestExecute_ScheduledFilterSelector()
         {
             string inputPool = "inputPool1";
@@ -74,11 +75,13 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
         static bool TestFilter(ContentUnit cu)
         {
             return cu.HasMetadataSlot("Test") && (int)cu.Metadata["Test"] == 1 ? true : false;
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
         /* Given a set of links which go from a unit in an input pool to a unit in an output pool, check that the L_SelectedContentUnit link is 
          * set up correctly and that the linked CU is in the correct output pool. 
          */
@@ -94,6 +97,7 @@ namespace CSA.Tests
             Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
         static private void TestNumberOfCUsInOutputPool(int desiredNumberOfCUs, IBlackboard blackboard, string outputPool)
         {
             var CUs = from cu in blackboard.LookupUnits<ContentUnit>()
@@ -104,6 +108,7 @@ namespace CSA.Tests
             Assert.Equal(desiredNumberOfCUs, CUs.Count());
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledFilterSelector))]
         public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
@@ -136,6 +141,7 @@ namespace CSA.Tests
 
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledIDSelector
         public static IEnumerable<object[]> Data_TestExecute_ScheduledIDSelector()
         {
             string inputPool = "inputPool1";
@@ -205,6 +211,7 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledIDSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledIDSelector))]
         public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
@@ -245,6 +252,7 @@ namespace CSA.Tests
             Assert.False(reqs.Any());
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledUniformDistributionSelector
         public static IEnumerable<object[]> Data_TestExecute_ScheduledUniformDistributionSelector()
         {
             string inputPool = "inputPool1";
@@ -307,6 +315,7 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledUniformDistributionSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledUniformDistributionSelector))]
         public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_ScheduledUniformDistributionSelector filterSelector,
@@ -343,6 +352,7 @@ namespace CSA.Tests
             TestNumberOfCUsInOutputPool((int)Math.Min(numberToSelect, unitsToSelectFrom.Length), blackboard, outputPool);
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledPoolCleaner
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPoolCleaner()
         {
             string pool1 = "pool1";
@@ -398,6 +408,7 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledPoolCleaner
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledPoolCleaner))]
         public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_ScheduledFilterPoolCleaner cleaner,
@@ -421,7 +432,7 @@ namespace CSA.Tests
         }
 
         // fixme: add tests for the handlers defined in EventHandlers_ChoicePresenter 
-
+        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
         {
             IBlackboard blackboard = new Blackboard();
@@ -468,6 +479,7 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         private EventHandler<PresenterExecuteEventArgs>
             GenerateEventHandler(ContentUnit selectedCU, ContentUnit[] choices, IBlackboard blackboard)
         {
@@ -504,6 +516,7 @@ namespace CSA.Tests
             };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
         public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU,
@@ -547,6 +560,7 @@ namespace CSA.Tests
             ks.Execute();
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledPrologEval (once it has been defined)
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPrologEval()
         {
             string inputPool = "inputPool1";
@@ -649,7 +663,7 @@ namespace CSA.Tests
             };
         }
 
-
+        // fixme: change this to test KnowledgeComponent-based ScheduledPrologEval (once it has been defined)
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledPrologEval))]
         public void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_ScheduledPrologEval prologEval, ContentUnit[] unitsToAdd,
@@ -747,6 +761,7 @@ namespace CSA.Tests
 
         // fixme: add test for KS_ScheduledExecute
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledTierSelector
         /* 
          * Data and test methods for KS_ScheduledTierSelector
          */
@@ -847,6 +862,7 @@ namespace CSA.Tests
              };
         }
 
+        // fixme: change this to test KnowledgeComponent-based ScheduledTierSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledTierSelector))]
         public void TestExecute_ScheduledTierSelector(IBlackboard blackboard, KS_ScheduledTierSelector tierSelector,
