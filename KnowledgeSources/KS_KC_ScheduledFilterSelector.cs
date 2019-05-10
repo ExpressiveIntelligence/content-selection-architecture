@@ -18,8 +18,14 @@ namespace CSA.KnowledgeSources
         {
             Unit newUnit = new Unit(unit);
 
-            // Remove the previous readonly ContentPool component and add a new one with the new pool
-            newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
+            /* 
+             * If there is an existing content pool component remove the componenet before adding a new one with the new pool. The case in which there won't be a content pool
+             * component is when copying from the global pool (no pool) into a pool.             
+             */
+            if (newUnit.HasComponent<KC_ContentPool>())
+            {
+                newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
+            }
             newUnit.AddComponent(new KC_ContentPool(OutputPool, true));
 
             m_blackboard.AddUnit(newUnit);

@@ -10,7 +10,7 @@ namespace CSA.KnowledgeSources
     public class KS_KC_ExpandTreeNode : KS_KC_ContentPoolCollector
     {
         protected const string Decomposition = "Decomposition";
-        protected const string NodeToExpand = "NodeToExpand";
+        protected const string NodeToExpandRef = "NodeToExpand";
         protected const string OrderCounter = "OrderCounter";
 
         protected override IDictionary<string, object>[] Precondition()
@@ -33,9 +33,9 @@ namespace CSA.KnowledgeSources
                 /*
                  * Grab the reference to the current leaf node (non-terminal) we're expanding. 
                  */
-                var nodeToExpand = from unit in m_blackboard.LookupUnits<Unit>()
-                                   where unit.HasComponent<KC_UnitReference>() && unit.ReferenceNameEquals(CurrentTreeNodeExpansion)
-                                   select unit.GetUnitReference();
+                var nodeToExpandQuery = from unit in m_blackboard.LookupUnits<Unit>()
+                                        where unit.HasComponent<KC_UnitReference>() && unit.ReferenceNameEquals(CurrentTreeNodeExpansion)
+                                        select unit;
 
                 /*
                  * Grab a reference to the order counter. Currently assume there's only one order counter. 
@@ -45,12 +45,12 @@ namespace CSA.KnowledgeSources
                                         where unit.HasComponent<KC_OrderCounter>()
                                         select unit;
 
-                if (nodeToExpand.Any())
+                if (nodeToExpandQuery.Any())
                 {
                     // At least one node to expand was found - continue. 
 
                     // There should just be one nodeToExpandRef
-                    Debug.Assert(nodeToExpand.Count() == 1);
+                    Debug.Assert(nodeToExpandQuery.Count() == 1);
 
                     // Currently assuming there are 0 or 1 order counters. 
                     Debug.Assert(!orderCounterQuery.Any() || orderCounterQuery.Count() == 1);
@@ -65,7 +65,7 @@ namespace CSA.KnowledgeSources
                     bindings[0] = new Dictionary<string, object>
                     {
                         [Decomposition] = filteredDecomps.First(),
-                        [NodeToExpand] = nodeToExpand,
+                        [NodeToExpandRef] = nodeToExpandQuery.First(),
                         [OrderCounter] = orderCounterUnit
                     };
 
@@ -76,23 +76,27 @@ namespace CSA.KnowledgeSources
             return m_emptyBindings;
         }
 
-        // fixme: Add an KC_Order to the nodes being added. In the general case may not need this - figure out how to refactor it later when other tree expansion 
-        // examples exist. 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            Unit nodeToExpand = (Unit)boundVars[NodeToExpand];
+            Unit nodeToExpandRef = (Unit)boundVars[NodeToExpandRef];
             Unit decomposition = (Unit)boundVars[Decomposition];
             Unit orderCounter = (Unit)boundVars[OrderCounter];
 
             Unit ruleNode = new Unit(decomposition);
             // Remove the KC_Decomposition (not needed) and KC_ContentPool (will cause node to be prematurely cleaned up) components
-            ruleNode.RemoveComponent(ruleNode.GetComponent<KC_Decomposition>());
-            ruleNode.RemoveComponent(ruleNode.GetComponent<KC_ContentPool>());
+            ruleNode.RemoveComponent(ruleNode.GetComponent<KC_Decomposition>()); // fixme: consider adding AddSingleComponent<T> and RemoveSingletonComponent<T> to simplify working with this common case
+            ruleNode.RemoveComponent(ruleNode.GetComponent<KC_ContentPool>()); // fixme: consider adding AddSingleComponent<T> and RemoveSingletonComponent<T> to simplify working with this common case
 
             // Add a tree node component with the parent being the node to expand. 
             // fixme: consider defining conversion operators so this looks like
             // new KC_TreeNode((KC_TreeNode)nodeToExpand);
-            ruleNode.AddComponent(new KC_TreeNode(nodeToExpand.GetComponent<KC_TreeNode>()));
+            ruleNode.AddComponent(new KC_TreeNode(nodeToExpandRef.GetUnitReference().GetComponent<KC_TreeNode>()));
+
+            // Now that we've used it to add to the tree, remove the nodeToExpandRef from the blackboard
+            m_blackboard.RemoveUnit(nodeToExpandRef);
+
+            // fixme: Add an KC_Order to the nodes being added. In the general case may not need this - figure out how to refactor it later when other tree expansion 
+            // examples exist. 
             if (orderCounter != null)
             {
                 int order = orderCounter.IncOrderCounter();

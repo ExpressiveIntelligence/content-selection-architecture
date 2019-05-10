@@ -30,7 +30,7 @@ namespace CSA.Core
         {
             if (o is KC_Integer otherObject)
             {
-                return m_int.CompareTo(otherObject);
+                return m_int.CompareTo(otherObject.IntValue);
             }
             else
             {

@@ -2,7 +2,7 @@
 
 namespace CSA.Core
 {
-    public abstract class KC_ReadOnlyString : KC_ReadOnly
+    public abstract class KC_ReadOnlyString : KC_ReadOnly, IComparable
     {
         private string m_storedString;
 
@@ -24,6 +24,15 @@ namespace CSA.Core
                     throw new InvalidOperationException("Attempt to set the StoredString properity of a readOnly KC_ReadOnlyString");
                 }
             }
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is KC_ReadOnlyString otherObject)
+            {
+                return string.Compare(m_storedString, otherObject.StringValue, StringComparison.CurrentCulture);
+            }
+            throw new ArgumentException("Object: " + obj + " is not a KS_ReadOnlyString");
         }
 
         protected KC_ReadOnlyString()

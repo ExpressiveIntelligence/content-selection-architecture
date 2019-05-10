@@ -97,7 +97,7 @@ namespace CSA.Tests
             Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
+        // fixme: delete this when all test methods have been converted to KnowledgeComponent-based knowledge sources. 
         static private void TestNumberOfCUsInOutputPool(int desiredNumberOfCUs, IBlackboard blackboard, string outputPool)
         {
             var CUs = from cu in blackboard.LookupUnits<ContentUnit>()
@@ -106,6 +106,15 @@ namespace CSA.Tests
                       select cu;
 
             Assert.Equal(desiredNumberOfCUs, CUs.Count());
+        }
+
+        static private void TestNumberOfUnitsInOutputPool(int desiredNumberOfUnits, IBlackboard blackboard, string outputPool)
+        {
+            var units = from unit in blackboard.LookupUnits<Unit>()
+                        where unit.HasComponent<KC_ContentPool>() && unit.ContentPoolEquals(outputPool)
+                        select unit;
+
+            Assert.Equal(desiredNumberOfUnits, units.Count());
         }
 
         // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
@@ -771,44 +780,46 @@ namespace CSA.Tests
 
             IBlackboard blackboard = new Blackboard();
 
-            ContentUnit[] CUs = new ContentUnit[15];
+            Unit[] units = new Unit[15];
 
-            for (int i = 0; i < CUs.Length; i++)
+            for (int i = 0; i < units.Length; i++)
             {
-                CUs[i] = new ContentUnit();
+                units[i] = new Unit();
             }
 
-            CUs[0].Metadata[ContentPool] = pool1;
-            CUs[1].Metadata[ContentPool] = pool1;
-            CUs[2].Metadata[ContentPool] = pool1;
+            units[0].AddComponent(new KC_ContentPool(pool1, true));
+            units[1].AddComponent(new KC_ContentPool(pool1, true));
+            units[2].AddComponent(new KC_ContentPool(pool1, true));
 
-            CUs[0].Metadata[Specificity] = 5;
-            CUs[0].Metadata[ContentUnitID] = "ID0";
+            // fixme: commented out until I finish making the change 
+            /*
+            units[0].Metadata[Specificity] = 5;
+            units[0].Metadata[ContentUnitID] = "ID0";
 
-            CUs[1].Metadata[Specificity] = 3;
-            CUs[1].Metadata[ContentUnitID] = "ID1";
+            units[1].Metadata[Specificity] = 3;
+            units[1].Metadata[ContentUnitID] = "ID1";
 
-            CUs[2].Metadata[Specificity] = 5;
-            CUs[2].Metadata[ContentUnitID] = "ID2";
+            units[2].Metadata[Specificity] = 5;
+            units[2].Metadata[ContentUnitID] = "ID2";
 
-            CUs[3].Metadata[Specificity] = 3;
-            CUs[3].Metadata[ContentUnitID] = "ID3";
+            units[3].Metadata[Specificity] = 3;
+            units[3].Metadata[ContentUnitID] = "ID3";
 
-            CUs[4].Metadata[Specificity] = 6;
-            CUs[4].Metadata[ContentUnitID] = "ID4";
+            units[4].Metadata[Specificity] = 6;
+            units[4].Metadata[ContentUnitID] = "ID4";
 
-            CUs[5].Metadata[Specificity] = "xylophone";
-            CUs[6].Metadata[Specificity] = "carburator";
-            CUs[7].Metadata[Specificity] = "xylophone";
-            CUs[8].Metadata[Specificity] = "carburator";
-            CUs[9].Metadata[Specificity] = "Zebra";
+            units[5].Metadata[Specificity] = "xylophone";
+            units[6].Metadata[Specificity] = "carburator";
+            units[7].Metadata[Specificity] = "xylophone";
+            units[8].Metadata[Specificity] = "carburator";
+            units[9].Metadata[Specificity] = "Zebra";
 
-            CUs[10].Metadata[Specificity] = 5.3;
-            CUs[11].Metadata[Specificity] = 3.1;
-            CUs[12].Metadata[Specificity] = 5.3;
-            CUs[13].Metadata[Specificity] = 3.1;
-            CUs[14].Metadata[Specificity] = 6.7;
-
+            units[10].Metadata[Specificity] = 5.3;
+            units[11].Metadata[Specificity] = 3.1;
+            units[12].Metadata[Specificity] = 5.3;
+            units[13].Metadata[Specificity] = 3.1;
+            units[14].Metadata[Specificity] = 6.7;
+            */
             /* Structure of object[]: 
             * IBlackboard: blackboard, 
             * KS_ScheduledTierSelector: the knowledge source to test            
@@ -818,47 +829,50 @@ namespace CSA.Tests
 
             return new List<object[]>
             {
+                // fixme: commented out until I finish making the change
+                /*
                 // No input pool, default output pool, integer specificity
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, Specificity),
-                    CUs.Take(5), new ContentUnit[] { CUs[4] } }, 
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
+                    units.Take(5), new ContentUnit[] { units[4] } }, 
 
                 // No input pool, specified output pool, integer specificy
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, "output1", Specificity),
-                    CUs.Take(5), new ContentUnit[] { CUs[4] } }, 
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, "output1", Specificity),
+                    units.Take(5), new ContentUnit[] { units[4] } }, 
 
                 // Input pool, specified output pool, integer specificity
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
-                    CUs.Take(5), new ContentUnit[] { CUs[0], CUs[2] } },
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
+                    units.Take(5), new ContentUnit[] { units[0], units[2] } },
 
                 // No input pool, specified output pool, filter condition, integer specificity
                 new object[] { blackboard,
-                    new KS_ScheduledTierSelector(blackboard, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(6) < 0, Specificity),
-                    CUs.Take(5), new ContentUnit[] { CUs[0], CUs[2] } },
+                    new KS_KC_ScheduledTierSelector(blackboard, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(6) < 0, Specificity),
+                    units.Take(5), new ContentUnit[] { units[0], units[2] } },
                               
                 // Input pool, specified output pool, filter condition, integer specificity
                 new object[] { blackboard,
-                    new KS_ScheduledTierSelector(blackboard, pool1, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(5) < 0, Specificity),
-                    CUs.Take(5), new ContentUnit[] { CUs[1] } },
+                    new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(5) < 0, Specificity),
+                    units.Take(5), new ContentUnit[] { units[1] } },
 
                 // No input pool, default output pool, string specificity
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, Specificity),
-                    CUs.Skip(5).Take(5), new ContentUnit[] { CUs[9] } }, 
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
+                    units.Skip(5).Take(5), new ContentUnit[] { units[9] } }, 
 
                 // No input pool, default output pool, float specificity
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, Specificity),
-                    CUs.Skip(10), new ContentUnit[] { CUs[14] } }, 
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
+                    units.Skip(10), new ContentUnit[] { units[14] } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, Specificity),
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
                     new ContentUnit[0], new ContentUnit[0] }, 
 
                 // Empty pool
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
-                    CUs.Skip(3).Take(2), new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
+                    units.Skip(3).Take(2), new ContentUnit[0] },
 
                 // Non-existant tier slot
-                new object[] { blackboard, new KS_ScheduledTierSelector(blackboard, "ThisSlotDoesNotExist"),
-                    CUs.Take(5), new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, "ThisSlotDoesNotExist"),
+                    units.Take(5), new ContentUnit[0] },
+                    */
              };
         }
 
@@ -866,15 +880,15 @@ namespace CSA.Tests
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledTierSelector))]
         public void TestExecute_ScheduledTierSelector(IBlackboard blackboard, KS_ScheduledTierSelector tierSelector,
-            ContentUnit[] unitsToAdd, ContentUnit[] filteredUnits)
+            Unit[] unitsToAdd, Unit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
 
             // Add the content units to the blackboard
-            foreach (var cu in unitsToAdd)
+            foreach (var unit in unitsToAdd)
             {
-                blackboard.AddUnit(cu);
+                blackboard.AddUnit(unit);
             }
 
             // Execute the tier selector
@@ -883,18 +897,18 @@ namespace CSA.Tests
             string outputPool = tierSelector.OutputPool;
 
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
-            foreach (var cu in filteredUnits)
+            foreach (var unit in filteredUnits)
             {
-                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unit);
 
                 output.WriteLine("Original ContentUnit");
-                output.WriteLine(cu.ToString());
+                output.WriteLine(unit.ToString());
 
                 TestFilterLinks(s, outputPool);
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
-            TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
+            TestNumberOfUnitsInOutputPool(filteredUnits.Length, blackboard, outputPool);
         }
 
         public TestScheduledKnowledgeSources(ITestOutputHelper output)

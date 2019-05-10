@@ -11,12 +11,12 @@ namespace CSA.KnowledgeSources
      */
     public class KS_KC_SelectTreeLeaves : KS_KC_ScheduledFilterSelector
     {
+        /*
+         * fixme: in general need a content pool specifier as their may be other leaf nodes on the blackboard not associated with the tree of interest.
+         * Currently the constructors of this class don't support having trees live in content pools.         
+         */
 
-        // fixme: remove this string constant when the Dictionary is replaced with an array of object or tuple. 
-        public const string DefaultOutputPoolName = "SelectedLeafNodes";
-
-        // Default filter pool name
-        public const string LeafNodes = "LeafNodes";
+        public const string DefaultOutputPoolName = "LeafNodes";
 
         /*
          * Given a Unit, returns true if the unit is the leaf of a tree, false otherwise. 
@@ -32,13 +32,13 @@ namespace CSA.KnowledgeSources
          * fixme: figure out how to best handle multiple trees when this case comes up. 
          */
 
-        public KS_KC_SelectTreeLeaves(IBlackboard blackboard, string outputPool = LeafNodes) : base(blackboard, outputPool)
+        public KS_KC_SelectTreeLeaves(IBlackboard blackboard, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
         {
             FilterConditionDel = SelectTreeLeaf;
         }
 
 
-        public KS_KC_SelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool = LeafNodes) : base(blackboard, outputPool)
+        public KS_KC_SelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
         {
             FilterConditionDel = (Unit unit) => SelectTreeLeaf(unit) && filter(unit);
         }
