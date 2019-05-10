@@ -6,7 +6,7 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_ScheduledFilterSelector : KS_KC_ContentPoolCollector
+    public class KS_KC_ScheduledFilterSelector : KS_KC_ScheduledContentPoolCollector
     {
         // Output pool for this filter. 
         public string OutputPool { get; }

@@ -8,7 +8,7 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_DefaultGrammarNonterminalDecomposition : KS_KC_ContentPoolCollector
+    public class KS_KC_ScheduledDefaultGrammarNonterminalDecomposition : KS_KC_ScheduledContentPoolCollector
     {
         protected const string TargetIDForDefault = "TargetIDForDefault";
 
@@ -66,16 +66,16 @@ namespace CSA.KnowledgeSources
             m_blackboard.AddUnit(pseudoRule);
         }
 
-        protected KS_KC_DefaultGrammarNonterminalDecomposition(IBlackboard blackboard) : base(blackboard)
+        protected KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard) : base(blackboard)
         {
             FilterConditionDel = DefaultFilterCondition;
         }
 
-        public KS_KC_DefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
+        public KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
         {
         }
 
-        protected KS_KC_DefaultGrammarNonterminalDecomposition(IBlackboard blackboard, FilterCondition filter) : base(blackboard, filter)
+        protected KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, FilterCondition filter) : base(blackboard, filter)
         {
         }
 
@@ -83,7 +83,7 @@ namespace CSA.KnowledgeSources
          * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
          * as the FilterConditionDel.         
          */
-        protected KS_KC_DefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
+        protected KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
         {
         }
     }

@@ -4,7 +4,7 @@ using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_HighestTierSelector<T> : KS_KC_ScheduledTierSelector<T> where T : KnowledgeComponent, IComparable
+    public class KS_KC_ScheduledHighestTierSelector<T> : KS_KC_ScheduledTierSelector<T> where T : KnowledgeComponent, IComparable
     {
 
         protected override void Execute(IDictionary<string, object> boundVars)
@@ -27,23 +27,23 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_KC_HighestTierSelector(IBlackboard blackboard) : base(blackboard)
+        public KS_KC_ScheduledHighestTierSelector(IBlackboard blackboard) : base(blackboard)
         {
         }
 
-        public KS_KC_HighestTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
+        public KS_KC_ScheduledHighestTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
         {
         }
 
-        public KS_KC_HighestTierSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
+        public KS_KC_ScheduledHighestTierSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
         {
         }
 
-        public KS_KC_HighestTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
+        public KS_KC_ScheduledHighestTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
         {
         }
 
-        public KS_KC_HighestTierSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter)
+        public KS_KC_ScheduledHighestTierSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter)
             : base(blackboard, inputPool, outputPool, filter)
         {
         }

@@ -7,7 +7,7 @@ using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_ProcessTreeNode : KS_KC_ContentPoolCollector
+    public class KS_KC_ScheduledProcessTreeNode : KS_KC_ScheduledContentPoolCollector
     {
         // Declare delegate for processing tree nodes
         public delegate void ProcessNode(Unit node, IBlackboard blackboard);
@@ -45,17 +45,17 @@ namespace CSA.KnowledgeSources
             blackboard.AddUnit(leafExpansionRef);
         }
 
-        public KS_KC_ProcessTreeNode(IBlackboard blackboard, ProcessNode processNode) : base(blackboard)
+        public KS_KC_ScheduledProcessTreeNode(IBlackboard blackboard, ProcessNode processNode) : base(blackboard)
         {
             m_processNode = processNode ?? throw new ArgumentException("Null value for processNode passed into KS_ProcessTreeNode consructor");
         }
 
-        public KS_KC_ProcessTreeNode(IBlackboard blackboard, string inputPool, ProcessNode processNode) : base(blackboard, inputPool)
+        public KS_KC_ScheduledProcessTreeNode(IBlackboard blackboard, string inputPool, ProcessNode processNode) : base(blackboard, inputPool)
         {
             m_processNode = processNode ?? throw new ArgumentException("Null value for processNode passed into KS_ProcessTreeNode consructor");
         }
 
-        public KS_KC_ProcessTreeNode(IBlackboard blackboard, FilterCondition filter, ProcessNode processNode) : base(blackboard, filter)
+        public KS_KC_ScheduledProcessTreeNode(IBlackboard blackboard, FilterCondition filter, ProcessNode processNode) : base(blackboard, filter)
         {
             m_processNode = processNode ?? throw new ArgumentException("Null value for processNode passed into KS_ProcessTreeNode consructor");
         }
@@ -64,7 +64,7 @@ namespace CSA.KnowledgeSources
          * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
          * as the FilterConditionDel.         
          */
-        public KS_KC_ProcessTreeNode(IBlackboard blackboard, string inputPool, FilterCondition filter, ProcessNode processNode) : base(blackboard, inputPool, filter)
+        public KS_KC_ScheduledProcessTreeNode(IBlackboard blackboard, string inputPool, FilterCondition filter, ProcessNode processNode) : base(blackboard, inputPool, filter)
         {
             m_processNode = processNode ?? throw new ArgumentException("Null value for processNode passed into KS_ProcessTreeNode consructor");
         }

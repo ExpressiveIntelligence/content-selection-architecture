@@ -25,17 +25,17 @@ namespace CSA.Demo
             Controller = new ScheduledSequenceController();
 
             Controller.AddKnowledgeSource(new KS_KC_ScheduledPrintTree(Blackboard));
-            Controller.AddKnowledgeSource(new KS_KC_SelectTreeLeaves(
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledSelectTreeLeaves(
                 Blackboard,
-                KS_KC_ContentPoolCollector.GenerateHasComponent<KC_IDSelectionRequest>()));
-            Controller.AddKnowledgeSource(new KS_KC_HighestTierSelector<KC_Order>(
+                KS_KC_ScheduledContentPoolCollector.GenerateHasComponent<KC_IDSelectionRequest>()));
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledHighestTierSelector<KC_Order>(
                 Blackboard, 
-                KS_KC_SelectTreeLeaves.DefaultOutputPoolName, 
+                KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
                 KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ProcessTreeNode(
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledProcessTreeNode(
                 Blackboard,
                 KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
-                KS_KC_ProcessTreeNode.ActivateIDRequest));
+                KS_KC_ScheduledProcessTreeNode.ActivateIDRequest));
             Controller.AddKnowledgeSource(new KS_KC_ScheduledIDSelector(
                 Blackboard,
                 grammarPool,
@@ -45,16 +45,16 @@ namespace CSA.Demo
                 KS_KC_ScheduledIDSelector.DefaultOutputPoolName,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName,
                 1));
-            Controller.AddKnowledgeSource(new KS_KC_DefaultGrammarNonterminalDecomposition(
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(
                 Blackboard,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ExpandTreeNode(
+            Controller.AddKnowledgeSource(new KS_KC_ScheduledExpandTreeNode(
                 Blackboard,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
             Controller.AddKnowledgeSource(new KS_KC_ScheduledFilterPoolCleaner(
                 Blackboard,
                 new string[] {
-                    KS_KC_SelectTreeLeaves.DefaultOutputPoolName, 
+                    KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
                     KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
                     KS_KC_ScheduledIDSelector.DefaultOutputPoolName,
                     KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName

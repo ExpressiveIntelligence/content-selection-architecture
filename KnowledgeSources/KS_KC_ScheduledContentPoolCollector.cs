@@ -13,7 +13,7 @@ namespace CSA.KnowledgeSources
      * inherit from KS_ScheduledFilterSelector while knowledge sources that perform some kind of non-copying processing (such as KS_ChoicePresenter or KS_ProcessTreeNode) will
      * inherit from KS_ContentPoolCollector.     
      */
-    public abstract class KS_KC_ContentPoolCollector : ScheduledKnowledgeSource
+    public abstract class KS_KC_ScheduledContentPoolCollector : ScheduledKnowledgeSource
     {
         // Name of the bound activation variable
         protected const string FilteredUnits = "FilteredUnits";
@@ -113,18 +113,18 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        protected KS_KC_ContentPoolCollector(IBlackboard blackboard) : base(blackboard)
+        protected KS_KC_ScheduledContentPoolCollector(IBlackboard blackboard) : base(blackboard)
         {
             FilterConditionDel = DefaultFilterCondition;
         }
 
-        protected KS_KC_ContentPoolCollector(IBlackboard blackboard, string inputPool) : base(blackboard)
+        protected KS_KC_ScheduledContentPoolCollector(IBlackboard blackboard, string inputPool) : base(blackboard)
         {
             InputPool = inputPool ?? throw new ArgumentException("Null inputPool passed to constructor for KS_ContentPoolCollector");
             FilterConditionDel = SelectFromPool;
         }
 
-        protected KS_KC_ContentPoolCollector(IBlackboard blackboard, FilterCondition filter) : base(blackboard)
+        protected KS_KC_ScheduledContentPoolCollector(IBlackboard blackboard, FilterCondition filter) : base(blackboard)
         {
             FilterConditionDel = filter ?? throw new ArgumentException("Null filter passed to constructor for KS_ContentPoolCollector");
         }
@@ -133,7 +133,7 @@ namespace CSA.KnowledgeSources
         * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
         * as the FilterConditionDel.         
         */
-        protected KS_KC_ContentPoolCollector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard)
+        protected KS_KC_ScheduledContentPoolCollector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard)
         {
             if (filter == null)
             {
