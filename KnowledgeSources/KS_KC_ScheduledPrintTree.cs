@@ -19,6 +19,8 @@ namespace CSA.KnowledgeSources
         {
             var treeRoot = from Unit node in m_blackboard.LookupUnits<Unit>()
                            where node.HasComponent<KC_TreeNode>() && node.IsTreeRoot()
+                           // fixme: hardcoding in contentpool name just for testing
+                           where node.HasComponent<KC_ContentPool>() && node.ContentPoolEquals("GrammarRulePool")
                            select node; 
 
             if (treeRoot.Any())
