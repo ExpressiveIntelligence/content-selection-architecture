@@ -53,11 +53,13 @@ namespace ConsoleDemo
             }
         }
 
-        private static void SimpleScheduledCFGExpansion()
+        private static void SimpleScheduledCFGExpansion(string[] args)
         {
             Console.WriteLine("Starting demo3 (simple CFG expansion).");
 
-            for (int i = 0; i < 1; i++)
+            int numberOfExpansions = Int32.Parse(args[1]);
+
+            for (int i = 0; i < numberOfExpansions; i++)
             {
                 Demo3 demo = new Demo3();
                 uint unitCount1 = demo.Blackboard.NumberOfUnits();
@@ -93,7 +95,7 @@ namespace ConsoleDemo
                     ScheduledConsoleChoice_PrologApplTest();
                     break;
                 case "demo3":
-                    SimpleScheduledCFGExpansion();
+                    SimpleScheduledCFGExpansion(args);
                     break;
                 default:
                     throw new ArgumentException("Unrecognized argument: " + args[0]);
