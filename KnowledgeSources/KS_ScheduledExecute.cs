@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use KnowledgeComponent-based version of KS_ScheduledExecute.")]
     public class KS_ScheduledExecute : IScheduledKnowledgeSource
     {
         /* 

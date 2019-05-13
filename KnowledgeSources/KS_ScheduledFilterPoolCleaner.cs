@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSA.Core;
 using static CSA.KnowledgeUnits.CUSlots;
 
@@ -9,6 +10,7 @@ namespace CSA.KnowledgeSources
      * fixme: Like ChoicePresenter, FilterPoolCleaner doesn't copy anything with an output pool. Consider a refactor where the logic for selecting
      * a collection of content units based on filter condition is pushed up into a class above KS_ScheduledFilterSelector. 
      */
+    [Obsolete("Use KnowledgeComponent-based version of ScheduledFilterPoolCleaner.")]
     public class KS_ScheduledFilterPoolCleaner : KS_ScheduledFilterSelector
     {
         private static bool SelectFromInputPools(string[] inputPools, ContentUnit cu)

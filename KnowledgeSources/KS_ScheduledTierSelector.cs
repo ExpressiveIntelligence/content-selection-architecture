@@ -5,6 +5,7 @@ using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use classes in the KnowledgeComponent-based ScheduledTierSelector hierarchy.")]
     public class KS_ScheduledTierSelector : KS_ScheduledFilterSelector
     {
         public const string DefaultOutputPoolName = "SelectedByTier";

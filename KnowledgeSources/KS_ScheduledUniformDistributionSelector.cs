@@ -5,6 +5,7 @@ using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use KnowledgeComponent-based ScheduledUniformDistributionSelector.")]
     public class KS_ScheduledUniformDistributionSelector : KS_ScheduledFilterSelector
     {
 

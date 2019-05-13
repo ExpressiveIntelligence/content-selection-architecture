@@ -14,7 +14,7 @@ namespace CSA.KnowledgeSources
      * and Process (which does some manipulation of ContentUnits passing some filter criterion, including input pool). The PrologEval unit still copies
      * CUs because it's modifying meta-data, while Display doesn't do meta-data modification. So not clear if the are both subclasses of Process or not. 
      */
-
+    [Obsolete("Use KnowledgeComponent-based version of this controller.")]
     public class KS_ScheduledChoicePresenter : KS_ScheduledFilterSelector, IChoicePresenter
     {
         public const string DefaultChoicePresenterInputPool = "ContentUnitToDisplay";

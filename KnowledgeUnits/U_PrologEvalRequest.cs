@@ -1,7 +1,9 @@
-﻿using CSA.Core;
+﻿using System;
+using CSA.Core;
 
 namespace CSA.KnowledgeUnits
 {
+    [Obsolete("Create a KC_PrologEvalRequest KnowledgeComponent.")]
     public class U_PrologEvalRequest : Unit
     {
         // fixme: to get prolog working at first not implementing pools but will come back to this

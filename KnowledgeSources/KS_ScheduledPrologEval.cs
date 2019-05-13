@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
@@ -12,7 +13,7 @@ namespace CSA.KnowledgeSources
      * fixme: perhaps knowledge sources that manipulate meta-data will inherit from a different parent than ScheduledFilterSelector. For now we'll use
      * ScheduledFilterSelector since the precondition is almost identical. It's the action to take that changes. 
      */
-
+    [Obsolete("Use KnowledgeComponent-based ScheduledPrologEval.")]
     public class KS_ScheduledPrologEval : KS_ScheduledFilterSelector
     {
         private const string PrologEvalRequest = "PrologEvalRequest";

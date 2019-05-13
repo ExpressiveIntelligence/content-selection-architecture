@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSA.Core;
 using static CSA.KnowledgeUnits.CUSlots;
@@ -6,6 +7,7 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use KnowledgeComponent-based ScheduledFilterSelector.")]
     public class KS_ScheduledIDSelector : KS_ScheduledFilterSelector
     {
         // fixme: remove

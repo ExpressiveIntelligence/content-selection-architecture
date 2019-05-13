@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
@@ -7,6 +8,7 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use KnowledgeComponent-based ScheduledFilterSelector.")]
     public class KS_ScheduledFilterSelector : ScheduledKnowledgeSource
     {
 

@@ -1,8 +1,10 @@
-﻿using CSA.Core;
+﻿using System;
+using CSA.Core;
 using Prolog;
 
 namespace CSA.KnowledgeUnits
 {
+    [Obsolete("Create a KC_PrologKB KnowledgeComponent.")]
     public class U_PrologKB : Unit
     {
         /*

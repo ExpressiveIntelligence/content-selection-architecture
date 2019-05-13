@@ -13,8 +13,10 @@ namespace CSA.Core
          * fixme: keeping this slot infrastructure here for now so as not to break the code that depends on it.
          * But it should be deleted, and all code changed to use a component model.         
          */
+        [Obsolete("Use KnowledgeComponents instead of slots.")]
         public IDictionary<string, object> Slots { get; }
 
+        [Obsolete("Call HasComponent<T> instead.")]
         public bool HasSlot(string propName)
         {
             return Slots.ContainsKey(propName);
