@@ -9,10 +9,11 @@ namespace CSA.Demo
     {
         public IBlackboard Blackboard { get; }
 
-        // fixme: remove
-        // public CFGExpansionController Controller { get; }
-        
-        public ScheduledSequenceController Controller { get; }
+        public ScheduledSequenceController GenerateTree { get; }
+
+        public KS_KC_ScheduledCleanTree CleanTree { get; }
+
+        public KS_KC_ScheduledLinearizeTreeLeaves LinearizeTreeLeaves { get; }
 
         private const string grammarPool = "GrammarRulePool";
 
@@ -22,36 +23,36 @@ namespace CSA.Demo
             // _ = ContentUnitSetupForDemos.Demo3_1_DefineUnits(Blackboard, grammarPool);
             _ = ContentUnitSetupForDemos.Demo3_2_DefineUnits(Blackboard, grammarPool);
 
-            Controller = new ScheduledSequenceController();
+            GenerateTree = new ScheduledSequenceController();
 
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledPrintTree(Blackboard));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledSelectTreeLeaves(
+            // GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledPrintTree(Blackboard));
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledSelectTreeLeaves(
                 Blackboard,
                 KS_KC_ScheduledContentPoolCollector.GenerateHasComponent<KC_IDSelectionRequest>()));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledHighestTierSelector<KC_Order>(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledHighestTierSelector<KC_Order>(
                 Blackboard, 
                 KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
                 KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledProcessTreeNode(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledProcessTreeNode(
                 Blackboard,
                 KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
                 KS_KC_ScheduledProcessTreeNode.ActivateIDRequest));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledIDSelector(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledIDSelector(
                 Blackboard,
                 grammarPool,
                 KS_KC_ScheduledIDSelector.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledUniformDistributionSelector(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledUniformDistributionSelector(
                 Blackboard,
                 KS_KC_ScheduledIDSelector.DefaultOutputPoolName,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName,
                 1));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(
                 Blackboard,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledExpandTreeNode(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledExpandTreeNode(
                 Blackboard,
                 KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
-            Controller.AddKnowledgeSource(new KS_KC_ScheduledFilterPoolCleaner(
+            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledFilterPoolCleaner(
                 Blackboard,
                 new string[] {
                     KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
@@ -60,8 +61,9 @@ namespace CSA.Demo
                     KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName
                   }));
 
-            // fixme: remove
-            // Controller = new CFGExpansionController(expansionTreeRootNode, grammarPool, Blackboard);
+            CleanTree = new KS_KC_ScheduledCleanTree(Blackboard);
+
+            LinearizeTreeLeaves = new KS_KC_ScheduledLinearizeTreeLeaves(Blackboard);
         }
     }
 }

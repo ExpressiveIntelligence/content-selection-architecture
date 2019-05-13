@@ -9,7 +9,7 @@ namespace CSA.KnowledgeSources
 {
     /*
      * KS_ContentPoolCollector is an abstract class that provides functionality for collecting the Units in a content pool, potentially with additional filtering logic applied. 
-     * KS_ScheduledFilterSelector is a subclass which adds additional functionality for copying the collect Units to an output pool. In general, filter knowledge sources will
+     * KS_ScheduledFilterSelector is a subclass which adds additional functionality for copying the collected Units to an output pool. In general, filter knowledge sources will
      * inherit from KS_ScheduledFilterSelector while knowledge sources that perform some kind of non-copying processing (such as KS_ChoicePresenter or KS_ProcessTreeNode) will
      * inherit from KS_ContentPoolCollector.     
      */
@@ -129,10 +129,6 @@ namespace CSA.KnowledgeSources
             FilterConditionDel = filter ?? throw new ArgumentException("Null filter passed to constructor for KS_ContentPoolCollector");
         }
 
-        /*
-        * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
-        * as the FilterConditionDel.         
-        */
         protected KS_KC_ScheduledContentPoolCollector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard)
         {
             if (filter == null)

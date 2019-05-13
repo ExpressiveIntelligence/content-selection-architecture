@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using CSA.KnowledgeSources;
 using CSA.Demo;
+using CSA.Core;
+using CSA.KnowledgeUnits;
 
 namespace ConsoleDemo
 {
@@ -68,9 +72,34 @@ namespace ConsoleDemo
                 while (demo.Blackboard.Changed)
                 {
                     demo.Blackboard.ResetChanged();
-                    demo.Controller.Execute();
+                    demo.GenerateTree.Execute();
                 }
+
+                /*
+                 * For now not placing these in a separate controller or worrying about how to generalize if-then logic in controllers. 
+                 * May just want to keep it this way, where raw c# is used for more complicated controller logic. 
+                 * fixme: This would be easy to specify in a priority-based scheme: LinearizeTreeLeaves, CleanTree and the logic to print the linearized leaves would all 
+                 * be lower priority than the knowledge sources that build the tree. So they would only fire when the tree is complete. 
+                 * Even without waiting for reactive KSs, this could be done with scheduled KSs that are sorted by priority with a loop that goes through each of the 
+                 * KSs executing the first one whose precondition is satisfied then starting over again from the highest priority. 
+                 */
+                demo.LinearizeTreeLeaves.Execute();
+                demo.CleanTree.Execute();
+
+                var sequenceQuery = from unit in demo.Blackboard.LookupUnits<Unit>()
+                                    where unit.HasComponent<KC_Sequence>()
+                                    select unit;
+
+                Debug.Assert(sequenceQuery.Count() == 1);
+                Unit sequence = sequenceQuery.First();
+                foreach(Unit unit in sequence.GetSequence())
+                {
+                    Console.Write(unit.GetText() + " ");
+                }
+                Console.WriteLine();
+
                 uint unitCount2 = demo.Blackboard.NumberOfUnits();
+                
                 Console.WriteLine("Number of units after execution = " + unitCount2);
                 Console.WriteLine();
             }
