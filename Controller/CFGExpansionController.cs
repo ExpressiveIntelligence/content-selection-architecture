@@ -12,9 +12,10 @@ using CSA.KnowledgeSources;
 namespace CSA.Controllers
 {
     /*
-     * Controller class for doing context-free grammar expansions. Currently I'm hardcoding the logic for grammar 
-     * expansions into the controller until I have some other tree expansion cases which I can then use to generalize this.     
+     * Deprecated controller class for doing CFG expansions. Used this to initially figure out how to decompose CFG expansions into knowledge sources, 
+     * then cleanly refactored as separate knowledge sources using a standard sequential controller. Demo3 is now structured this way. 
      */
+    [Obsolete("CFGExpansionController is obsolete. CFG expansion should be done using standard sequential controller and KnowledgeSources.")]
     public class CFGExpansionController : IScheduledController
     {
         public Unit RootNode { get; }
