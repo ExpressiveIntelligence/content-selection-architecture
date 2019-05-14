@@ -67,7 +67,7 @@ namespace CSA.KnowledgeSources
             return choices.ToArray();
         }
 
-        // Gathers the choices for the selected content unit, stores them on fields provided on this KS, and calls any calls any registered event handlers. 
+        // Gathers the choices for the selected content unit and calls any registered event handlers. 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
             var selectedCUs = ContentUnitsFilteredByPrecondition(boundVars);

@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace CSA.Core
 {
+    [Obsolete("Replace with Unit using appropriate KnowledgeComponents.")]
     public class ContentUnit : Unit
     {
         // fixme: consider changing string to object so that hashes and comparisons are more efficient

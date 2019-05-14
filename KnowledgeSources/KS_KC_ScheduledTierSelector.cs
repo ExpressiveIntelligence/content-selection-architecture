@@ -27,7 +27,7 @@ namespace CSA.KnowledgeSources
             return units;
         }
 
-        protected KS_KC_ScheduledTierSelector(IBlackboard blackboard) : base(blackboard, DefaultOutputPoolName)
+        protected KS_KC_ScheduledTierSelector(IBlackboard blackboard) : base(blackboard, DefaultOutputPoolName, GenerateHasComponent<T>())
         {
         }
 

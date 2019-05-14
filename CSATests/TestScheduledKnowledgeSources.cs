@@ -16,85 +16,29 @@ namespace CSA.Tests
     {
         private readonly ITestOutputHelper output;
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
-        public static IEnumerable<object[]> Data_TestExecute_ScheduledFilterSelector()
+        /*
+         * Utilities used by test methods. 
+         */
+        #region utilities used by test methods
+        static bool TestFilter(Unit unit)
         {
-            string inputPool = "inputPool1";
-            string outputPool = "outputPool1";
-
-            IBlackboard blackboard = new Blackboard();
-
-            ContentUnit cu1 = new ContentUnit();
-            ContentUnit cu2 = new ContentUnit();
-            ContentUnit cu3 = new ContentUnit();
-            ContentUnit cu4 = new ContentUnit();
-
-            cu1.Metadata[ContentPool] = inputPool;
-            cu2.Metadata[ContentPool] = inputPool;
-
-            cu2.Metadata["Test"] = 1;
-            cu3.Metadata["Test"] = 1;
-            cu4.Metadata["Test"] = 2;
-
-            /* Structure of object[]: 
-             * IBlackboard: blackboard, 
-             * KS_ScheduledFilterSelector: the filter selector to test            
-             * ContentUnit[]: array of CUs to add to the blackboard
-             * ContentUnit[]: CUs which should be copied to the output pool        
-             */
-
-            return new List<object[]>
-            {
-                // Filter with default filter condition
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 } }, 
-
-                // Filter with input pool and output pool using input pool selection
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] {cu1, cu2} }, 
-
-                // Filter with output pool and specified filter
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu2, cu3 } },
-
-                // Filter with input and output pools and specified filter
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] { cu2 } },
-
-                // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new ContentUnit[0], new ContentUnit[0] },
-
-                // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu3, cu4 },
-                    new ContentUnit[0] },
-
-                // Nothing in the input pool and specified filter
-                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new ContentUnit[] { cu3, cu4 },
-                    new ContentUnit[0] },
-
-             };
+            return unit.HasComponent<KC_Order>() && unit.GetOrder() == 1;
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
-        static bool TestFilter(ContentUnit cu)
-        {
-            return cu.HasMetadataSlot("Test") && (int)cu.Metadata["Test"] == 1 ? true : false;
-        }
-
-        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
-        /* Given a set of links which go from a unit in an input pool to a unit in an output pool, check that the L_SelectedContentUnit link is 
-         * set up correctly and that the linked CU is in the correct output pool. 
+        /* 
+         * Given a set of links which go from a unit in an input pool to a unit in an output pool, check that the L_SelectedContentUnit link is 
+         * set up correctly and that the linked Unit is in the correct output pool. 
          */
         private static void TestFilterLinks(ISet<(IUnit, string, LinkDirection)> links, string outputPool)
         {
             int count = links.Count;
             Assert.Equal(1, count);
-            (IUnit cu, string linkType, LinkDirection dir) = links.First();
+            (IUnit unit, string linkType, LinkDirection dir) = links.First();
             Assert.Equal(LinkTypes.L_SelectedContentUnit, linkType);
             Assert.Equal(LinkDirection.End, dir);
-            ContentUnit cuCopy = cu as ContentUnit;
-            Assert.True(cuCopy.HasMetadataSlot(ContentPool));
-            Assert.Equal(outputPool, cuCopy.Metadata[ContentPool]);
+            Unit unitCast = unit as Unit; // fixme: only needing to cast because I'm being inconsistent with whether Unit or IUnit is what I'm targeting. Switch to IUnit. 
+            Assert.True(unitCast.HasComponent<KC_ContentPool>());
+            Assert.True(unitCast.ContentPoolEquals(outputPool));
         }
 
         // fixme: delete this when all test methods have been converted to KnowledgeComponent-based knowledge sources. 
@@ -116,20 +60,81 @@ namespace CSA.Tests
 
             Assert.Equal(desiredNumberOfUnits, units.Count());
         }
+        #endregion
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledFilerSelector
+        /*
+         * Data and test methods for KS_ScheduledFilterSelector
+         */
+        #region KS_ScheduledFilterSelector tests
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledFilterSelector()
+        {
+            string inputPool = "inputPool1";
+            string outputPool = "outputPool1";
+
+            IBlackboard blackboard = new Blackboard();
+
+            var unit1 = new Unit();
+            var unit2 = new Unit();
+            var unit3 = new Unit();
+            var unit4 = new Unit();
+
+            unit1.AddComponent(new KC_ContentPool(inputPool, true));
+            unit2.AddComponent(new KC_ContentPool(inputPool, true));
+
+            unit2.AddComponent(new KC_Order(1, true));
+            unit3.AddComponent(new KC_Order(1, true));
+            unit4.AddComponent(new KC_Order(2, true));
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard, 
+             * KS_ScheduledFilterSelector: the filter selector to test            
+             * Unit[]: array of CUs to add to the blackboard
+             * Unit[]: CUs which should be copied to the output pool        
+             */
+
+            return new List<object[]>
+            {
+                // Filter with default filter condition
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { unit1, unit2, unit3, unit4 } },
+
+                // Filter with input pool and output pool using input pool selection
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] {unit1, unit2} }, 
+
+                // Filter with output pool and specified filter
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { unit2, unit3 } },
+
+                // Filter with input and output pools and specified filter
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { unit2 } },
+
+                // Empty blackboard
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool), new Unit[0], new Unit[0] },
+
+                // Nothing in the input pool and no filter
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
+                    new Unit[0] },
+
+                // Nothing in the input pool and specified filter
+                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit3, unit4 },
+                    new Unit[0] },
+             };
+        }
+
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledFilterSelector))]
-        public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
-            ContentUnit[] filteredUnits)
+        public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_KC_ScheduledFilterSelector filterSelector, Unit[] unitsToAdd,
+            Unit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
 
             // Add the units to the blackboard
-            foreach (var cu in unitsToAdd)
+            foreach (var unit in unitsToAdd)
             {
-                blackboard.AddUnit(cu);
+                blackboard.AddUnit(unit);
             }
 
 
@@ -139,18 +144,22 @@ namespace CSA.Tests
             string outputPool = filterSelector.OutputPool;
 
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
-            foreach (var cu in filteredUnits)
+            foreach (var unit in filteredUnits)
             {
-                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unit);
                 TestFilterLinks(s, outputPool);
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
-            TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
+            TestNumberOfUnitsInOutputPool(filteredUnits.Length, blackboard, outputPool);
 
         }
+        #endregion
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledIDSelector
+        /*
+         * Data and test methods for KS_ScheduledIDSelector.
+         */
+        #region KS_ScheduledIDSelector tests
         public static IEnumerable<object[]> Data_TestExecute_ScheduledIDSelector()
         {
             string inputPool = "inputPool1";
@@ -158,87 +167,91 @@ namespace CSA.Tests
 
             IBlackboard blackboard = new Blackboard();
 
-            ContentUnit cu1 = new ContentUnit();
-            ContentUnit cu2 = new ContentUnit();
-            ContentUnit cu3 = new ContentUnit();
-            ContentUnit cu4 = new ContentUnit();
+            Unit unit1 = new Unit();
+            Unit unit2 = new Unit();
+            Unit unit3 = new Unit();
+            Unit unit4 = new Unit();
 
-            cu1.Metadata[ContentPool] = inputPool;
-            cu2.Metadata[ContentPool] = inputPool;
+            unit1.AddComponent(new KC_ContentPool(inputPool, true));
+            unit2.AddComponent(new KC_ContentPool(inputPool, true));
 
-            cu2.Metadata["Test"] = 1;
-            cu3.Metadata["Test"] = 1;
-            cu4.Metadata["Test"] = 2;
+            unit2.AddComponent(new KC_Order(1, true));
+            unit3.AddComponent(new KC_Order(1, true));
+            unit4.AddComponent(new KC_Order(2, true));
 
-            cu1.Metadata[ContentUnitID] = "ID1";
-            cu2.Metadata[ContentUnitID] = "ID2";
-            cu3.Metadata[ContentUnitID] = "ID1";
-            cu4.Metadata[ContentUnitID] = "ID3";
+            unit1.AddComponent(new KC_UnitID("ID1", true));
+            unit2.AddComponent(new KC_UnitID("ID2", true));
+            unit3.AddComponent(new KC_UnitID("ID1", true));
+            unit4.AddComponent(new KC_UnitID("ID3", true));
 
-            U_IDSelectRequest idReq1 = new U_IDSelectRequest("ID1");
-            U_IDSelectRequest idReq2 = new U_IDSelectRequest("ID2");
-            U_IDSelectRequest idReq3 = new U_IDSelectRequest("ID3");
+            Unit idReq1 = new Unit();
+            Unit idReq2 = new Unit();
+            Unit idReq3 = new Unit();
+
+            idReq1.AddComponent(new KC_IDSelectionRequest("ID1", true));
+            idReq2.AddComponent(new KC_IDSelectionRequest("ID2", true));
+            idReq3.AddComponent(new KC_IDSelectionRequest("ID3", true));
 
             /* Structure of object[]: 
              * IBlackboard: blackboard, 
              * KS_ScheduledFilterSelector: the filter selector to test            
-             * ContentUnit[]: array of CUs to add to the blackboard
-             * U_IDSelectRequest[]: array of U_IDSelectRequests to add to the blackboard            
-             * ContentUnit[]: CUs which should be copied to the output pool           
+             * Unit[]: array of Units to add to the blackboard
+             * Unit[]: array of Units with a KC_IDSelectRequest to add to the blackboard            
+             * Unit[]: Units which should be copied to the output pool           
              */
 
             return new List<object[]>
             {
                 // Filter with default filter condition
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu1, cu3, } }, 
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { idReq1 }, new Unit[] { unit1, unit3, } }, 
 
                 // Filter with input pool and output pool using input pool selection
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] {cu1 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { idReq1 }, new Unit[] {unit1 } }, 
 
                 // Filter with output pool and specified filter
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool, TestFilter), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[] { cu3 } },
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] { idReq1 }, new Unit[] { unit3 } },
 
                 // Filter with input and output pools and specified filter
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                    new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { idReq1 }, new Unit[0] },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new ContentUnit[0], new U_IDSelectRequest[0],
-                    new ContentUnit[0]},
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool), new Unit[0], new Unit[0],
+                    new Unit[0]},
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new ContentUnit[] { cu3, cu4 },
-                    new U_IDSelectRequest[] { idReq1 }, new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
+                    new Unit[] { idReq1 }, new Unit[0] },
 
                 // Multiple U_IDRequests
-                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new U_IDSelectRequest[] { idReq1, idReq2, idReq3}, new ContentUnit[] { cu2 } },
+                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                    new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { idReq1, idReq2, idReq3}, new Unit[] { unit2 } },
 
              };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledIDSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledIDSelector))]
-        public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, ContentUnit[] unitsToAdd,
-            U_IDSelectRequest[] reqsToAdd, ContentUnit[] filteredUnits)
+        public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_KC_ScheduledIDSelector filterSelector, Unit[] unitsToAdd,
+            Unit[] reqsToAdd, Unit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
 
             // Add the content units to the blackboard
-            foreach (var cu in unitsToAdd)
+            foreach (var unit in unitsToAdd)
             {
-                blackboard.AddUnit(cu);
+                blackboard.AddUnit(unit);
             }
 
             // Add the requests to the blackboad
             foreach (var req in reqsToAdd)
             {
                 blackboard.AddUnit(req);
+                req.SetActiveRequest(true);
             }
 
             // Executed the filter selector
@@ -247,21 +260,28 @@ namespace CSA.Tests
             string outputPool = filterSelector.OutputPool;
 
             // Iterate through each of the units which should have passed the filter and see if there's a copy of them in the output pool.
-            foreach (var cu in filteredUnits)
+            foreach (var unit in filteredUnits)
             {
-                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(cu);
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unit);
                 TestFilterLinks(s, outputPool);
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
-            TestNumberOfCUsInOutputPool(filteredUnits.Length, blackboard, outputPool);
+            TestNumberOfUnitsInOutputPool(filteredUnits.Length, blackboard, outputPool);
 
-            // Grab all of the reqs on the blackboard and verify that there are none (should have all been deleted).
-            ISet<U_IDSelectRequest> reqs = blackboard.LookupUnits<U_IDSelectRequest>();
+            // Grab all of the reqs on the blackboard and verify that none that are still active (all requests should have been set to inactive). 
+            var reqs = from unit in blackboard.LookupUnits<Unit>()
+                       where unit.HasComponent<KC_IDSelectionRequest>()
+                       where unit.GetActiveRequest()
+                       select unit;
             Assert.False(reqs.Any());
         }
+        #endregion
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledUniformDistributionSelector
+        /*
+         * Data and test methods for KS_ScheduledUniformDistributionSelector.
+         */
+        #region KS_ScheduledUniformDistributionSelector tests
         public static IEnumerable<object[]> Data_TestExecute_ScheduledUniformDistributionSelector()
         {
             string inputPool = "inputPool1";
@@ -270,65 +290,64 @@ namespace CSA.Tests
 
             IBlackboard blackboard = new Blackboard();
 
-            ContentUnit cu1 = new ContentUnit();
-            ContentUnit cu2 = new ContentUnit();
-            ContentUnit cu3 = new ContentUnit();
-            ContentUnit cu4 = new ContentUnit();
+            Unit unit1 = new Unit();
+            Unit unit2 = new Unit();
+            Unit unit3 = new Unit();
+            Unit unit4 = new Unit();
 
-            cu1.Metadata[ContentPool] = inputPool;
-            cu2.Metadata[ContentPool] = inputPool;
-            cu3.Metadata[ContentPool] = inputPool;
+            unit1.AddComponent(new KC_ContentPool(inputPool, true));
+            unit2.AddComponent(new KC_ContentPool(inputPool, true));
+            unit3.AddComponent(new KC_ContentPool(inputPool, true));
 
-            cu2.Metadata["Test"] = 1;
-            cu3.Metadata["Test"] = 1;
-            cu4.Metadata["Test"] = 2;
+            unit2.AddComponent(new KC_Order(1, true));
+            unit3.AddComponent(new KC_Order(1, true));
+            unit4.AddComponent(new KC_Order(2, true));
 
-            cu1.Metadata[ContentUnitID] = "ID1";
-            cu2.Metadata[ContentUnitID] = "ID2";
-            cu3.Metadata[ContentUnitID] = "ID1";
-            cu4.Metadata[ContentUnitID] = "ID3";
+            unit1.AddComponent(new KC_UnitID("ID1", true));
+            unit2.AddComponent(new KC_UnitID("ID2", true));
+            unit3.AddComponent(new KC_UnitID("ID1", true));
+            unit4.AddComponent(new KC_UnitID("ID3", true));
 
             /* Structure of object[]: 
             * IBlackboard: blackboard, 
             * KS_ScheduledFilterSelector: the filter selector to test            
-            * ContentUnit[]: array of CUs to add to the blackboard
-            * ContentUnit[]: units to select among (that pass inputPool and testfilter filters)              
+            * Unit[]: array of units to add to the blackboard
+            * Unit[]: units to select among (that pass inputPool and testfilter filters)              
             */
 
             return new List<object[]>
             {
                 // Filter with default filter condition and output pool using seed of 1
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, seed), new ContentUnit[] { cu1, cu2, cu3, cu4 },
-                    new ContentUnit[] {cu1, cu2, cu3, cu4 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, seed), new Unit[] { unit1, unit2, unit3, unit4 },
+                    new Unit[] {unit1, unit2, unit3, unit4 } }, 
 
                 // Filter with specified output pool, using seed of 1, requesting 1 CU
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, outputPool, seed),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu1, cu2, cu3, cu4 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, outputPool, seed),
+                    new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit1, unit2, unit3, unit4 } }, 
 
                 // Filter with specified input and output pools, specified number to select and seed of 1
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu1, cu2, cu3 } },
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed),
+                    new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit1, unit2, unit3 } },
 
                 // Filter with specified input and output pools, specified filter, specified number to select and seed of 1
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, TestFilter, 1, seed),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4 }, new ContentUnit[] { cu2, cu3 } },
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, TestFilter, 1, seed),
+                    new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit2, unit3 } },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, 5), new ContentUnit[0],
-                    new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, 5), new Unit[0],
+                    new Unit[0] },
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1),
-                    new ContentUnit[] { cu4 }, new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1),
+                    new Unit[] { unit4 }, new Unit[0] },
 
              };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledUniformDistributionSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledUniformDistributionSelector))]
-        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_ScheduledUniformDistributionSelector filterSelector,
-            ContentUnit[] unitsToAdd, ContentUnit[] unitsToSelectFrom)
+        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_KC_ScheduledUniformDistributionSelector filterSelector,
+            Unit[] unitsToAdd, Unit[] unitsToSelectFrom)
         {
             int seed = filterSelector.Seed;
             uint numberToSelect = filterSelector.NumberToSelect;
@@ -340,16 +359,15 @@ namespace CSA.Tests
             blackboard.Clear();
 
             // Add the content units to the blackboard
-            foreach (var cu in unitsToAdd)
+            foreach (var unit in unitsToAdd)
             {
-                blackboard.AddUnit(cu);
+                blackboard.AddUnit(unit);
             }
 
             // Executed the filter selector
             filterSelector.Execute();
 
             // Check that the uniform distriubtion selector selected the correct numberToSelect content units
-
             for (int i = 0; i < Math.Min(numberToSelect, unitsToSelectFrom.Length); i++)
             {
                 int r = i + random.Next(unitsToSelectFrom.Length - i);
@@ -358,10 +376,14 @@ namespace CSA.Tests
             }
 
             // Grab all the content units in the output pool and verify that there's the same number of them as numberToSelect
-            TestNumberOfCUsInOutputPool((int)Math.Min(numberToSelect, unitsToSelectFrom.Length), blackboard, outputPool);
+            TestNumberOfUnitsInOutputPool((int)Math.Min(numberToSelect, unitsToSelectFrom.Length), blackboard, outputPool);
         }
+        #endregion
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledPoolCleaner
+        /*
+         * Data and test methods for KS_ScheduledPoolCleaner.
+         */
+        #region KS_ScheduledPoolCleaner tests
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPoolCleaner()
         {
             string pool1 = "pool1";
@@ -370,76 +392,79 @@ namespace CSA.Tests
 
             IBlackboard blackboard = new Blackboard();
 
-            ContentUnit cu1 = new ContentUnit();
-            ContentUnit cu2 = new ContentUnit();
-            ContentUnit cu3 = new ContentUnit();
-            ContentUnit cu4 = new ContentUnit();
-            ContentUnit cu5 = new ContentUnit();
+            Unit unit1 = new Unit();
+            Unit unit2 = new Unit();
+            Unit unit3 = new Unit();
+            Unit unit4 = new Unit();
+            Unit unit5 = new Unit();
 
-            cu1.Metadata[ContentPool] = pool1;
-            cu2.Metadata[ContentPool] = pool1;
-            cu3.Metadata[ContentPool] = pool2;
-            cu4.Metadata[ContentPool] = pool3;
+            unit1.AddComponent(new KC_ContentPool(pool1, true));
+            unit2.AddComponent(new KC_ContentPool(pool1, true));
+            unit3.AddComponent(new KC_ContentPool(pool2, true));
+            unit4.AddComponent(new KC_ContentPool(pool3, true));
 
             /* Structure of object[]: 
             * IBlackboard: blackboard, 
             * KS_ScheduledFilterPoolCleaner: the knowledge source to test            
-            * ContentUnit[]: array of CUs to add to the blackboard
-            * ContentUnit[]: the content units that should be left on the blackboard           
+            * Unit[]: array of units to add to the blackboard
             */
 
             return new List<object[]>
             {
                 // One pool to clean
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
+                    new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit3, unit4, unit5 } }, 
 
                 // Two pools to clean
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2 }),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu4, cu5 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2 }),
+                    new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit4, unit5 } }, 
 
                 // Three pools to clean
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu5 } },
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
+                    new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit5 } },
 
                 // Empty pool to clean
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
-                    new ContentUnit[] { cu3, cu4, cu5}, new ContentUnit[] { cu3, cu4, cu5 } }, 
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
+                    new Unit[] { unit3, unit4, unit5}, new Unit[] { unit3, unit4, unit5 } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
-                    new ContentUnit[0], new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
+                    new Unit[0], new Unit[0] },
 
                 // No filter pools specified in constructor
-                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[0]),
-                    new ContentUnit[] { cu1, cu2, cu3, cu4, cu5}, new ContentUnit[] { cu1, cu2, cu3, cu4, cu5 } },
+                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[0]),
+                    new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit1, unit2, unit3, unit4, unit5 } },
 
              };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledPoolCleaner
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledPoolCleaner))]
-        public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_ScheduledFilterPoolCleaner cleaner,
-            ContentUnit[] unitsToAdd, ContentUnit[] unitsRemaining)
+        public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_KC_ScheduledFilterPoolCleaner cleaner,
+            Unit[] unitsToAdd, Unit[] unitsRemaining)
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
 
             // Add the content units to the blackboard
-            foreach (var cu in unitsToAdd)
+            foreach (var unit in unitsToAdd)
             {
-                blackboard.AddUnit(cu);
+                blackboard.AddUnit(unit);
             }
 
             // Executed the cleaner
             cleaner.Execute();
 
             // Check that only the remaining units are on the blackboard 
-            ISet<ContentUnit> cuSet = blackboard.LookupUnits<ContentUnit>();
-            Assert.True(cuSet.SetEquals(unitsRemaining));
+            ISet<Unit> unitSet = blackboard.LookupUnits<Unit>();
+            Assert.True(unitSet.SetEquals(unitsRemaining));
         }
+        #endregion
 
+        /*
+         * Data and test methods for KS_ScheduledChoicePresenter. 
+         */
+        #region KS_ScheduledChoicePresenter tests
         // fixme: add tests for the handlers defined in EventHandlers_ChoicePresenter 
         // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
@@ -568,7 +593,12 @@ namespace CSA.Tests
             // Execute the choice presenter
             ks.Execute();
         }
+        #endregion
 
+        /*
+         * Data and test methods for KS_ScheduledPrologEval.
+         */
+        #region KS_ScheduledPrologEval tests
         // fixme: change this to test KnowledgeComponent-based ScheduledPrologEval (once it has been defined)
         public static IEnumerable<object[]> Data_TestExecute_ScheduledPrologEval()
         {
@@ -767,13 +797,14 @@ namespace CSA.Tests
             ISet<U_PrologEvalRequest> reqs = blackboard.LookupUnits<U_PrologEvalRequest>();
             Assert.False(reqs.Any());
         }
+        #endregion
 
         // fixme: add test for KS_ScheduledExecute
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledTierSelector
         /* 
          * Data and test methods for KS_ScheduledTierSelector
          */
+        #region KS_ScheduledTierSelector tests
         public static IEnumerable<object[]> Data_TestExecute_ScheduledTierSelector()
         {
             string pool1 = "pool1";
@@ -791,100 +822,147 @@ namespace CSA.Tests
             units[1].AddComponent(new KC_ContentPool(pool1, true));
             units[2].AddComponent(new KC_ContentPool(pool1, true));
 
-            // fixme: commented out until I finish making the change 
-            /*
-            units[0].Metadata[Specificity] = 5;
-            units[0].Metadata[ContentUnitID] = "ID0";
+            units[0].AddComponent(new KC_Order(5, true));
+            units[0].AddComponent(new KC_UnitID("ID0", true));
 
-            units[1].Metadata[Specificity] = 3;
-            units[1].Metadata[ContentUnitID] = "ID1";
+            units[1].AddComponent(new KC_Order(3, true));
+            units[1].AddComponent(new KC_UnitID("ID1", true));
 
-            units[2].Metadata[Specificity] = 5;
-            units[2].Metadata[ContentUnitID] = "ID2";
+            units[2].AddComponent(new KC_Order(5, true));
+            units[2].AddComponent(new KC_UnitID("ID2", true));
 
-            units[3].Metadata[Specificity] = 3;
-            units[3].Metadata[ContentUnitID] = "ID3";
+            units[3].AddComponent(new KC_Order(3, true));
+            units[3].AddComponent(new KC_UnitID("ID3", true));
 
-            units[4].Metadata[Specificity] = 6;
-            units[4].Metadata[ContentUnitID] = "ID4";
+            units[4].AddComponent(new KC_Order(6, true));
+            units[4].AddComponent(new KC_UnitID("ID4", true));
 
-            units[5].Metadata[Specificity] = "xylophone";
-            units[6].Metadata[Specificity] = "carburator";
-            units[7].Metadata[Specificity] = "xylophone";
-            units[8].Metadata[Specificity] = "carburator";
-            units[9].Metadata[Specificity] = "Zebra";
+            units[5].AddComponent(new KC_Text("xylophone", true));
+            units[6].AddComponent(new KC_Text("carburator", true));
+            units[7].AddComponent(new KC_Text("xylophone", true));
+            units[8].AddComponent(new KC_Text("carburator", true));
+            units[9].AddComponent(new KC_Text("Zebra", true));
 
-            units[10].Metadata[Specificity] = 5.3;
-            units[11].Metadata[Specificity] = 3.1;
-            units[12].Metadata[Specificity] = 5.3;
-            units[13].Metadata[Specificity] = 3.1;
-            units[14].Metadata[Specificity] = 6.7;
-            */
+            units[10].AddComponent(new KC_Utility(5.3, true));
+            units[11].AddComponent(new KC_Utility(3.1, true));
+            units[12].AddComponent(new KC_Utility(5.3, true));
+            units[13].AddComponent(new KC_Utility(3.1, true));
+            units[14].AddComponent(new KC_Utility(6.7, true));
+
             /* Structure of object[]: 
             * IBlackboard: blackboard, 
             * KS_ScheduledTierSelector: the knowledge source to test            
-            * ContentUnit[]: array of CUs to add to the blackboard
-            * ContentUnit[]: the content units that should be in the output pool  
+            * Unit[]: array of CUs to add to the blackboard
+            * Unit[]: the units that should be in the output pool  
             */
 
             return new List<object[]>
             {
-                // fixme: commented out until I finish making the change
                 /*
-                // No input pool, default output pool, integer specificity
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
-                    units.Take(5), new ContentUnit[] { units[4] } }, 
+                 * Test cases for HighestTierSelector
+                 */
+                #region HighestTierSelector test cases
+                // No input pool, default output pool, KC_Order as tier slot
+                new object[] { blackboard,  new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard),
+                    units.Take(5), new Unit[] { units[4] } }, 
 
-                // No input pool, specified output pool, integer specificy
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, "output1", Specificity),
-                    units.Take(5), new ContentUnit[] { units[4] } }, 
+                // No input pool, specified output pool, KC_Order as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1"),
+                    units.Take(5), new Unit[] { units[4] } }, 
 
-                // Input pool, specified output pool, integer specificity
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
-                    units.Take(5), new ContentUnit[] { units[0], units[2] } },
+                // Input pool, specified output pool, KC_Order as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                    units.Take(5), new Unit[] { units[0], units[2] } },
 
-                // No input pool, specified output pool, filter condition, integer specificity
+                // No input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledTierSelector(blackboard, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(6) < 0, Specificity),
-                    units.Take(5), new ContentUnit[] { units[0], units[2] } },
+                    new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() < 6),
+                    units.Take(5), new Unit[] { units[0], units[2] } },
                               
-                // Input pool, specified output pool, filter condition, integer specificity
+                // Input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", (cu) => ((IComparable)cu.Metadata[Specificity]).CompareTo(5) < 0, Specificity),
-                    units.Take(5), new ContentUnit[] { units[1] } },
+                    new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() < 5),
+                    units.Take(5), new Unit[] { units[1] } },
 
-                // No input pool, default output pool, string specificity
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
-                    units.Skip(5).Take(5), new ContentUnit[] { units[9] } }, 
+                // No input pool, default output pool, KC_Text as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Text>(blackboard),
+                    units.Skip(5).Take(5), new Unit[] { units[9] } }, 
 
-                // No input pool, default output pool, float specificity
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
-                    units.Skip(10), new ContentUnit[] { units[14] } }, 
+                // No input pool, default output pool, KC_Utility as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Utility>(blackboard),
+                    units.Skip(10), new Unit[] { units[14] } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, Specificity),
-                    new ContentUnit[0], new ContentUnit[0] }, 
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard),
+                    new Unit[0], new Unit[0] }, 
 
                 // Empty pool
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, pool1, "output1", Specificity),
-                    units.Skip(3).Take(2), new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                    units.Skip(3).Take(2), new Unit[0] },
 
-                // Non-existant tier slot
-                new object[] { blackboard, new KS_KC_ScheduledTierSelector(blackboard, "ThisSlotDoesNotExist"),
-                    units.Take(5), new ContentUnit[0] },
-                    */
-             };
+                // Non-existant KC_UnitID tier slot
+                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_UnitID>(blackboard),
+                    units.Skip(5).Take(5), new Unit[0] },
+                #endregion
+
+                /*
+                 * Test cases for ScheduledLowestTierSelector
+                 */
+                #region LowestTierSelector test cases
+                // No input pool, default output pool, KC_Order as tier slot
+                new object[] { blackboard,  new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard),
+                    units.Take(5), new Unit[] { units[1], units[3] } }, 
+
+                // No input pool, specified output pool, KC_Order as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1"),
+                    units.Take(5), new Unit[] { units[1], units[3] } }, 
+
+                // Input pool, specified output pool, KC_Order as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                    units.Take(5), new Unit[] { units[1] } },
+
+                // No input pool, specified output pool, filter condition, KC_Order as tier slot
+                new object[] { blackboard,
+                    new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() > 5),
+                    units.Take(5), new Unit[] { units[4] } },
+                              
+                // Input pool, specified output pool, filter condition, KC_Order as tier slot
+                new object[] { blackboard,
+                    new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() > 3),
+                    units.Take(5), new Unit[] { units[0], units[2] } },
+
+                // No input pool, default output pool, KC_Text as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Text>(blackboard),
+                    units.Skip(5).Take(5), new Unit[] { units[6], units[8] } }, 
+
+                // No input pool, default output pool, KC_Utility as tier slot
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Utility>(blackboard),
+                    units.Skip(10), new Unit[] { units[11], units[13] } }, 
+
+                // Empty blackboard
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard),
+                    new Unit[0], new Unit[0] }, 
+
+                // Empty pool
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                    units.Skip(3).Take(2), new Unit[0] },
+
+                // Non-existant KC_UnitID tier slot
+                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_UnitID>(blackboard),
+                    units.Skip(5).Take(5), new Unit[0] },
+                #endregion
+
+            };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledTierSelector
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledTierSelector))]
-        public void TestExecute_ScheduledTierSelector(IBlackboard blackboard, KS_ScheduledTierSelector tierSelector,
-            Unit[] unitsToAdd, Unit[] filteredUnits)
+        public void TestExecute_ScheduledTierSelector<T>(IBlackboard blackboard, KS_KC_ScheduledTierSelector<T> tierSelector,
+            Unit[] unitsToAdd, Unit[] filteredUnits) where T : KnowledgeComponent, IComparable
         {
             // Clear the blackboard of any previous testing state
             blackboard.Clear();
-
+            
             // Add the content units to the blackboard
             foreach (var unit in unitsToAdd)
             {
@@ -901,7 +979,7 @@ namespace CSA.Tests
             {
                 ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unit);
 
-                output.WriteLine("Original ContentUnit");
+                output.WriteLine("Original Unit:");
                 output.WriteLine(unit.ToString());
 
                 TestFilterLinks(s, outputPool);
@@ -910,6 +988,7 @@ namespace CSA.Tests
             // Grab all the content units in the output pool and verify that there's the same number of them as filteredUnits
             TestNumberOfUnitsInOutputPool(filteredUnits.Length, blackboard, outputPool);
         }
+        #endregion
 
         public TestScheduledKnowledgeSources(ITestOutputHelper output)
         {
