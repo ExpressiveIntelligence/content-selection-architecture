@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using CSA.Core;
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
@@ -69,6 +71,7 @@ namespace CSA.KnowledgeSources
      */
     public class PresenterExecuteEventArgs : EventArgs
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         public string TextToDisplay { get; }
         public string[] ChoicesToDisplay { get; }
         public ContentUnit[] Choices { get; }
@@ -79,6 +82,7 @@ namespace CSA.KnowledgeSources
             ChoicesToDisplay = choicesToDisplay;
             Choices = choices;
         }
+#pragma warning disable CS0618 // Type or member is obsolete
     }
 
     /*
@@ -87,6 +91,7 @@ namespace CSA.KnowledgeSources
      */
     public class SelectChoiceEventArgs : EventArgs
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         public ContentUnit SelectedChoice { get; }
         public IBlackboard Blackboard { get; }
 
@@ -95,5 +100,6 @@ namespace CSA.KnowledgeSources
             SelectedChoice = selectedChoice;
             Blackboard = blackboard;
         }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -92,7 +92,7 @@ namespace CSA.KnowledgeSources
         public static Unit FindOriginalUnit(Unit unit, IBlackboard blackboard)
         {
             var linkToPreviousUnitsInFilterChain = from link in blackboard.LookupLinks(unit)
-                                                   where link.LinkType.Equals(LinkTypes.L_SelectedContentUnit)
+                                                   where link.LinkType.Equals(LinkTypes.L_SelectedUnit)
                                                    where link.Direction.Equals(LinkDirection.Start)
                                                    select link;
 

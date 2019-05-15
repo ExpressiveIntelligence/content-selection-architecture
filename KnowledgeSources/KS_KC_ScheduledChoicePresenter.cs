@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 using CSA.Core;
 using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.CUSlots;
 
 namespace CSA.KnowledgeSources
 {
@@ -27,8 +26,8 @@ namespace CSA.KnowledgeSources
 
             // Gather the choices connected to the originalUnit.
             IEnumerable<Unit> choices = from link in m_blackboard.LookupLinks(originalUnit)
-                                               where link.LinkType.Equals(LinkTypes.L_Choice)
-                                               select (Unit)link.Node;
+                                        where link.LinkType.Equals(LinkTypes.L_Choice)
+                                        select (Unit)link.Node;
 
             return choices.ToArray();
         }
@@ -43,7 +42,7 @@ namespace CSA.KnowledgeSources
 
             Unit selectedUnit = selectedUnits.First();
 
-            string textToDisplay = (string)selectedUnit.GetText();
+            string textToDisplay = selectedUnit.GetText();
 
             Unit[] choices = GetChoices(selectedUnit);
 
@@ -74,19 +73,18 @@ namespace CSA.KnowledgeSources
         }
 
         /*
-         * Given an array of choices and a 0-indexed choice selection, adds the appropriate query to the blackboard. 
+         * Given an array of choices and a 0-indexed choice selection, activates the KC_IDSelectionRequest on the selected choice and
+         * call any actions registered on PresenterSelectChoice.         
          */
         public void SelectChoice(Unit[] choices, uint choiceMade)
         {
             if (choiceMade < choices.Length)
             {
-                // Add a Unit with KC_IDSelectionRequest to blackboard for the target unit ID associated with the choice and activate KC_IDSelectQuery
+                // Add a Unit with KC_IDSelectionRequest to blackboard for the target unit ID associated with the choice and activate KC_IDSelectionRequest
                 Unit selectedChoice = choices[choiceMade];
-                Unit idSelectRequest = new Unit();
+                selectedChoice.SetActiveRequest(true);
 
-                // fixme: may just want to store a KC_IDSelectionRequest on each choice and activate it here. 
-                idSelectRequest.AddComponent(new KC_IDSelectionRequest(selectedChoice.GetTargetUnitID()));
-                m_blackboard.AddUnit(idSelectRequest);
+                // Do an actions that have been registered on PresenterSelectChoice. 
                 KC_SelectChoiceEventArgs eventArgs = new KC_SelectChoiceEventArgs(selectedChoice, m_blackboard);
                 OnSelectChoice(eventArgs);
             }

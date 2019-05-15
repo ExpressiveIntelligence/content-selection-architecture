@@ -29,7 +29,7 @@ namespace CSA.KnowledgeSources
             newUnit.AddComponent(new KC_ContentPool(OutputPool, true));
 
             m_blackboard.AddUnit(newUnit);
-            m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedContentUnit, true); // fixme: need a more general link type for copies between pools
+            m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedUnit, true); // fixme: need a more general link type for copies between pools
             return newUnit;
         }
 

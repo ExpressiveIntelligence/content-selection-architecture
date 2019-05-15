@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Dynamic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.Collections.Generic;
 using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
+using CSA.KnowledgeSources;
 using static CSA.KnowledgeUnits.CUSlots;
-using UnityEngine;
 
 /* 
  * A test rig for testing integration of UnityProlog (https://github.com/ianhorswill/UnityProlog) with CSA.
@@ -26,7 +26,8 @@ namespace TestScratchpad
             //PrintTypeVariable<KnowledgeBase>(kb);
             // TestIncrement();   
             // TestBoolConstant();
-            TestContainingUnit();
+            // TestContainingUnit();
+            ScheduledChoicePresenterTestHarness();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -182,6 +183,146 @@ namespace TestScratchpad
                 throw new ArgumentException("Argument to SolveFor(string) must be of the form Var:Goal.");
             return kb.SolveFor((LogicVariable)colonExpression.Argument(0), colonExpression.Argument(1), null, false);
 
+        }
+
+        /*
+         * Unit test code for KS_ScheduledChoicePresenter so that I can use the debugger. 
+         */
+        private static EventHandler<KC_PresenterExecuteEventArgs>
+            GenerateEventHandler(Unit selectedUnit, Unit[] choices, IBlackboard blackboard)
+        {
+            return (object sender, KC_PresenterExecuteEventArgs eventArgs) =>
+            {
+                if (selectedUnit != null)
+                {
+                    Debug.Assert(selectedUnit.TextEquals(eventArgs.TextToDisplay));
+                    int numOfChoices = choices.Length;
+                    Debug.Assert(numOfChoices == eventArgs.Choices.Length);
+
+                    foreach (Unit choice in choices)
+                    {
+                        Debug.Assert(Array.Exists(eventArgs.ChoicesToDisplay, element => element.Equals(choice.GetText())));
+                    }
+                }
+                else
+                {
+                    Debug.Assert(eventArgs.TextToDisplay.Equals(""));
+                }
+
+                // Iterate through each of the choices selecting it and confirming that the KC_IDSelectionRequest is activated. 
+                I_KC_ChoicePresenter cp = (I_KC_ChoicePresenter)sender;
+                for (uint i = 0; i < eventArgs.ChoicesToDisplay.Length; i++)
+                {
+                    cp.SelectChoice(eventArgs.Choices, i);
+                    Debug.Assert(eventArgs.Choices[i].GetActiveRequest());
+                    eventArgs.Choices[i].SetActiveRequest(false); // Deactivate the KC_IDSelectionRequest.
+                }
+            };
+        }
+
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
+        {
+            IBlackboard blackboard = new Blackboard();
+
+            Unit originalUnit = new Unit();
+            originalUnit.AddComponent(new KC_UnitID("foo", true));
+            originalUnit.AddComponent(new KC_Text("Here is a node with choices", true));
+
+            Unit selectedUnit = new Unit(originalUnit);
+            selectedUnit.AddComponent(new KC_ContentPool(KS_KC_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
+
+            Unit choice1 = new Unit();
+            choice1.AddComponent(new KC_IDSelectionRequest("bar", true));
+            choice1.AddComponent(new KC_Text("Choice 1", true));
+
+            Unit choice2 = new Unit();
+            choice2.AddComponent(new KC_IDSelectionRequest("baz", true));
+            choice2.AddComponent(new KC_Text("Choice 2", true));
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard, 
+             * KS_ScheduledChoicePresenter: the choice presenter to test            
+             * Unit: the selected CU,
+             * Unit: the original CU (selected CU is an copy of this),
+             * Unit[]: array of choices 
+             */
+
+            return new List<object[]>
+            {
+                // Selected and original CU, no choices
+                // new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit,  new Unit[] { } }, 
+
+                // Selected and original CU, one choice
+                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
+
+                //// Selected and original CU, two choices
+                //new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1, choice2} },
+
+                //// empty blackboard
+                //new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, null, new Unit[0] },
+
+                //// no selected CU
+                 //new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, originalUnit, new Unit[] { choice1, choice2} },
+             };
+        }
+
+        public static void ScheduledChoicePresenterTestHarness()
+        {
+            var tests = Data_TestExecute_ScheduledChoicePresenter();
+            foreach(var test in tests)
+            {
+                IBlackboard blackboard = (IBlackboard)test[0];
+                KS_KC_ScheduledChoicePresenter cp = (KS_KC_ScheduledChoicePresenter)test[1];
+                Unit selectedUnit = (Unit)test[2];
+                Unit originalUnit = (Unit)test[3];
+                Unit[] choices = (Unit[])test[4];
+                TestExecute_ScheduledChoicePresenter(blackboard, cp, selectedUnit, originalUnit, choices);
+            }
+        }
+
+        public static void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_KC_ScheduledChoicePresenter ks, Unit selectedUnit,
+            Unit originalUnit, Unit[] choices)
+        {
+            Debug.Assert((selectedUnit != null && originalUnit != null) || (selectedUnit == null));
+
+            blackboard.Clear();
+
+            // If there's a selectedUnit, add it to the blackboard. 
+            if (selectedUnit != null)
+            {
+                blackboard.AddUnit(selectedUnit);
+            }
+
+            // Add any choices to the blackboard. 
+            foreach (Unit choice in choices)
+            {
+                blackboard.AddUnit(choice);
+            }
+
+            // If there is an originalUnit, add links between the originalUnit and the choices. 
+            if (originalUnit != null)
+            {
+                blackboard.AddUnit(originalUnit);
+                foreach (Unit choice in choices)
+                {
+                    blackboard.AddLink(originalUnit, choice, LinkTypes.L_Choice);
+                }
+            }
+
+            // If there's both an original unit and a selected unit, add a link between them. 
+            if (originalUnit != null && selectedUnit != null)
+            {
+                blackboard.AddLink(originalUnit, selectedUnit, LinkTypes.L_SelectedUnit, true);
+            }
+
+            /* 
+             * Add the event handler which tests whether the correct event args are being passed and that the KS_ScheduledChoicePresenter.SelectChoice()
+             * is activating the KC_IDSelectionRequest on the choice. 
+             */
+            ks.PresenterExecute += GenerateEventHandler(selectedUnit, choices, blackboard);
+
+            // Execute the choice presenter
+            ks.Execute();
         }
 
         /*
@@ -376,7 +517,8 @@ namespace TestScratchpad
 
         /*
          * Yay, it looks like this approach to faking multiple inheritance for content units is going to work! 
-         * fixme: for now let's get the simple CFG demo working, then move code base over to supporting this approach to multiple inheritance.        
+         * But, instead, I decide to use a component-based approach. This allows me to dynamically define the slots on a Unit without 
+         * having to statically declare a type for each combination of tag interfaces that I use.  
          */
         public static void MultipleInheritanceTest()
         {

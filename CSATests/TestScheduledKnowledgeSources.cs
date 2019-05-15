@@ -34,7 +34,7 @@ namespace CSA.Tests
             int count = links.Count;
             Assert.Equal(1, count);
             (IUnit unit, string linkType, LinkDirection dir) = links.First();
-            Assert.Equal(LinkTypes.L_SelectedContentUnit, linkType);
+            Assert.Equal(LinkTypes.L_SelectedUnit, linkType);
             Assert.Equal(LinkDirection.End, dir);
             Unit unitCast = unit as Unit; // fixme: only needing to cast because I'm being inconsistent with whether Unit or IUnit is what I'm targeting. Switch to IUnit. 
             Assert.True(unitCast.HasComponent<KC_ContentPool>());
@@ -466,129 +466,126 @@ namespace CSA.Tests
          */
         #region KS_ScheduledChoicePresenter tests
         // fixme: add tests for the handlers defined in EventHandlers_ChoicePresenter 
-        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         public static IEnumerable<object[]> Data_TestExecute_ScheduledChoicePresenter()
         {
             IBlackboard blackboard = new Blackboard();
 
-            ContentUnit originalCU = new ContentUnit();
-            originalCU.Metadata[ContentUnitID] = "foo";
-            originalCU.Content[Text] = "Here is a node with choices";
+            Unit originalUnit = new Unit();
+            originalUnit.AddComponent(new KC_UnitID("foo", true));
+            originalUnit.AddComponent(new KC_Text("Here is a node with choices", true));
 
-            ContentUnit selectedCU = new ContentUnit(originalCU);
-            selectedCU.Metadata[ContentPool] = KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
+            Unit selectedUnit = new Unit(originalUnit);
+            selectedUnit.AddComponent(new KC_ContentPool(KS_KC_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
 
-            ContentUnit choice1 = new ContentUnit();
-            choice1.Metadata[TargetContentUnitID] = "bar";
-            choice1.Content[Text] = "Choice 1";
+            Unit choice1 = new Unit();
+            choice1.AddComponent(new KC_IDSelectionRequest("bar", true));
+            choice1.AddComponent(new KC_Text("Choice 1", true));
 
-            ContentUnit choice2 = new ContentUnit();
-            choice2.Metadata[TargetContentUnitID] = "baz";
-            choice2.Content[Text] = "Choice 2";
+            Unit choice2 = new Unit();
+            choice2.AddComponent(new KC_IDSelectionRequest("baz", true));
+            choice2.AddComponent(new KC_Text("Choice 2", true));
 
             /* Structure of object[]: 
              * IBlackboard: blackboard, 
-             * KSScheduledChoicePresenter: the choice presenter to test            
-             * ContentUnit: the selected CU,
-             * ContentUnit: the original CU (selected CU is an copy of this),
-             * ContentUnit[]: array of choices (ContentUnits) 
+             * KS_ScheduledChoicePresenter: the choice presenter to test            
+             * Unit: the selected CU,
+             * Unit: the original CU (selected CU is an copy of this),
+             * Unit[]: array of choices 
              */
 
             return new List<object[]>
             {
                 // Selected and original CU, no choices
-                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU,  new ContentUnit[] { } }, 
+                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit,  new Unit[] { } }, 
 
                 // Selected and original CU, one choice
-                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU, new ContentUnit[] { choice1 } },
+                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
 
                 // Selected and original CU, two choices
-                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedCU, originalCU, new ContentUnit[] { choice1, choice2} },
+                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1, choice2} },
 
                 // empty blackboard
-                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, null, new ContentUnit[0] },
+                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, null, new Unit[0] },
 
                 // no selected CU
-                 new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, originalCU, new ContentUnit[] { choice1, choice2} },
+                 new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, originalUnit, new Unit[] { choice1, choice2} },
              };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
-        private EventHandler<PresenterExecuteEventArgs>
-            GenerateEventHandler(ContentUnit selectedCU, ContentUnit[] choices, IBlackboard blackboard)
+        private EventHandler<KC_PresenterExecuteEventArgs>
+            GenerateEventHandler(Unit selectedUnit, Unit[] choices, IBlackboard blackboard)
         {
-            return (object sender, PresenterExecuteEventArgs eventArgs) =>
+            return (object sender, KC_PresenterExecuteEventArgs eventArgs) =>
             {
-                var presenterEventArgs = eventArgs as PresenterExecuteEventArgs;
-
-                if (selectedCU != null)
+                if (selectedUnit != null)
                 {
-                    Assert.Equal(selectedCU.Content[Text], presenterEventArgs.TextToDisplay);
+                    Assert.True(selectedUnit.TextEquals(eventArgs.TextToDisplay));
                     int numOfChoices = choices.Length;
-                    Assert.Equal(numOfChoices, presenterEventArgs.Choices.Length);
+                    Assert.Equal(numOfChoices, eventArgs.Choices.Length);
 
-                    foreach (ContentUnit choice in choices)
+                    foreach (Unit choice in choices)
                     {
-                        Assert.True(Array.Exists(presenterEventArgs.ChoicesToDisplay, element => element.Equals(choice.Content[Text])));
+                        Assert.True(Array.Exists(eventArgs.ChoicesToDisplay, element => element.Equals(choice.GetText())));
                     }
                 }
                 else
                 {
-                    Assert.Equal("", presenterEventArgs.TextToDisplay);
+                    Assert.Equal("", eventArgs.TextToDisplay);
                 }
 
-                // Iterate through each of the choices selecting it and confirming that the correct U_IDSelectRequest is added. 
-                IChoicePresenter cp = (IChoicePresenter)sender;
-                for (uint i = 0; i < presenterEventArgs.ChoicesToDisplay.Length; i++)
+                // Iterate through each of the choices selecting it and confirming that the KC_IDSelectionRequest is activated. 
+                I_KC_ChoicePresenter cp = (I_KC_ChoicePresenter)sender;
+                for (uint i = 0; i < eventArgs.ChoicesToDisplay.Length; i++)
                 {
-                    cp.SelectChoice(presenterEventArgs.Choices, i);
-                    U_IDSelectRequest idSelectRequest = blackboard.LookupSingleton<U_IDSelectRequest>();
-                    Assert.True(idSelectRequest.TargetContentUnitID.Equals(choices[i].Metadata[TargetContentUnitID]));
-                    blackboard.RemoveUnit(idSelectRequest); // Remove the U_IDSelect request before the next iteration. 
+                    cp.SelectChoice(eventArgs.Choices, i);
+                    Assert.True(eventArgs.Choices[i].GetActiveRequest());
+                    eventArgs.Choices[i].SetActiveRequest(false); // Deactivate the KC_IDSelectionRequest.
                 }
-
             };
         }
 
-        // fixme: change this to test KnowledgeComponent-based ScheduledChoicePresenter (once it has been defined)
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
-        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, ContentUnit selectedCU,
-            ContentUnit originalCU, ContentUnit[] choices)
+        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_KC_ScheduledChoicePresenter ks, Unit selectedUnit,
+            Unit originalUnit, Unit[] choices)
         {
-            System.Diagnostics.Debug.Assert((selectedCU != null && originalCU != null) || (selectedCU == null));
+            System.Diagnostics.Debug.Assert((selectedUnit != null && originalUnit != null) || (selectedUnit == null));
 
             blackboard.Clear();
 
-            if (selectedCU != null)
+            // If there's a selectedUnit, add it to the blackboard. 
+            if (selectedUnit != null)
             {
-                blackboard.AddUnit(selectedCU);
+                blackboard.AddUnit(selectedUnit);
             }
 
-            foreach (ContentUnit choice in choices)
+            // Add any choices to the blackboard. 
+            foreach (Unit choice in choices)
             {
                 blackboard.AddUnit(choice);
             }
 
-            if (originalCU != null)
+            // If there is an originalUnit, add links between the originalUnit and the choices. 
+            if (originalUnit != null)
             {
-                blackboard.AddUnit(originalCU);
-                foreach (ContentUnit choice in choices)
+                blackboard.AddUnit(originalUnit);
+                foreach (Unit choice in choices)
                 {
-                    blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
+                    blackboard.AddLink(originalUnit, choice, LinkTypes.L_Choice);
                 }
             }
 
-            if (originalCU != null && selectedCU != null)
+            // If there's both an original unit and a selected unit, add a link between them. 
+            if (originalUnit != null && selectedUnit != null)
             {
-                blackboard.AddLink(originalCU, selectedCU, LinkTypes.L_SelectedContentUnit, true);
+                blackboard.AddLink(originalUnit, selectedUnit, LinkTypes.L_SelectedUnit, true);
             }
 
             /* 
              * Add the event handler which tests whether the correct event args are being passed and that the KS_ScheduledChoicePresenter.SelectChoice()
-             * is adding the correct U_IDSelectRequest. 
+             * is activating the KC_IDSelectionRequest on the choice. 
              */
-            ks.PresenterExecute += GenerateEventHandler(selectedCU, choices, blackboard);
+            ks.PresenterExecute += GenerateEventHandler(selectedUnit, choices, blackboard);
 
             // Execute the choice presenter
             ks.Execute();
