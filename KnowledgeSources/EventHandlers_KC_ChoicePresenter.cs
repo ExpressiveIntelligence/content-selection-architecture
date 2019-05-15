@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using CSA.Core;
-using static CSA.KnowledgeUnits.CUSlots;
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    [Obsolete("Use KnowledgeComponent-based version of this class.")]
-    public static class EventHandlers_ChoicePresenter
+    public static class EventHandlers_KC_ChoicePresenter
     {
-        public static void Execute_DisplayConsoleChoice(object sender, PresenterExecuteEventArgs eventArgs)
+        public static void Execute_DisplayConsoleChoice(object sender, KC_PresenterExecuteEventArgs eventArgs)
         {
-            IChoicePresenter cp = (IChoicePresenter)sender;
+            I_KC_ChoicePresenter cp = (I_KC_ChoicePresenter)sender;
             Console.WriteLine(eventArgs.TextToDisplay);
 
             if (eventArgs.ChoicesToDisplay.Length > 0)
@@ -31,35 +30,36 @@ namespace CSA.KnowledgeSources
                 }
                 while (!char.IsDigit(keyInfo.KeyChar));
 
-                // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
+                // fixme: Make a decision about how IDSelectionRequests are handled - stored on choices or explicitly created in a new unit. 
+                // Activate the KC_IDSelectionRequest associated with the choice. 
                 uint choiceMade = uint.Parse(keyInfo.KeyChar.ToString());
                 cp.SelectChoice(eventArgs.Choices, choiceMade);
             }
         }
 
-        public static void SelectChoice_PrologKBChanges(object sender, SelectChoiceEventArgs eventArgs)
+        public static void SelectChoice_PrologKBChanges(object sender, KC_SelectChoiceEventArgs eventArgs)
         {
-            ContentUnit selectedChoice = eventArgs.SelectedChoice;
-            U_PrologKB kb = eventArgs.Blackboard.LookupSingleton<U_PrologKB>();
+            Unit selectedChoice = eventArgs.SelectedChoice;
+
+            var prologKBQuery = from unit in eventArgs.Blackboard.LookupUnits<Unit>()
+                                where unit.HasComponent<KC_PrologKB>()
+                                select unit;
+
+            // Currently only support one global KB. 
+            Debug.Assert(prologKBQuery.Count() == 1);
+
+            KC_PrologKB prologKB = prologKBQuery.First().GetComponent<KC_PrologKB>();
 
             // If there are any facts to retract, retract them
-            if (selectedChoice.HasMetadataSlot(FactDeleteList_Prolog))
+            if (selectedChoice.HasComponent<KC_PrologFactDeleteList>())
             {
-                string[] deleteList = (string[])selectedChoice.Metadata[FactDeleteList_Prolog];
-                foreach (string fact in deleteList)
-                {
-                    kb.Retract(fact);
-                }
+                selectedChoice.GetComponent<KC_PrologFactDeleteList>().DeleteFacts(prologKB);
             }
 
             // If there are any facts to add, add them 
-            if (selectedChoice.HasMetadataSlot(FactAddList_Prolog))
+            if (selectedChoice.HasComponent<KC_PrologFactAddList>())
             {
-                string[] addList = (string[])selectedChoice.Metadata[FactAddList_Prolog];
-                foreach (string fact in addList)
-                {
-                    kb.Assert(fact);
-                }
+                selectedChoice.GetComponent<KC_PrologFactAddList>().AddFacts(prologKB);
             }
         }
     }
@@ -67,13 +67,13 @@ namespace CSA.KnowledgeSources
     /* 
      * The EventArgs class definition for passing text to display and choice information to the display callback. 
      */
-    public class PresenterExecuteEventArgs : EventArgs
+    public class KC_PresenterExecuteEventArgs : EventArgs
     {
         public string TextToDisplay { get; }
         public string[] ChoicesToDisplay { get; }
-        public ContentUnit[] Choices { get; }
+        public Unit[] Choices { get; }
 
-        public PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, ContentUnit[] choices)
+        public KC_PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, Unit[] choices)
         {
             TextToDisplay = textToDisplay;
             ChoicesToDisplay = choicesToDisplay;
@@ -85,12 +85,12 @@ namespace CSA.KnowledgeSources
      * The EventArgs class definition for performing any processing on the selected choice. This can be used, for example, to process the FactAddList
      * and FactDeleteList slots on the selected choice.         
      */
-    public class SelectChoiceEventArgs : EventArgs
+    public class KC_SelectChoiceEventArgs : EventArgs
     {
-        public ContentUnit SelectedChoice { get; }
+        public Unit SelectedChoice { get; }
         public IBlackboard Blackboard { get; }
 
-        public SelectChoiceEventArgs(ContentUnit selectedChoice, IBlackboard blackboard)
+        public KC_SelectChoiceEventArgs(Unit selectedChoice, IBlackboard blackboard)
         {
             SelectedChoice = selectedChoice;
             Blackboard = blackboard;

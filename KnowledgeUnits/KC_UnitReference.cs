@@ -12,6 +12,7 @@ namespace CSA.KnowledgeUnits
     {
         public Unit Reference { get; set; }
 
+        // fixme: replace with Name slot on KnowledgeComponent
         public string Name
         {
             get => StringValue;

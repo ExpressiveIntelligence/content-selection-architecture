@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.KUProps;
+using static CSA.KnowledgeUnits.KCNames;
 
 namespace CSA.KnowledgeSources
 {

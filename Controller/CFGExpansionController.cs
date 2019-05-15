@@ -6,7 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using CSA.Core;
 using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.KUProps;
+using static CSA.KnowledgeUnits.KCNames;
 using CSA.KnowledgeSources;
 
 namespace CSA.Controllers

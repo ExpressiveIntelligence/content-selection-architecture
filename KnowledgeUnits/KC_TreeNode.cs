@@ -70,7 +70,8 @@ namespace CSA.KnowledgeUnits
          */
         protected KC_TreeNode() : base()
         {
-            /* When copying a KC_TreeNode, leave parent null and children empty. If we're copying a KC_TreeNode, it's because we're copying a unit, and it wouldn't 
+            /* 
+             * When copying a KC_TreeNode, leave parent null and children empty. If we're copying a KC_TreeNode, it's because we're copying a unit, and it wouldn't 
              * make sense to have the new KC_TreeNode still pointing to the old units. 
              */
             Parent = null;
