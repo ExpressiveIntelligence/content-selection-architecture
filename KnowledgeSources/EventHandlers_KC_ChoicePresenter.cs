@@ -30,8 +30,7 @@ namespace CSA.KnowledgeSources
                 }
                 while (!char.IsDigit(keyInfo.KeyChar));
 
-                // fixme: Make a decision about how IDSelectionRequests are handled - stored on choices or explicitly created in a new unit. 
-                // Activate the KC_IDSelectionRequest associated with the choice. 
+                // Activate the KC_IDSelectionRequest stored on the selected choice unit.  
                 uint choiceMade = uint.Parse(keyInfo.KeyChar.ToString());
                 cp.SelectChoice(eventArgs.Choices, choiceMade);
             }
