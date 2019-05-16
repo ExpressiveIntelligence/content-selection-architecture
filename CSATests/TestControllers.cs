@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 using CSA.Controllers;
 using CSA.KnowledgeSources;
 using CSA.Core;
@@ -6,22 +7,28 @@ using System.Collections.Generic;
 using CSA.KnowledgeUnits;
 using System.Linq;
 using static CSA.KnowledgeSources.KSProps;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 
 namespace CSA.Tests
 {
     public class TestControllers
     {
+        [Obsolete("Reactive controller infrastructure is obsolete.")]
         class KS_Dummy1 : KS_ReactiveIDSelector
         {
             public KS_Dummy1(IBlackboard blackboard) : base(blackboard) { }
         }
 
+        [Obsolete("Reactive controller infrastructure is obsolete.")]
         class KS_Dummy2 : KS_ReactiveIDSelector
         {
             public KS_Dummy2(IBlackboard blackboard) : base(blackboard) { }
         }
 
+        [Obsolete("Reactive controller infrastructure is obsolete.")]
         class Controller_PublicUpdateAgenda : ReactiveController
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
@@ -29,6 +36,7 @@ namespace CSA.Tests
             protected override IKnowledgeSourceActivation SelectKSForExecution() => throw new System.NotImplementedException();
         }
 
+        [Obsolete("Reactive controller infrastructure is obsolete.")]
         class PriorityController_PublicMethods : ReactivePriorityController
         {
             public new void UpdateAgenda() => base.UpdateAgenda();
@@ -36,8 +44,10 @@ namespace CSA.Tests
             public new IKnowledgeSourceActivation SelectKSForExecution() => base.SelectKSForExecution();
         }
 
-        [Fact]
-        public void TestAddingKS()
+        // [Fact]
+        [Obsolete("Not performing this unit test. Reactive controller infrastructure is obsolete.")]
+        /*public*/
+        void TestAddingKS()
         {
             // Maintaining the activeKSs is done through the abstract class Controller. Using the concrete class LexemeController for testing. 
             IReactiveController controller = new ReactivePriorityController();
@@ -48,8 +58,10 @@ namespace CSA.Tests
             Assert.Equal(1, controller.ActiveKSs.Count);
         }
 
-        [Fact]
-        public void TestRemovingKS()
+        // [Fact]
+        [Obsolete("Not performing this unit test. Reactive controller infrastructure is obsolete.")]
+        /*public*/
+        void TestRemovingKS()
         {
             IReactiveController controller = new ReactivePriorityController();
             IBlackboard blackboard = new Blackboard();
@@ -60,8 +72,10 @@ namespace CSA.Tests
             Assert.Equal(0, controller.ActiveKSs.Count);
         }
 
-        [Fact]
-        public void TestUpdateAgenda_Controller()
+        // [Fact]
+        [Obsolete("Not performing this unit test. Reactive controller infrastructure is obsolete.")]
+        /*public*/
+        void TestUpdateAgenda_Controller()
         {
             Controller_PublicUpdateAgenda controller = new Controller_PublicUpdateAgenda();
             IBlackboard blackboard = new Blackboard();
@@ -80,8 +94,10 @@ namespace CSA.Tests
             Assert.Equal(0, controller.Agenda.Count);
         }
 
-        [Fact]
-        public void TestSelectKSForExecution_PriorityController()
+        // [Fact]
+        [Obsolete("Not performing this unit test. Reactive controller infrastructure is obsolete.")]
+        /*public*/
+        void TestSelectKSForExecution_PriorityController()
         {
             PriorityController_PublicMethods controller = new PriorityController_PublicMethods();
             IBlackboard blackboard = new Blackboard();
@@ -95,7 +111,7 @@ namespace CSA.Tests
             controller.AddKnowledgeSource(ks2);
             controller.AddKnowledgeSource(ks3);
             blackboard.AddUnit(new U_IDSelectRequest("foo"));
-            
+
             controller.UpdateAgenda();
             Assert.Equal(3, controller.Agenda.Count);
 
@@ -103,8 +119,10 @@ namespace CSA.Tests
             Assert.Equal(30, KSA.Properties[KSProps.Priority]);
         }
 
-        [Fact]
-        public void TestExecute_PriorityController()
+        // [Fact]
+        [Obsolete("Not performing this unit test. Reactive controller infrastructure is obsolete.")]
+        /*public*/ 
+        void TestExecute_PriorityController()
         {
             PriorityController_PublicMethods controller = new PriorityController_PublicMethods();
             IBlackboard blackboard = new Blackboard();
@@ -154,9 +172,9 @@ namespace CSA.Tests
         public void TestAddKnowledgeSource_ScheduledSequenceController()
         {
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
-            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            IScheduledKnowledgeSource ks1 = new KS_KC_ScheduledFilterSelector(blackboard, "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_KC_ScheduledIDSelector(blackboard, "pool1", "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_KC_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);
@@ -173,9 +191,9 @@ namespace CSA.Tests
         public void TestRemoveKnowledgeSource_ScheduledSequenceController()
         {
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
-            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            IScheduledKnowledgeSource ks1 = new KS_KC_ScheduledFilterSelector(blackboard, "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_KC_ScheduledIDSelector(blackboard, "pool1", "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_KC_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);
@@ -212,39 +230,41 @@ namespace CSA.Tests
             string pool2 = "pool2";
 
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, pool1);
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, pool1, pool2);
+            IScheduledKnowledgeSource ks1 = new KS_KC_ScheduledFilterSelector(blackboard, pool1, (Unit u) => u.HasComponent<KC_UnitID>());
+            IScheduledKnowledgeSource ks2 = new KS_KC_ScheduledIDSelector(blackboard, pool1, pool2);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);
             controller.AddKnowledgeSource(ks2);
 
-            ContentUnit contentUnit = new ContentUnit();
-            contentUnit.Metadata[ContentUnitID] = id;
-            blackboard.AddUnit(contentUnit);
+            Unit unit = new Unit();
+            unit.AddComponent(new KC_UnitID(id));
+            blackboard.AddUnit(unit);
 
-            U_IDSelectRequest req = new U_IDSelectRequest(id);
+            Unit req = new Unit();
+            req.AddComponent(new KC_IDSelectionRequest(id));
             blackboard.AddUnit(req);
+            req.SetActiveRequest(true);
 
             controller.Execute();
 
-            var pool1CUs = from cu in blackboard.LookupUnits<ContentUnit>()
-                           where cu.HasMetadataSlot(ContentPool)
-                           where cu.Metadata[ContentPool].Equals(pool1)
-                           select cu;
+            var pool1Units = from u in blackboard.LookupUnits<Unit>()
+                             where u.HasComponent<KC_ContentPool>()
+                             where u.ContentPoolEquals(pool1)
+                             select u;
 
-            var pool2CUs = from cu in blackboard.LookupUnits<ContentUnit>()
-                           where cu.HasMetadataSlot(ContentPool)
-                           where cu.Metadata[ContentPool].Equals(pool2)
-                           select cu;
+            var pool2Units = from u in blackboard.LookupUnits<Unit>()
+                             where u.HasComponent<KC_ContentPool>()
+                             where u.ContentPoolEquals(pool2)
+                             select u;
 
-            int pool1Count = pool1CUs.Count();
-            int pool2Count = pool2CUs.Count();
+            int pool1Count = pool1Units.Count();
+            int pool2Count = pool2Units.Count();
             Assert.Equal(1, pool1Count);
             Assert.Equal(1, pool2Count);
 
-            Assert.True(pool1CUs.First().Metadata[ContentUnitID].Equals(id));
-            Assert.True(pool2CUs.First().Metadata[ContentUnitID].Equals(id));
+            Assert.True(pool1Units.First().UnitIDEquals(id));
+            Assert.True(pool2Units.First().UnitIDEquals(id));
         }
     }
 }

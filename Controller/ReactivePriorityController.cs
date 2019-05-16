@@ -1,9 +1,11 @@
-﻿using CSA.KnowledgeSources;
+﻿using System;
+using CSA.KnowledgeSources;
 using static CSA.KnowledgeSources.KSProps;
 using System.Diagnostics;
 
 namespace CSA.Controllers
 {
+    [Obsolete("Have stopped developing reactive controller and KS infrastructure. Need to come up with new design for reactive controllers.")]
     public class ReactivePriorityController : ReactiveController
     {
  

@@ -1,9 +1,11 @@
-﻿using CSA.KnowledgeSources;
+﻿using System;
+using CSA.KnowledgeSources;
 using System.Collections.Generic;
 
 namespace CSA.Controllers
 {
     // fixme: stub. Fill in once I've figured out more general patterns for controllers.
+    [Obsolete("Have stopped developing reactive controller and KS infrastructure. Need to come up with new design for reactive controllers.")]
     public interface IReactiveController
     {
         // Performs any initialization of the controller that needs to happen outside of adding the knowledge sources.

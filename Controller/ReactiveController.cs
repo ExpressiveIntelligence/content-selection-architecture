@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSA.KnowledgeSources;
 
 namespace CSA.Controllers
 {
+    [Obsolete("Have stopped developing reactive controller and KS infrastructure. Need to come up with new design for reactive controllers.")]
     public abstract class ReactiveController : IReactiveController
     {
 

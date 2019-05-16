@@ -41,7 +41,7 @@ namespace CSA.UnitySupport
         public void DisplayUnityChoice(object sender, PresenterExecuteEventArgs eventArgs)
         {
             // Get the ChoicePresenter knowledge source that fired this event. Currently the choice info is stored on the knowledge source.
-            IChoicePresenter cp = (IChoicePresenter)sender;
+            I_KC_ChoicePresenter cp = (I_KC_ChoicePresenter)sender;
 
             if (buttons.Count > 0)
             {
@@ -87,7 +87,7 @@ namespace CSA.UnitySupport
             }
         }
 
-        void ButtonCallback(ContentUnit[] choices, uint selection, IChoicePresenter cp)
+        void ButtonCallback(Unit[] choices, uint selection, I_KC_ChoicePresenter cp)
         {
             cp.SelectChoice(choices, selection);
         }

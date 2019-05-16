@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using CSA.Core;
+using CSA.KnowledgeUnits;
 using static CSA.KnowledgeUnits.LinkTypes;
 using Xunit;
 
@@ -9,36 +10,21 @@ namespace CSA.Tests
     public class TestBlackboardOperations
     {
 
-        class TestUnit1 : Unit
-        {
-            public string S { get; set; }
-
-            public TestUnit1(string init)
-            {
-                S = init;
-            }
-        }
-
-        class TestUnit2 : Unit
-        {
-
-            public int I { get; set; }
-
-            public TestUnit2(int i_init)
-            {
-                I = i_init;
-            }
-        }
-
         // fixme: Blackboard.AddUnit now returns a bool. Add this to tests. 
 
         [Fact]
         public void TestAddContains()
         {
             IBlackboard blackboard = new Blackboard();
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit1 u2 = new TestUnit1("two");
-            TestUnit1 u3 = new TestUnit1("three");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
+
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
+
+            Unit u3 = new Unit();
+            u3.AddComponent(new KC_UnitID("three", true));
+
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
             blackboard.AddUnit(u3);
@@ -51,9 +37,15 @@ namespace CSA.Tests
         public void TestAddDeleteContains()
         {
             IBlackboard blackboard = new Blackboard();
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit1 u2 = new TestUnit1("two");
-            TestUnit1 u3 = new TestUnit1("three");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
+
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
+
+            Unit u3 = new Unit();
+            u3.AddComponent(new KC_UnitID("three", true));
+
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
             blackboard.AddUnit(u3);
@@ -79,14 +71,12 @@ namespace CSA.Tests
         {
             IBlackboard blackboard = new Blackboard();
 
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit2 u2 = new TestUnit2(1);
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
 
             blackboard.AddUnit(u1);
-            blackboard.AddUnit(u2);
 
-            Assert.NotNull(blackboard.LookupUnits<TestUnit1>());
-            Assert.NotNull(blackboard.LookupUnits<TestUnit2>());
+            Assert.NotNull(blackboard.LookupUnits<Unit>());
         }
 
         [Fact]
@@ -94,48 +84,22 @@ namespace CSA.Tests
         {
             IBlackboard blackboard = new Blackboard();
 
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit1 u2 = new TestUnit1("two");
-            TestUnit1 u3 = new TestUnit1("three");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
 
-            TestUnit2 u4 = new TestUnit2(1);
-            TestUnit2 u5 = new TestUnit2(2);
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
+
+            Unit u3 = new Unit();
+            u3.AddComponent(new KC_UnitID("three", true));
 
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
             blackboard.AddUnit(u3);
-            blackboard.AddUnit(u4);
-            blackboard.AddUnit(u5);
 
-            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
-            ISet<TestUnit2> set2 = blackboard.LookupUnits<TestUnit2>();
+            ISet<Unit> set1 = blackboard.LookupUnits<Unit>();
 
             Assert.Equal(3, set1.Count);
-            Assert.Equal(2, set2.Count);
-
-        }
-
-        [Fact]
-        public void TestLookupCountIsZeroAfterDelete()
-        {
-            IBlackboard blackboard = new Blackboard();
-
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit2 u2 = new TestUnit2(1);
-
-            blackboard.AddUnit(u1);
-            blackboard.AddUnit(u2);
-
-            Assert.Equal(1, blackboard.LookupUnits<TestUnit1>().Count);
-            Assert.Equal(1, blackboard.LookupUnits<TestUnit2>().Count);
-
-            blackboard.RemoveUnit(u1);
-            Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
-            Assert.Equal(1, blackboard.LookupUnits<TestUnit2>().Count);
-
-            blackboard.RemoveUnit(u2);
-            Assert.Equal(0, blackboard.LookupUnits<TestUnit1>().Count);
-            Assert.Equal(0, blackboard.LookupUnits<TestUnit2>().Count);
         }
 
         [Fact]
@@ -143,56 +107,46 @@ namespace CSA.Tests
         {
             IBlackboard blackboard = new Blackboard();
 
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit1 u2 = new TestUnit1("two");
-            TestUnit1 u3 = new TestUnit1("three");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
 
-            TestUnit2 u4 = new TestUnit2(1);
-            TestUnit2 u5 = new TestUnit2(2);
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
 
             blackboard.AddUnit(u1);
             blackboard.AddUnit(u2);
-            blackboard.AddUnit(u3);
-            blackboard.AddUnit(u4);
-            blackboard.AddUnit(u5);
 
-            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
-            ISet<TestUnit2> set2 = blackboard.LookupUnits<TestUnit2>();
-
-            Assert.Equal(3, set1.Count);
-            Assert.Equal(2, set2.Count);
-
+            Assert.Equal(2, blackboard.LookupUnits<Unit>().Count);
+ 
             blackboard.RemoveUnit(u1);
-            blackboard.RemoveUnit(u4);
-
-            set1 = blackboard.LookupUnits<TestUnit1>();
-            set2 = blackboard.LookupUnits<TestUnit2>();
-
-            Assert.Equal(2, set1.Count);
-            Assert.Equal(1, set2.Count);
-        }
-
+            Assert.Equal(1, blackboard.LookupUnits<Unit>().Count);
+ 
+            blackboard.RemoveUnit(u2);
+            Assert.Equal(0, blackboard.LookupUnits<Unit>().Count);
+         }
+         
         [Fact]
         // Deleting and adding elements to a returned set shouldn't change the set in the dictionary
         public void TestManipulatingSet()
         {
             IBlackboard blackboard = new Blackboard();
 
-            TestUnit1 u1 = new TestUnit1("one");
-            TestUnit1 u2 = new TestUnit1("two");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
 
-            string type1 = u1.GetType().FullName;
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
 
             blackboard.AddUnit(u1);
-            ISet<TestUnit1> set1 = blackboard.LookupUnits<TestUnit1>();
+            ISet<Unit> set1 = blackboard.LookupUnits<Unit>();
             Assert.Equal(1, set1.Count);
 
             set1.Add(u2);
-            ISet<TestUnit1> set2 = blackboard.LookupUnits<TestUnit1>();
+            ISet<Unit> set2 = blackboard.LookupUnits<Unit>();
             Assert.Equal(1, set2.Count);
 
             set2.Remove(u1);
-            ISet<TestUnit1> set3 = blackboard.LookupUnits<TestUnit1>();
+            ISet<Unit> set3 = blackboard.LookupUnits<Unit>();
             Assert.Equal(1, set3.Count);
         }
 
@@ -204,9 +158,9 @@ namespace CSA.Tests
 
             IUnit[] units = {
                 new Unit(),
-                new ContentUnit(),
                 new Unit(),
-                new TestUnit1("foo")
+                new Unit(),
+                new Unit()
             };
 
             /* Structure of object[]: 
@@ -229,14 +183,14 @@ namespace CSA.Tests
                 new object[] { blackboard, new IUnit[0],
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, false),
-                        (units[1], units[2], L_Choice, false, false)
+                        (units[0], units[1], L_SelectedUnit, true, false),
+                        (units[1], units[2], L_SelectedUnit, false, false)
                     },
                     new IUnit[0],
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, false),
-                        (units[1], units[2], L_Choice, false, false)
+                        (units[0], units[1], L_SelectedUnit, true, false),
+                        (units[1], units[2], L_SelectedUnit, false, false)
                     },
                     new IUnit[0], new (IUnit, IUnit, string, bool)[0] }, 
 
@@ -245,15 +199,15 @@ namespace CSA.Tests
                     new IUnit[] { units[0], units[1], units[2] },
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, true),
-                        (units[0], units[2], L_Tree, false, true)
+                        (units[0], units[1], L_Choice, true, true),
+                        (units[0], units[2], L_Choice, false, true)
                     },
                     new IUnit[] { units[2] },
                     new (IUnit, IUnit, string, bool, bool)[0],
                     new IUnit[] { units[0], units[1] },
                     new (IUnit, IUnit, string, bool)[]
                     {
-                       (units[0], units[1], L_Tree, true),
+                       (units[0], units[1], L_Choice, true),
                     }
                 },
 
@@ -262,16 +216,16 @@ namespace CSA.Tests
                     new IUnit[] { units[0], units[1], units[2], units[3] },
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, true),
-                        (units[0], units[2], L_Tree, true, true),
-                        (units[1], units[3], L_Tree, true, true)
+                        (units[0], units[1], L_Choice, true, true),
+                        (units[0], units[2], L_Choice, true, true),
+                        (units[1], units[3], L_SelectedUnit, true, true)
                     },
                     new IUnit[] { units[0] },
                     new (IUnit, IUnit, string, bool, bool)[0],
                     new IUnit[] { units[1], units[2], units[3] },
                     new (IUnit, IUnit, string, bool)[]
                     {
-                        (units[1], units[3], L_Tree, true)
+                        (units[1], units[3], L_SelectedUnit, true)
                     }
                 },
 
@@ -281,16 +235,16 @@ namespace CSA.Tests
                     new IUnit[] { units[0], units[1], units[2], units[3] },
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, true),
-                        (units[0], units[2], L_Tree, true, true),
-                        (units[0], units[3], L_Tree, true, true)
+                        (units[0], units[1], L_Choice, true, true),
+                        (units[0], units[2], L_Choice, true, true),
+                        (units[0], units[3], L_Choice, true, true)
                     },
                     new IUnit[] { units[0] },
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_Tree, true, false),
-                        (units[0], units[2], L_Tree, true, false),
-                        (units[0], units[3], L_Tree, true, false)
+                        (units[0], units[1], L_Choice, true, false),
+                        (units[0], units[2], L_Choice, true, false),
+                        (units[0], units[3], L_Choice, true, false)
 
                     },
                     new IUnit[] { units[1], units[2], units[3] },
@@ -298,22 +252,22 @@ namespace CSA.Tests
                 },
 
                 // Blackboard with two nodes connected to each other with two directed links. Removing one link should leave the other 
-                new object[] { blackboard,
+                 new object[] { blackboard,
                     new IUnit[] { units[0], units[1] },
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_SelectedContentUnit, true, true),
-                        (units[1], units[0], L_Tree, true, true),
+                        (units[0], units[1], "lType1", true, true),
+                        (units[1], units[0], "lType1", true, true),
                     },
                     new IUnit[0],
                     new (IUnit, IUnit, string, bool, bool)[]
                     {
-                        (units[0], units[1], L_SelectedContentUnit, true, true),
+                        (units[0], units[1], "lType1", true, true),
                     },
                     new IUnit[] { units[0], units[1] } ,
                     new (IUnit, IUnit, string, bool)[]
                     {
-                        (units[1], units[0], L_Tree, true)
+                        (units[1], units[0], "lType1", true)
                     }
                 },
 
@@ -378,11 +332,13 @@ namespace CSA.Tests
         public void TestAddLink_UnitsOnBlackboard()
         {
             IBlackboard blackboard = new Blackboard();
-            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz") };
-            foreach (var unit in units)
+            IUnit[] units = { new Unit(), new Unit(), new Unit() };
+            for (int i = 0; i < units.Length; i++)
             {
-                blackboard.AddUnit(unit);
+                units[i].AddComponent(new KC_Order(i));
+                blackboard.AddUnit(units[i]);
             }
+
             Assert.True(blackboard.AddLink(units[0], units[1], "lType1"));
             Assert.True(blackboard.AddLink(units[0], units[2], "lType2"));
 
@@ -400,7 +356,7 @@ namespace CSA.Tests
         public void TestAddLink_UnitNotOnBlackboard()
         {
             IBlackboard blackboard = new Blackboard();
-            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz") };
+            IUnit[] units = { new Unit(), new Unit(), new Unit() };
             blackboard.AddUnit(units[0]);
             blackboard.AddUnit(units[1]);
             Assert.True(blackboard.AddLink(units[0], units[1], "lType1"));
@@ -422,7 +378,7 @@ namespace CSA.Tests
         public void TestLookupLinks()
         {
             IBlackboard blackboard = new Blackboard();
-            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz") };
+            IUnit[] units = { new Unit(), new Unit(), new Unit() };
             foreach (var unit in units)
             {
                 blackboard.AddUnit(unit);
@@ -448,7 +404,7 @@ namespace CSA.Tests
         public void TestRemoveLink()
         {
             IBlackboard blackboard = new Blackboard();
-            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz"), new ContentUnit() };
+            IUnit[] units = { new Unit(), new Unit(), new Unit(), new Unit() };
             foreach (var unit in units)
             {
                 blackboard.AddUnit(unit);
@@ -473,8 +429,8 @@ namespace CSA.Tests
             Assert.Equal(1, linkSet1.Count);
             Assert.Equal(1, linkSet2.Count);
 
-            TestUnit1 u = new TestUnit1("NotOnBlackboard");
-            Assert.False(blackboard.RemoveLink(units[3], u, "lType1"));
+            Unit notOnBlackboard = new Unit();
+            Assert.False(blackboard.RemoveLink(units[3], notOnBlackboard, "lType1"));
             var linkSet3 = blackboard.LookupLinks(units[3]);
             Assert.Equal(1, linkSet3.Count);
         }
@@ -483,7 +439,7 @@ namespace CSA.Tests
         public void TestDeleteUnitWithLinks()
         {
             IBlackboard blackboard = new Blackboard();
-            IUnit[] units = { new TestUnit1("foo"), new TestUnit1("bar"), new TestUnit1("baz"), new ContentUnit() };
+            IUnit[] units = { new Unit(), new Unit(), new Unit(), new Unit() };
             foreach (var unit in units)
             {
                 blackboard.AddUnit(unit);
@@ -509,9 +465,14 @@ namespace CSA.Tests
         public static IEnumerable<object[]> Data_TestChanged_Blackboard()
         {
 
-            TestUnit1 u1 = new TestUnit1("foo");
-            TestUnit1 u2 = new TestUnit1("bar");
-            TestUnit1 u3 = new TestUnit1("baz");
+            Unit u1 = new Unit();
+            u1.AddComponent(new KC_UnitID("one", true));
+
+            Unit u2 = new Unit();
+            u2.AddComponent(new KC_UnitID("two", true));
+
+            Unit u3 = new Unit();
+            u3.AddComponent(new KC_UnitID("three", true));
 
             IBlackboard blackboard = new Blackboard();
 
