@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Dynamic;
 using System.Collections.Generic;
+using System.Linq;
 using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
@@ -27,7 +28,8 @@ namespace TestScratchpad
             // TestIncrement();   
             // TestBoolConstant();
             // TestContainingUnit();
-            ScheduledChoicePresenterTestHarness();
+            // ScheduledChoicePresenterTestHarness();
+            ScheduledPrologEvalTestHarness();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -186,8 +188,243 @@ namespace TestScratchpad
         }
 
         /*
+         * Unit test code for KC_ScheduledPrologEval so that I can use the debugger
+         */
+        #region ScheduledPrologEval Unit Tests
+
+        private static void TestFilterLinks(ISet<(IUnit, string, LinkDirection)> links, string outputPool)
+        {
+            int count = links.Count;
+            Debug.Assert(1 == count);
+            (IUnit unit, string linkType, LinkDirection dir) = links.First();
+            Debug.Assert(LinkTypes.L_SelectedUnit.Equals(linkType));
+            Debug.Assert(LinkDirection.End == dir);
+            Unit unitCast = unit as Unit; // fixme: only needing to cast because I'm being inconsistent with whether Unit or IUnit is what I'm targeting. 
+            Debug.Assert(unitCast.HasComponent<KC_ContentPool>());
+            Debug.Assert(unitCast.ContentPoolEquals(outputPool));
+        }
+
+        private static void TestNumberOfUnitsInOutputPool(int desiredNumberOfUnits, IBlackboard blackboard, string outputPool)
+        {
+            var units = from unit in blackboard.LookupUnits<Unit>()
+                        where unit.HasComponent<KC_ContentPool>() && unit.ContentPoolEquals(outputPool)
+                        select unit;
+
+            Debug.Assert(desiredNumberOfUnits == units.Count());
+        }
+
+        public static IEnumerable<object[]> Data_TestExecute_ScheduledPrologEval()
+        {
+            string inputPool = "inputPool1";
+            string outputPool = "outputPool1";
+
+            IBlackboard blackboard = new Blackboard();
+
+            Unit unit1 = new Unit();
+            Unit unit2 = new Unit();
+            Unit unit3 = new Unit();
+            Unit unit4 = new Unit();
+
+            unit1.AddComponent(new KC_ContentPool(inputPool, true));
+            unit2.AddComponent(new KC_ContentPool(inputPool, true));
+            // unit3 and unit4 are in the global content pool (no content pool specified) 
+
+            unit1.AddComponent(new KC_UnitID("ID1", true));
+            unit2.AddComponent(new KC_UnitID("ID2", true));
+            unit3.AddComponent(new KC_UnitID("ID3", true));
+            unit4.AddComponent(new KC_UnitID("ID4", true));
+
+            // Prolog applicability tests
+            unit1.AddComponent(new KC_PrologExpression(ApplTest_Prolog, "frustrated.", true));
+            unit2.AddComponent(new KC_PrologExpression(ApplTest_Prolog, "Character:frustrated(Character).", true));
+            unit3.AddComponent(new KC_PrologExpression(ApplTest_Prolog, "frustrated.", true));
+            // unit4 doesn't have a prolog expression defined, so it shouldn't be filtered by KS_ScheduledPrologEval
+
+            Unit prologKB = new Unit();
+            prologKB.AddComponent(new KC_PrologKB("Global", true));
+
+            /*
+             * For some reason the unit testing infrastructure is making a folder way down in the bin directory the current folder. So using a relative 
+             * file to the source folder for CATests.
+             */
+            prologKB.GetComponent<KC_PrologKB>().Consult("../../../UnitTestProlog.prolog");
+
+            /* Structure of object[]: 
+             * IBlackboard: blackboard, 
+             * KS_ScheduledPrologEval[]: the ScheduledPrologEval to test            
+             * Unit[]: array of CUs to add to the blackboard
+             * Unit: the prolog KB to add to the blackboard
+             * Unit[]: Content units on which the prolog applicability test was evaluated.
+             * string[]: Array of assertions to make in prolog KB.            
+             * (Unit, bool)[]: Array of evaluation results
+             * (Unit, object)[]: Array of bindings   
+             */
+
+            return new List<object[]>
+            {
+                // No specific input pool (global), no queries with bindings, assertion that makes queries true. 
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                    prologKB, new Unit[] { unit1, unit3 }, new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[] { (unit1, true), (unit3, true) },
+                    new (Unit, object)[0] },
+
+                // No specific input pool (global), no queries with bindings, no assertion to make queries true.  
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                    prologKB, new Unit[] { unit1, unit3 }, new string[0],
+                    new (Unit, bool)[] { (unit1, false), (unit3, false) },
+                    new (Unit, object)[0] },
+
+                // No specific input pool (global), query with binding, assertion to make queries true.
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                    prologKB, new Unit[] { unit2 }, new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[] { (unit2, true) },
+                    new (Unit, object)[] { (unit2, Symbol.Intern("character1")) } },
+
+                // No specific input pool (global), query with binding, no assertion to make queries true.
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                    prologKB, new Unit[] { unit2 }, new string[0],
+                    new (Unit, bool)[] { (unit2, false) },
+                    new (Unit, object)[0] }, 
+
+                // No specific input pool (global), some queries with bindings, some without, assertion to make queries true.
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                    prologKB, new Unit[] { unit1, unit2, unit3 }, new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[] { (unit1, true), (unit2, true), (unit3, true) },
+                    new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")), (unit3, new LogicVariable("V2")) } },
+
+                // No content units on blackboard
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
+                    prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[0],
+                    new (Unit, object)[0] },
+
+                // Specifying input pool, some queries with bindings, some without, assertion to make queries true.
+                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                    prologKB, new Unit[] { unit1, unit2 }, new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[] { (unit1, true), (unit2, true) },
+                    new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")) } },
+
+            };
+        }
+
+        public static void ScheduledPrologEvalTestHarness()
+        {
+            var tests = Data_TestExecute_ScheduledPrologEval();
+            foreach (var test in tests)
+            {
+                IBlackboard blackboard = (IBlackboard)test[0];
+                KS_KC_ScheduledPrologEval pe = (KS_KC_ScheduledPrologEval)test[1];
+                Unit[] unitsToAdd = (Unit[])test[2];
+                Unit prologKB = (Unit)test[3];
+                Unit[] evaledUnits = (Unit[])test[4];
+                string[] assertions = (string[])test[5];
+                (Unit, bool)[] evalResults = ((Unit, bool)[])test[6];
+                (Unit, object)[] bindings = ((Unit, object)[])test[7];
+                TestExecute_ScheduledPrologEval(
+                    blackboard,
+                    pe,
+                    unitsToAdd,
+                    prologKB,
+                    evaledUnits,
+                    assertions,
+                    evalResults,
+                    bindings);
+            }
+        }
+
+        public static void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_KC_ScheduledPrologEval prologEval, Unit[] unitsToAdd,
+            Unit prologKB, Unit[] evaluatedUnits, string[] assertionsToAdd, (Unit u, bool result)[] evalResults,
+            (Unit u, object binding)[] bindings)
+        {
+            // Clear the blackboard of any previous testing state
+            blackboard.Clear();
+
+            // Add the units to the blackboard
+            foreach (var unit in unitsToAdd)
+            {
+                blackboard.AddUnit(unit);
+            }
+
+            blackboard.AddUnit(prologKB);
+
+            if (assertionsToAdd.Length > 0)
+            {
+                foreach (string assertion in assertionsToAdd)
+                {
+                     prologKB.GetComponent<KC_PrologKB>().Assert(assertion);
+                }
+            }
+
+            // Execute the filter selector
+            prologEval.Execute();
+
+            // Remove any assertions that were added for this test case
+            if (assertionsToAdd.Length > 0)
+            {
+                foreach (string assertion in assertionsToAdd)
+                {
+                    prologKB.GetComponent<KC_PrologKB>().Retract(assertion);
+                }
+            }
+
+            string outputPool = prologEval.OutputPool;
+
+            // Iterate through each of the units which should have been evaluated and see if there's a copy of them in the output pool.
+            // Also test that the evaluation results and bindings are correct for each evaluated unit.
+            foreach (var unit in evaluatedUnits)
+            {
+
+                /*
+                 * Lookup links from this unit and verify that:
+                 * 1) there is only one link, 
+                 * 2) the one link is of type L_SelectedUnit
+                 * 3) the direction is LinkDirection.End (the linked unit is the end of the link)
+                 * 4) the linked unit is in the correct output pool               
+                 */
+                ISet<(IUnit, string, LinkDirection)> s = blackboard.LookupLinks(unit);
+                TestFilterLinks(s, outputPool);
+
+                // Get the result unit and cast as a Unit. 
+                (IUnit resultIUnit, _, _) = s.First();
+                Unit resultUnit = resultIUnit as Unit;
+
+                if (evalResults.Length > 0)
+                {
+                    (Unit u, bool result) =
+                        Array.Find(evalResults, resultTuple => resultTuple.u == unit);
+                    Debug.Assert(u != null);
+                    Debug.Assert(result == resultUnit.GetPrologExpEvalResult());
+                }
+
+                if (bindings.Length > 0)
+                {
+                    (Unit u, object binding) =
+                        Array.Find(bindings, bindingTuple => bindingTuple.u == unit);
+                    Debug.Assert(u != null);
+
+                    IEnumerable<bool> checkBinding = Term.Unify(resultUnit.GetPrologExpBindings(), binding);
+                    Debug.Assert(checkBinding.GetEnumerator().MoveNext(),
+                        $"Variable binding not correct: {resultUnit.GetPrologExpBindings()} != {binding}");
+                }
+
+                // Verify that each evaluated unit is linked to a unit containing a matching, evaluated KC_EvaluatablePrologExpression.
+                KC_EvaluatablePrologExpression evaledPrologExp = resultUnit.GetComponent<KC_EvaluatablePrologExpression>();
+                Debug.Assert(unit.GetPrologExpName().Equals(evaledPrologExp.PrologExpName));
+                Debug.Assert(evaledPrologExp.Evaluated);
+            }
+
+            // Grab all the content units in the output pool and verify that there's the same number of them as evaluatedUnits
+            TestNumberOfUnitsInOutputPool(evaluatedUnits.Length, blackboard, outputPool);
+        }
+
+        #endregion
+
+
+        /*
          * Unit test code for KS_ScheduledChoicePresenter so that I can use the debugger. 
          */
+        #region ScheduledChoicePresenter Unit Tests
+
         private static EventHandler<KC_PresenterExecuteEventArgs>
             GenerateEventHandler(Unit selectedUnit, Unit[] choices, IBlackboard blackboard)
         {
@@ -324,10 +561,12 @@ namespace TestScratchpad
             // Execute the choice presenter
             ks.Execute();
         }
+        #endregion
 
         /*
          * Test whether an interface can be used to make intellisence work with an ExpandoObject. 
          */
+        #region ExpandObject + Interface Experiment
         public static void TestExpandoObjectWithInterface()
         {
             dynamic test = new ExpandoObject();
@@ -345,10 +584,12 @@ namespace TestScratchpad
             int Foo { get; set; }
             object Bar { get; set; }
         }
+        #endregion
 
         /*
          * Test using object composition to provide typed access to metadata and content slots.
          */
+        #region Object Composition Experiment
         /* public interface IMetadata_ID
         {
             string ContentUnitID { get; set; }
@@ -394,11 +635,12 @@ namespace TestScratchpad
             public string ContentUnitID { get => m_id.ContentUnitID; set => m_id.ContentUnitID = value; }
             public bool ApplTestResult { get => m_applResult.ApplTestResult; set => m_applResult.ApplTestResult = value; }
         } */
+        #endregion
 
         /*
          * Let's explore now whether extension methods combined with using a dictionary will do what we need
          */
-
+        #region Tag Interface Experiment
         /*
          * IMetadata must have a Metadata dictionary. This is implemented by ContentUnit
          */
@@ -534,6 +776,7 @@ namespace TestScratchpad
 
             ContentUnit_ID_Prolog contentUnit3 = new ContentUnit_ID_Prolog(contentUnit);
         }
+        #endregion
 
     }
 }

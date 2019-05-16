@@ -114,13 +114,13 @@ namespace CSA.KnowledgeUnits
             }
         }
 
-        protected KC_PrologKB(string kbName)
+        public KC_PrologKB(string kbName)
         {
             m_KB = new KnowledgeBase(kbName, null);
             KBName = kbName;
         }
 
-        protected KC_PrologKB(string kbName, bool readOnly) : base(readOnly)
+        public KC_PrologKB(string kbName, bool readOnly) : base(readOnly)
         {
             m_KB = new KnowledgeBase(kbName, null);
             KBName = kbName;
@@ -129,7 +129,7 @@ namespace CSA.KnowledgeUnits
         /*
          * Create a shallow copy of the KC_PrologKB.
          */
-        protected KC_PrologKB(KC_PrologKB toCopy) : base(toCopy)
+        public KC_PrologKB(KC_PrologKB toCopy) : base(toCopy)
         {
             m_KB = toCopy.m_KB;
             KBName = toCopy.KBName;

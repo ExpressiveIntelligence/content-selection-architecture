@@ -9,6 +9,9 @@ namespace CSA.KnowledgeUnits
      */
     public class KC_PrologExpression : KC_ReadOnlyString
     {
+        /*
+         * String representation of the prolog expression to evaluate. 
+         */
         public string PrologExp
         {
             get => StringValue;
@@ -16,6 +19,9 @@ namespace CSA.KnowledgeUnits
             set => StringValue = value;
         }
 
+        /*
+         * Name of the prolog expression (can be used to disambiguate which prolog exp to evaluate if there are multiple expressions on one unit).
+         */
         public string PrologExpName { get; }
 
         public override string ToString()
@@ -56,6 +62,7 @@ namespace CSA.KnowledgeUnits
 
         protected KC_PrologExpression(KC_PrologExpression toCopy) : base(toCopy)
         {
+            PrologExpName = toCopy.PrologExpName;
         }
     }
 
