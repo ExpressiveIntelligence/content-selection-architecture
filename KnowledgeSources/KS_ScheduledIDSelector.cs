@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CSA.Core;
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources

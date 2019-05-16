@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using CSA.KnowledgeUnits;
 using CSA.Core;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Use ScheduledIDSelector until a reactive version of this has been implemented.")]
     public class KS_ReactiveIDSelector : ReactiveKnowledgeSource
     {
         // Name of the bound context variable

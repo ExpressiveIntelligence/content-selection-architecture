@@ -135,13 +135,21 @@ namespace CSA.Core
 
         public Unit()
         {
+            // fixme: remove when pre-KC-based code eliminated
+#pragma warning disable CS0618 // Type or member is obsolete
             Slots = new Dictionary<string, object>();
+#pragma warning restore CS0618 // Type or member is obsolete
+
             m_components = new Dictionary<string, ISet<KnowledgeComponent>>();
         }
 
         public Unit(Unit u)
         {
+            // fixme: remove when pre-KC-based code eliminated
+#pragma warning disable CS0618 // Type or member is obsolete
             Slots = new Dictionary<string, object>(u.Slots);
+#pragma warning restore CS0618 // Type or member is obsolete
+
             m_components = new Dictionary<string, ISet<KnowledgeComponent>>();
 
             // Iterate through all the components in the Unit being copied, adding 

@@ -7,7 +7,9 @@ using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 
 /* 
  * A test rig for testing integration of UnityProlog (https://github.com/ianhorswill/UnityProlog) with CSA.
@@ -157,7 +159,10 @@ namespace TestScratchpad
         private static void AddPrologQueriesToContentUnits()
         {
             IBlackboard blackboard = new Blackboard();
+#pragma warning disable CS0618 // Type or member is obsolete
             ContentUnit cu = new ContentUnit();
+#pragma warning restore CS0618 // Type or member is obsolete
+
             // cu.Metadata[] = 
         }
 
@@ -732,7 +737,7 @@ namespace TestScratchpad
         /*
          * Defining a ContentUnit with an ID, applicability test result, and prolog applicability test. 
          */
-        public class ContentUnit_ID_Prolog : ContentUnit, IMetadata_ID, IMetadata_ApplicabilityTestResult, IMetadata_UnityPrologApplTest
+        /* public class ContentUnit_ID_Prolog : ContentUnit, IMetadata_ID, IMetadata_ApplicabilityTestResult, IMetadata_UnityPrologApplTest
         {
             public ContentUnit_ID_Prolog() : base()
             {
@@ -741,12 +746,12 @@ namespace TestScratchpad
             public ContentUnit_ID_Prolog(ContentUnit_ID_Prolog contentUnit) : base(contentUnit)
             { 
             }
-        }
+        }*/
 
         /*
          * Defining a ContentUnit with a target ID
          */
-        public class ContentUnit_Choice_TargetID : ContentUnit, IMetadata_TargetID
+        /*public class ContentUnit_Choice_TargetID : ContentUnit, IMetadata_TargetID
         {
             public ContentUnit_Choice_TargetID() : base()
             {
@@ -755,14 +760,14 @@ namespace TestScratchpad
             public ContentUnit_Choice_TargetID(ContentUnit_Choice_TargetID contentUnit) : base(contentUnit)
             {
             }
-        }
+        }*/
 
         /*
          * Yay, it looks like this approach to faking multiple inheritance for content units is going to work! 
          * But, instead, I decide to use a component-based approach. This allows me to dynamically define the slots on a Unit without 
          * having to statically declare a type for each combination of tag interfaces that I use.  
          */
-        public static void MultipleInheritanceTest()
+        /*public static void MultipleInheritanceTest()
         {
             ContentUnit_ID_Prolog contentUnit = new ContentUnit_ID_Prolog();
 
@@ -775,7 +780,7 @@ namespace TestScratchpad
             contentUnit2.SetID("foo");
 
             ContentUnit_ID_Prolog contentUnit3 = new ContentUnit_ID_Prolog(contentUnit);
-        }
+        }*/
         #endregion
 
     }

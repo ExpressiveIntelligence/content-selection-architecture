@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using CSA.KnowledgeUnits;
 using CSA.Core;
 using static CSA.KnowledgeUnits.KUProps;
@@ -11,6 +11,7 @@ namespace CSA.KnowledgeSources
      * fixme: ReactivePrologEval has not been tested and is currently deprecated by ScheduledPrologEval. 
      * I will return to making ReactivePrologEval work when I have a general solution for reactive knowledge source activation. 
      */
+    [Obsolete("Use ScheduledPrologEval until a reactive version of this has been implemented.")]
     public class KS_ReactivePrologEval : ReactiveKnowledgeSource
     {
         // Name of the bound context variables

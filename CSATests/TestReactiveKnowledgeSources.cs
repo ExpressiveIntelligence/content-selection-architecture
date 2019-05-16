@@ -6,12 +6,15 @@ using Xunit.Abstractions;
 
 using CSA.KnowledgeSources;
 using CSA.KnowledgeUnits;
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.KUProps;
 using CSA.Core;
 
 namespace CSA.Tests
 {
+    [Obsolete("When reactive KSs are finally implemented again, implement real tests for them.")]
     public class TestReactiveKnowledgeSources
     {
 

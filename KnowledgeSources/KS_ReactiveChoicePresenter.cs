@@ -5,11 +5,14 @@ using System.Diagnostics;
 
 using CSA.Core;
 using CSA.KnowledgeUnits;
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Used ScheduledChoicePresenter until a reactive version of this has been implemented.")]
     public class KS_ReactiveChoicePresenter : ReactiveKnowledgeSource, IChoicePresenter
     {
         // Name of the bound activation variable
