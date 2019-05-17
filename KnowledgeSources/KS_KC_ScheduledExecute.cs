@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
-    [Obsolete("Use KnowledgeComponent-based version of KS_ScheduledExecute.")]
-    public class KS_ScheduledExecute : IScheduledKnowledgeSource
+    public class KS_KC_ScheduledExecute : IScheduledKnowledgeSource
     {
         /* 
          * Define delegates for the precondition and execution functions. The execution function will be executed if
@@ -36,7 +35,7 @@ namespace CSA.KnowledgeSources
         /* 
          * This constructor defines a default precondition which always returns true. 
          */
-        public KS_ScheduledExecute(ExecuteFun codeToExecute)
+        public KS_KC_ScheduledExecute(ExecuteFun codeToExecute)
         {
             m_precondition = () => true; 
             m_codeToExecute = codeToExecute;
@@ -46,7 +45,7 @@ namespace CSA.KnowledgeSources
         /*
          * This constructor defines an explicit precondition. 
          */
-        public KS_ScheduledExecute(ExecuteFun codeToExecute, PreconditionFun precondition)
+        public KS_KC_ScheduledExecute(ExecuteFun codeToExecute, PreconditionFun precondition)
         {
             m_precondition = precondition;
             m_codeToExecute = codeToExecute;
