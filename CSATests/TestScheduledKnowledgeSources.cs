@@ -775,7 +775,7 @@ namespace CSA.Tests
 
                 // Verify that each evaluated unit is linked to a unit containing a matching, evaluated KC_EvaluatablePrologExpression.
                 KC_EvaluatablePrologExpression evaledPrologExp = resultUnit.GetComponent<KC_EvaluatablePrologExpression>();
-                Assert.Equal(unit.GetPrologExpName(), evaledPrologExp.PrologExpName);
+                Assert.Equal(unit.GetPrologExpName<KC_PrologExpression>(), evaledPrologExp.PrologExpName);
                 Assert.True(evaledPrologExp.Evaluated);
             }
 

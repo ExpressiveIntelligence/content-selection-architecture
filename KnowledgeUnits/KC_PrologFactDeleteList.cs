@@ -32,19 +32,19 @@ namespace CSA.KnowledgeUnits
 
         public override object Clone() => new KC_PrologFactDeleteList(this);
 
-        protected KC_PrologFactDeleteList()
+        public KC_PrologFactDeleteList()
         {
         }
 
-        protected KC_PrologFactDeleteList(string[] strings) : base(strings)
+        public KC_PrologFactDeleteList(string[] strings) : base(strings)
         {
         }
 
-        protected KC_PrologFactDeleteList(string[] strings, bool readOnly) : base(strings, readOnly)
+        public KC_PrologFactDeleteList(string[] strings, bool readOnly) : base(strings, readOnly)
         {
         }
 
-        protected KC_PrologFactDeleteList(KC_PrologFactDeleteList toCopy) : base(toCopy)
+        public KC_PrologFactDeleteList(KC_PrologFactDeleteList toCopy) : base(toCopy)
         {
         }
     }

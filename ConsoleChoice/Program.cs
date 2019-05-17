@@ -47,14 +47,13 @@ namespace ConsoleDemo
 
             Demo2 demo = new Demo2();
 
-            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
-            demo.AddSelectChoicePresenterHandler(EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges);
+            demo.AddChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddSelectChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.SelectChoice_PrologKBChanges);
 
-            while (demo.Blackboard.Changed)
+             while (demo.Blackboard.Changed)
             {
                 demo.Blackboard.ResetChanged();
                 demo.Controller.Execute();
-                // Console.WriteLine(demo.Blackboard.NumberOfUnits<U_PrologEvalRequest>());
             }
         }
 

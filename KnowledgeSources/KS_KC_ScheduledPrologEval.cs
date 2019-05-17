@@ -23,7 +23,8 @@ namespace CSA.KnowledgeSources
          */
         public static FilterCondition FilterByPrologResult(string prologExpName, bool result)
         {
-            return (Unit unit) => unit.HasComponent<KC_EvaluatablePrologExpression>() && unit.GetPrologExpName().Equals(prologExpName) &&
+            return (Unit unit) => unit.HasComponent<KC_EvaluatablePrologExpression>() 
+                && unit.GetPrologExpName<KC_EvaluatablePrologExpression>().Equals(prologExpName) &&
                 unit.GetPrologExpEvaluated() && (unit.GetPrologExpEvalResult() == result);
         }
 
@@ -37,7 +38,7 @@ namespace CSA.KnowledgeSources
             {
                 return (Unit unit) =>
                     unit.HasComponent<KC_PrologExpression>() &&
-                    unit.GetPrologExpName().Equals(expName) &&
+                    unit.GetPrologExpName<KC_PrologExpression>().Equals(expName) &&
                     !HasLinkToEvaluatedExpression(unit, blackboard);
             }
             return GenerateHasComponent<KC_PrologExpression>();
@@ -65,7 +66,7 @@ namespace CSA.KnowledgeSources
                     if (linkedUnit.HasComponent<KC_EvaluatablePrologExpression>())
                     {
                         KC_EvaluatablePrologExpression evaledPrologExp = linkedUnit.GetComponent<KC_EvaluatablePrologExpression>();
-                        if (evaledPrologExp.PrologExpName.Equals(unit.GetPrologExpName()) && evaledPrologExp.Evaluated) {
+                        if (evaledPrologExp.PrologExpName.Equals(unit.GetPrologExpName<KC_PrologExpression>()) && evaledPrologExp.Evaluated) {
                             Debug.Assert(evaledPrologExp.PrologExp.Equals(unit.GetPrologExp()));
                             return true;
                         }

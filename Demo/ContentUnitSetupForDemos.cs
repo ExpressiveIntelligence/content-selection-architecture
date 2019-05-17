@@ -1,7 +1,10 @@
 ﻿using System;
 using CSA.Core;
 using CSA.KnowledgeUnits;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
+#pragma warning restore CS0618 // Type or member is obsolete
 
 namespace CSA.Demo
 {
@@ -125,36 +128,36 @@ namespace CSA.Demo
         /*
          * Adds ContentUnits to blackboard for demo2, a choice-based demo with prolog applicability tests for choice setups. 
          */
-        public static void Demo2_DefineCUs(IBlackboard blackboard)
+        public static void Demo2_DefineUnits(IBlackboard blackboard)
         {
-            ContentUnit start = new ContentUnit();
-            start.Metadata[ContentUnitID] = "start";
-            start.Metadata[ApplTest_Prolog] = "true.";
-            start.Content[Text] = "An old gentleman stands before you. ";
+            Unit start = new Unit();
+            start.AddComponent(new KC_UnitID("start", true));
+            start.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
+            start.AddComponent(new KC_Text("An old gentleman stands before you.", true));
 
-            ContentUnit choice_AskForHelp = new ContentUnit();
-            choice_AskForHelp.Metadata[TargetContentUnitID] = "ask for help";
-            choice_AskForHelp.Content[Text] = "Ask for help";
+            Unit choice_AskForHelp = new Unit();
+            choice_AskForHelp.AddComponent(new KC_IDSelectionRequest("ask for help", true));
+            choice_AskForHelp.AddComponent(new KC_Text("Ask for help", true));
 
-            ContentUnit choice_introduceYourself = new ContentUnit();
-            choice_introduceYourself.Metadata[TargetContentUnitID] = "introduce yourself";
-            choice_introduceYourself.Metadata[FactAddList_Prolog] = new string[] { "introducedYourself" };
-            choice_introduceYourself.Content[Text] = "Introduce yourself";
+            Unit choice_introduceYourself = new Unit();
+            choice_introduceYourself.AddComponent(new KC_IDSelectionRequest("introduce yourself", true));
+            choice_introduceYourself.AddComponent(new KC_PrologFactAddList(new string[] { "introducedYourself" }, true));
+            choice_introduceYourself.AddComponent(new KC_Text("Introduce yourself", true));
 
-            ContentUnit askForHelp1 = new ContentUnit();
-            askForHelp1.Metadata[ContentUnitID] = "ask for help";
-            askForHelp1.Metadata[ApplTest_Prolog] = "introducedYourself.";
-            askForHelp1.Content[Text] = "'Since you introduced yourself so nicely, I'm happy to help!'";
+            Unit askForHelp1 = new Unit();
+            askForHelp1.AddComponent(new KC_UnitID("ask for help", true));
+            askForHelp1.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "introducedYourself.", true));
+            askForHelp1.AddComponent(new KC_Text("'Since you introduced yourself so nicely, I'm happy to help!'", true));
 
-            ContentUnit askForHelp2 = new ContentUnit();
-            askForHelp2.Metadata[ContentUnitID] = "ask for help";
-            askForHelp2.Metadata[ApplTest_Prolog] = "\\+ introducedYourself.";
-            askForHelp2.Content[Text] = "Eyeing you suspiciously the old man replies 'Who are you?'";
+            Unit askForHelp2 = new Unit();
+            askForHelp2.AddComponent(new KC_UnitID("ask for help", true));
+            askForHelp2.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "\\+ introducedYourself.", true));
+            askForHelp2.AddComponent(new KC_Text("Eyeing you suspiciously the old man replies 'Who are you?'", true));
 
-            ContentUnit introduceYourself = new ContentUnit();
-            introduceYourself.Metadata[ContentUnitID] = "introduce yourself";
-            introduceYourself.Metadata[ApplTest_Prolog] = "true.";
-            introduceYourself.Content[Text] = "'Very nice to meet you!'";
+            Unit introduceYourself = new Unit();
+            introduceYourself.AddComponent(new KC_UnitID("introduce yourself", true));
+            introduceYourself.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
+            introduceYourself.AddComponent(new KC_Text("'Very nice to meet you!'", true));
 
             blackboard.AddUnit(start);
             blackboard.AddUnit(choice_AskForHelp);
@@ -169,7 +172,10 @@ namespace CSA.Demo
             blackboard.AddLink(askForHelp2, choice_introduceYourself, LinkTypes.L_Choice);
             blackboard.AddLink(introduceYourself, choice_AskForHelp, LinkTypes.L_Choice);
 
-            U_PrologKB prologKB = new U_PrologKB("Global");
+            Unit prologKBUnit = new Unit();
+            KC_PrologKB prologKB = new KC_PrologKB("Global", true);
+
+            prologKBUnit.AddComponent(prologKB);
 
             /*
              * fixme: is there a better way to define a predicate for prolog than asserting and retracting it?
@@ -177,7 +183,7 @@ namespace CSA.Demo
             prologKB.Assert("introducedYourself.");
             prologKB.Retract("introducedYourself.");
 
-            blackboard.AddUnit(prologKB);
+            blackboard.AddUnit(prologKBUnit);
         }
 
         /*

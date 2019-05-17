@@ -68,11 +68,11 @@ namespace CSA.KnowledgeUnits
 
     public static class KC_PrologExpression_Extensions
     {
-        public static string GetPrologExpName(this Unit unit)
+        public static string GetPrologExpName<T>(this Unit unit) where T : KC_PrologExpression
         {
-            if (unit.HasComponent<KC_PrologExpression>())
+            if (unit.HasComponent<T>())
             {
-                return unit.GetComponent<KC_PrologExpression>().PrologExpName;
+                return unit.GetComponent<T>().PrologExpName;
             }
             throw new InvalidOperationException("GetPrologExpName called on unit that does not have a KC_PrologExpression component.");
         }

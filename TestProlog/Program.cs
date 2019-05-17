@@ -414,7 +414,7 @@ namespace TestScratchpad
 
                 // Verify that each evaluated unit is linked to a unit containing a matching, evaluated KC_EvaluatablePrologExpression.
                 KC_EvaluatablePrologExpression evaledPrologExp = resultUnit.GetComponent<KC_EvaluatablePrologExpression>();
-                Debug.Assert(unit.GetPrologExpName().Equals(evaledPrologExp.PrologExpName));
+                Debug.Assert(unit.GetPrologExpName<KC_PrologExpression>().Equals(evaledPrologExp.PrologExpName));
                 Debug.Assert(evaledPrologExp.Evaluated);
             }
 
