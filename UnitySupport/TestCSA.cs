@@ -7,13 +7,13 @@ using UnityEngine.UI;
 
 namespace CSA.UnitySupport
 {
-
-    // fixme: generalize this so that it has a general button container with a layouy policy that you set (by dragging) in the inspector. 
+    /*
+     * fixme: Unable to test in Unity 2019. Get an "unloading broken assembly" error for dlls. The first thing to try is to see if this still works in Unity 2018. But
+     * the Simple Text Choices project got updated to Unity 2019 and won't import back to 2018. So I'll need to rebuild Simple Text Choices in Unity 2018 to test this.     
+     */
     public class TestCSA : MonoBehaviour
     {
-        // fixme: change this to Demo1_Reactive or Demo1_Scheduled depending on which demo you want. 
         private readonly Demo1_Scheduled m_demo = new Demo1_Scheduled();
-        // private readonly Demo1_Reactive m_demo = new Demo1_Reactive();
 
         private readonly List<Button> buttons = new List<Button>();
         private GameObject m_textDisplay;
@@ -38,6 +38,9 @@ namespace CSA.UnitySupport
             }
         }
 
+        /*
+         * fixme: Generalize this so that it has a general button container with a layouy policy that you set (by dragging) in the inspector. 
+         */
         public void DisplayUnityChoice(object sender, KC_PresenterExecuteEventArgs eventArgs)
         {
             // Get the ChoicePresenter knowledge source that fired this event. Currently the choice info is stored on the knowledge source.
