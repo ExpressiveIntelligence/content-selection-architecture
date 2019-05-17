@@ -80,11 +80,11 @@ namespace CSA.KnowledgeSources
         {
             if (choiceMade < choices.Length)
             {
-                // Add a Unit with KC_IDSelectionRequest to blackboard for the target unit ID associated with the choice and activate KC_IDSelectionRequest
+                // Activate the KC_IDSelectionRequest associated with the choice. 
                 Unit selectedChoice = choices[choiceMade];
                 selectedChoice.SetActiveRequest(true);
 
-                // Do an actions that have been registered on PresenterSelectChoice. 
+                // Do any actions that have been registered on PresenterSelectChoice. 
                 KC_SelectChoiceEventArgs eventArgs = new KC_SelectChoiceEventArgs(selectedChoice, m_blackboard);
                 OnSelectChoice(eventArgs);
             }

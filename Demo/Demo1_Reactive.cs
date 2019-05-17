@@ -8,6 +8,7 @@ using static CSA.Demo.ContentUnitSetupForDemos;
 
 namespace CSA.Demo
 {
+    [Obsolete("Reactive KSs are obsoleted so have not been updated to KnowledgeComponents.")]
     public class Demo1_Reactive
     {
         public IBlackboard Blackboard { get; }
@@ -31,7 +32,7 @@ namespace CSA.Demo
             Blackboard = new Blackboard();
 
             // Set up the ContentUnits on the blackboard
-            Demo1_DefineCUs(Blackboard);
+            Demo1_Slots_DefineCUs(Blackboard);
 
             // Set up the knowledge sources
             m_IDSelector = new KS_ReactiveIDSelector(Blackboard);

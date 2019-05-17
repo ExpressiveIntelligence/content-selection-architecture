@@ -10,6 +10,7 @@ namespace ConsoleDemo
 {
     class Program
     {
+        [Obsolete("Reactive KSs are obsolete so ReactiveConsoleChoice has not been updated to use KnowledgeComponents.")]
         private static void ReactiveConsoleChoice()
         {
             Console.WriteLine("Starting reactive demo1 (simple choice-based).");
@@ -31,7 +32,7 @@ namespace ConsoleDemo
 
             Demo1_Scheduled demo = new Demo1_Scheduled();
 
-            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.Execute_DisplayConsoleChoice);
 
             while(demo.Blackboard.Changed)
             {
@@ -115,7 +116,9 @@ namespace ConsoleDemo
             switch (args[0])
             {
                 case "reactive_demo1":
+#pragma warning disable CS0618 // Type or member is obsolete 
                     ReactiveConsoleChoice();
+#pragma warning restore CS0618 // Type or member is obsolete
                     break;
                 case "scheduled_demo1":
                     ScheduledConsoleChoice();

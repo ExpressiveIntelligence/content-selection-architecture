@@ -1,7 +1,7 @@
-﻿using CSA.Core;
+﻿using System;
+using CSA.Core;
 using CSA.KnowledgeUnits;
 using static CSA.KnowledgeUnits.CUSlots;
-using static CSA.KnowledgeUnits.KUProps;
 
 namespace CSA.Demo
 {
@@ -13,7 +13,8 @@ namespace CSA.Demo
         /* 
          * Adds ContentUnits to blackboard for demo1, a simple choice-based demo.
          */
-        public static void Demo1_DefineCUs(IBlackboard blackboard)
+        [Obsolete("Use Demo1_KC_DefineUnits instead. Only keeping this around so the old reactive KS demos will still compile.")]
+        public static void Demo1_Slots_DefineCUs(IBlackboard blackboard)
         {
             ContentUnit start = new ContentUnit();
             start.Metadata[ContentUnitID] = "start";
@@ -50,6 +51,60 @@ namespace CSA.Demo
             ContentUnit openDoorAfterWaiting = new ContentUnit();
             openDoorAfterWaiting.Metadata[ContentUnitID] = "open door after waiting";
             openDoorAfterWaiting.Content[Text] = "Breaking through your reservations, you step forward into a life of adventure.";
+
+            blackboard.AddUnit(start);
+            blackboard.AddUnit(start_Choice1);
+            blackboard.AddUnit(start_Choice2);
+            blackboard.AddUnit(openDoor);
+            blackboard.AddUnit(waited);
+            blackboard.AddUnit(waitedChoice1);
+            blackboard.AddUnit(waitedChoice2);
+            blackboard.AddUnit(waitedAgain);
+            blackboard.AddUnit(openDoorAfterWaiting);
+
+            blackboard.AddLink(start, start_Choice1, LinkTypes.L_Choice);
+            blackboard.AddLink(start, start_Choice2, LinkTypes.L_Choice);
+            blackboard.AddLink(waited, waitedChoice1, LinkTypes.L_Choice);
+            blackboard.AddLink(waited, waitedChoice2, LinkTypes.L_Choice);
+        }
+
+        public static void Demo1_KC_DefineUnits(IBlackboard blackboard)
+        {
+            Unit start = new Unit();
+            start.AddComponent(new KC_UnitID("start", true));
+            start.AddComponent(new KC_Text("You stand before an old wooden door.", true));
+
+            Unit start_Choice1 = new Unit();
+            start_Choice1.AddComponent(new KC_IDSelectionRequest("open door", true));
+            start_Choice1.AddComponent(new KC_Text("Open the door", true));
+
+            Unit start_Choice2 = new Unit();
+            start_Choice2.AddComponent(new KC_IDSelectionRequest("wait", true));
+            start_Choice2.AddComponent(new KC_Text("Wait", true));
+
+            Unit openDoor = new Unit();
+            openDoor.AddComponent(new KC_UnitID("open door", true));
+            openDoor.AddComponent(new KC_Text("Opening the door, you step forth into adventure.", true));
+
+            Unit waited = new Unit();
+            waited.AddComponent(new KC_UnitID("wait", true));
+            waited.AddComponent(new KC_Text("You wait fruitlessly in front the door.", true));
+                
+            Unit waitedChoice1 = new Unit();
+            waitedChoice1.AddComponent(new KC_IDSelectionRequest("waited again", true));
+            waitedChoice1.AddComponent(new KC_Text("Wait again", true));
+
+            Unit waitedChoice2 = new Unit();
+            waitedChoice2.AddComponent(new KC_IDSelectionRequest("open door after waiting", true));
+            waitedChoice2.AddComponent(new KC_Text("Finally open the door", true));
+
+            Unit waitedAgain = new Unit();
+            waitedAgain.AddComponent(new KC_UnitID("waited again", true));
+            waitedAgain.AddComponent(new KC_Text("Sunk in a deep malaise, you wait the rest of your life.", true));
+
+            Unit openDoorAfterWaiting = new Unit();
+            openDoorAfterWaiting.AddComponent(new KC_UnitID("open door after waiting", true));
+            openDoorAfterWaiting.AddComponent(new KC_Text("Breaking through your reservations, you step forward into a life of adventure.", true));
 
             blackboard.AddUnit(start);
             blackboard.AddUnit(start_Choice1);
