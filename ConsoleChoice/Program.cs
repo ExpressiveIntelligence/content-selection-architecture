@@ -17,7 +17,7 @@ namespace ConsoleDemo
 
             Demo1_Reactive demo = new Demo1_Reactive();
 
-            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandlers_Old_ChoicePresenter.Execute_DisplayConsoleChoice);
 
             while (demo.Blackboard.Changed)
             {
@@ -32,7 +32,7 @@ namespace ConsoleDemo
 
             Demo1_Scheduled demo = new Demo1_Scheduled();
 
-            demo.AddChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
 
             while(demo.Blackboard.Changed)
             {
@@ -47,8 +47,8 @@ namespace ConsoleDemo
 
             Demo2 demo = new Demo2();
 
-            demo.AddChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.Execute_DisplayConsoleChoice);
-            demo.AddSelectChoicePresenterHandler(EventHandlers_KC_ChoicePresenter.SelectChoice_PrologKBChanges);
+            demo.AddChoicePresenterHandler(EventHandlers_ChoicePresenter.Execute_DisplayConsoleChoice);
+            demo.AddSelectChoicePresenterHandler(EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges);
 
              while (demo.Blackboard.Changed)
             {
