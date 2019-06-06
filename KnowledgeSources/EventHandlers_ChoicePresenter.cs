@@ -8,7 +8,7 @@ namespace CSA.KnowledgeSources
 {
     public static class EventHandlers_ChoicePresenter
     {
-        public static void Execute_DisplayConsoleChoice(object sender, KC_PresenterExecuteEventArgs eventArgs)
+        public static void Execute_DisplayConsoleChoice(object sender, PresenterExecuteEventArgs eventArgs)
         {
             IChoicePresenter cp = (IChoicePresenter)sender;
             Console.WriteLine(eventArgs.TextToDisplay);
@@ -36,7 +36,7 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public static void SelectChoice_PrologKBChanges(object sender, KC_SelectChoiceEventArgs eventArgs)
+        public static void SelectChoice_PrologKBChanges(object sender, SelectChoiceEventArgs eventArgs)
         {
             Unit selectedChoice = eventArgs.SelectedChoice;
 
@@ -66,13 +66,13 @@ namespace CSA.KnowledgeSources
     /* 
      * The EventArgs class definition for passing text to display and choice information to the display callback. 
      */
-    public class KC_PresenterExecuteEventArgs : EventArgs
+    public class PresenterExecuteEventArgs : EventArgs
     {
         public string TextToDisplay { get; }
         public string[] ChoicesToDisplay { get; }
         public Unit[] Choices { get; }
 
-        public KC_PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, Unit[] choices)
+        public PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, Unit[] choices)
         {
             TextToDisplay = textToDisplay;
             ChoicesToDisplay = choicesToDisplay;
@@ -84,12 +84,12 @@ namespace CSA.KnowledgeSources
      * The EventArgs class definition for performing any processing on the selected choice. This can be used, for example, to process the FactAddList
      * and FactDeleteList slots on the selected choice.         
      */
-    public class KC_SelectChoiceEventArgs : EventArgs
+    public class SelectChoiceEventArgs : EventArgs
     {
         public Unit SelectedChoice { get; }
         public IBlackboard Blackboard { get; }
 
-        public KC_SelectChoiceEventArgs(Unit selectedChoice, IBlackboard blackboard)
+        public SelectChoiceEventArgs(Unit selectedChoice, IBlackboard blackboard)
         {
             SelectedChoice = selectedChoice;
             Blackboard = blackboard;

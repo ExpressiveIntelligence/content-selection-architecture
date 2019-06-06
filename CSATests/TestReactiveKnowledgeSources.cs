@@ -477,7 +477,7 @@ namespace CSA.Tests
                 IChoicePresenter_Old cp = (IChoicePresenter_Old)sender;
                 for (uint i = 0; i < presenterEventArgs.ChoicesToDisplay.Length; i++)
                 {
-                    cp.SelectChoice(presenterEventArgs.Choices, i);
+                    cp.SelectChoice((ContentUnit[])presenterEventArgs.Choices, i);
                     U_IDSelectRequest idSelectRequest = blackboard.LookupSingleton<U_IDSelectRequest>();
                     Assert.True(idSelectRequest.TargetContentUnitID.Equals(choices[i].Metadata[TargetContentUnitID]));
                     blackboard.RemoveUnit(idSelectRequest); // Remove the U_IDSelect request before the next iteration. 

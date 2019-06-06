@@ -35,11 +35,11 @@ namespace CSA.KnowledgeSources
 
                 // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
                 uint choiceMade = uint.Parse(keyInfo.KeyChar.ToString());
-                cp.SelectChoice(eventArgs.Choices, choiceMade);
+                cp.SelectChoice((ContentUnit[])eventArgs.Choices, choiceMade);
             }
         }
 
-        public static void SelectChoice_PrologKBChanges(object sender, SelectChoiceEventArgs eventArgs)
+        public static void SelectChoice_PrologKBChanges(object sender, SelectChoiceEventArgs_Old eventArgs)
         {
             ContentUnit selectedChoice = eventArgs.SelectedChoice;
             U_PrologKB kb = eventArgs.Blackboard.LookupSingleton<U_PrologKB>();
@@ -69,14 +69,14 @@ namespace CSA.KnowledgeSources
     /* 
      * The EventArgs class definition for passing text to display and choice information to the display callback. 
      */
-    public class PresenterExecuteEventArgs : EventArgs
+    public class PresenterExecuteEventArgs_Old : EventArgs
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         public string TextToDisplay { get; }
         public string[] ChoicesToDisplay { get; }
         public ContentUnit[] Choices { get; }
 
-        public PresenterExecuteEventArgs(string textToDisplay, string[] choicesToDisplay, ContentUnit[] choices)
+        public PresenterExecuteEventArgs_Old(string textToDisplay, string[] choicesToDisplay, ContentUnit[] choices)
         {
             TextToDisplay = textToDisplay;
             ChoicesToDisplay = choicesToDisplay;
@@ -89,13 +89,13 @@ namespace CSA.KnowledgeSources
      * The EventArgs class definition for performing any processing on the selected choice. This can be used, for example, to process the FactAddList
      * and FactDeleteList slots on the selected choice.         
      */
-    public class SelectChoiceEventArgs : EventArgs
+    public class SelectChoiceEventArgs_Old : EventArgs
     {
 #pragma warning disable CS0618 // Type or member is obsolete
         public ContentUnit SelectedChoice { get; }
         public IBlackboard Blackboard { get; }
 
-        public SelectChoiceEventArgs(ContentUnit selectedChoice, IBlackboard blackboard)
+        public SelectChoiceEventArgs_Old(ContentUnit selectedChoice, IBlackboard blackboard)
         {
             SelectedChoice = selectedChoice;
             Blackboard = blackboard;

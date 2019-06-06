@@ -41,7 +41,7 @@ namespace CSA.UnitySupport
         /*
          * fixme: Generalize this so that it has a general button container with a layouy policy that you set (by dragging) in the inspector. 
          */
-        public void DisplayUnityChoice(object sender, KC_PresenterExecuteEventArgs eventArgs)
+        public void DisplayUnityChoice(object sender, PresenterExecuteEventArgs eventArgs)
         {
             // Get the ChoicePresenter knowledge source that fired this event. Currently the choice info is stored on the knowledge source.
             IChoicePresenter cp = (IChoicePresenter)sender;

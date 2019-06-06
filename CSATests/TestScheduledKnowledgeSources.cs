@@ -501,10 +501,10 @@ namespace CSA.Tests
              };
         }
 
-        private EventHandler<KC_PresenterExecuteEventArgs>
+        private EventHandler<PresenterExecuteEventArgs>
             GenerateEventHandler(Unit selectedUnit, Unit[] choices, IBlackboard _)
         {
-            return (object sender, KC_PresenterExecuteEventArgs eventArgs) =>
+            return (object sender, PresenterExecuteEventArgs eventArgs) =>
             {
                 if (selectedUnit != null)
                 {

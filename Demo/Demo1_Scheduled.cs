@@ -19,7 +19,7 @@ namespace CSA.Demo
         private readonly KS_ScheduledChoicePresenter m_choicePresenter;
         private readonly KS_ScheduledFilterPoolCleaner m_filterPoolCleaner;
 
-        public void AddChoicePresenterHandler(EventHandler<KC_PresenterExecuteEventArgs> handler)
+        public void AddChoicePresenterHandler(EventHandler<PresenterExecuteEventArgs> handler)
         {
             m_choicePresenter.PresenterExecute += handler;
         }

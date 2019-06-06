@@ -430,10 +430,10 @@ namespace TestScratchpad
          */
         #region ScheduledChoicePresenter Unit Tests
 
-        private static EventHandler<KC_PresenterExecuteEventArgs>
+        private static EventHandler<PresenterExecuteEventArgs>
             GenerateEventHandler(Unit selectedUnit, Unit[] choices, IBlackboard blackboard)
         {
-            return (object sender, KC_PresenterExecuteEventArgs eventArgs) =>
+            return (object sender, PresenterExecuteEventArgs eventArgs) =>
             {
                 if (selectedUnit != null)
                 {

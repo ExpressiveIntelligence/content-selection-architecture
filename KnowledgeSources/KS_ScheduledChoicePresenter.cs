@@ -13,10 +13,10 @@ namespace CSA.KnowledgeSources
         public const string DefaultChoicePresenterInputPool = "ContentUnitToDisplay";
 
         // The delegate for event handling within the Execute() method
-        public event EventHandler<KC_PresenterExecuteEventArgs> PresenterExecute;
+        public event EventHandler<PresenterExecuteEventArgs> PresenterExecute;
 
         // The delegate for event handling within the SelectChoice method
-        public event EventHandler<KC_SelectChoiceEventArgs> PresenterSelectChoice;
+        public event EventHandler<SelectChoiceEventArgs> PresenterSelectChoice;
 
         // Returns an Enumerable of choices. Choices are Units linked to the filtered Unit by Choice links. 
         // fixme: add support for choices stored not as linked content, but as a query for selecting choices. 
@@ -63,11 +63,11 @@ namespace CSA.KnowledgeSources
                 choicesToDisplay = new string[0];
             }
 
-            KC_PresenterExecuteEventArgs eventArgs = new KC_PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
+            PresenterExecuteEventArgs eventArgs = new PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
             OnExecute(eventArgs);
         }
 
-        protected virtual void OnExecute(KC_PresenterExecuteEventArgs eventArgs)
+        protected virtual void OnExecute(PresenterExecuteEventArgs eventArgs)
         {
             PresenterExecute?.Invoke(this, eventArgs);
         }
@@ -85,7 +85,7 @@ namespace CSA.KnowledgeSources
                 selectedChoice.SetActiveRequest(true);
 
                 // Do any actions that have been registered on PresenterSelectChoice. 
-                KC_SelectChoiceEventArgs eventArgs = new KC_SelectChoiceEventArgs(selectedChoice, m_blackboard);
+                SelectChoiceEventArgs eventArgs = new SelectChoiceEventArgs(selectedChoice, m_blackboard);
                 OnSelectChoice(eventArgs);
             }
             else
@@ -94,7 +94,7 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        protected virtual void OnSelectChoice(KC_SelectChoiceEventArgs eventArgs)
+        protected virtual void OnSelectChoice(SelectChoiceEventArgs eventArgs)
         {
             PresenterSelectChoice?.Invoke(this, eventArgs);
         }
