@@ -1,2 +1,0 @@
-﻿Let's put some contents in here.
-What happens when I try to look at this file in the version system after I've deleted it.
