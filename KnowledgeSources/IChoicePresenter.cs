@@ -1,14 +1,12 @@
-﻿using System;
-using CSA.Core;
+﻿using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
     /*
      * Shared interface for both reactive and scheduled choice presenters.
      */
-    [Obsolete("Use KnowledgeComponent-based version of this interface.")]
     public interface IChoicePresenter
     {
-        void SelectChoice(ContentUnit[] choices, uint choiceMade);
+        void SelectChoice(Unit[] choices, uint choiceMade);
     }
 }

@@ -8,7 +8,7 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_ScheduledChoicePresenter : KS_ScheduledContentPoolCollector, I_KC_ChoicePresenter
+    public class KS_ScheduledChoicePresenter : KS_ScheduledContentPoolCollector, IChoicePresenter
     {
         public const string DefaultChoicePresenterInputPool = "ContentUnitToDisplay";
 

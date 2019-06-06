@@ -474,7 +474,7 @@ namespace CSA.Tests
                 }
 
                 // Iterate through each of the choices selecting it and confirming that the correct U_IDSelectRequest is added. 
-                IChoicePresenter cp = (IChoicePresenter)sender;
+                IChoicePresenter_Old cp = (IChoicePresenter_Old)sender;
                 for (uint i = 0; i < presenterEventArgs.ChoicesToDisplay.Length; i++)
                 {
                     cp.SelectChoice(presenterEventArgs.Choices, i);

@@ -18,7 +18,7 @@ namespace CSA.KnowledgeSources
      * CUs because it's modifying meta-data, while Display doesn't do meta-data modification. So not clear if the are both subclasses of Process or not. 
      */
     [Obsolete("Use KnowledgeComponent-based version of this controller.")]
-    public class KS_Old_ScheduledChoicePresenter : KS_Old_ScheduledFilterSelector, IChoicePresenter
+    public class KS_Old_ScheduledChoicePresenter : KS_Old_ScheduledFilterSelector, IChoicePresenter_Old
     {
         public const string DefaultChoicePresenterInputPool = "ContentUnitToDisplay";
 

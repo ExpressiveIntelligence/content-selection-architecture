@@ -13,7 +13,7 @@ namespace CSA.KnowledgeSources
     {
         public static void Execute_DisplayConsoleChoice(object sender, PresenterExecuteEventArgs eventArgs)
         {
-            IChoicePresenter cp = (IChoicePresenter)sender;
+            IChoicePresenter_Old cp = (IChoicePresenter_Old)sender;
             Console.WriteLine(eventArgs.TextToDisplay);
 
             if (eventArgs.ChoicesToDisplay.Length > 0)

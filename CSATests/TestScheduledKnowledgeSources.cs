@@ -523,7 +523,7 @@ namespace CSA.Tests
                 }
 
                 // Iterate through each of the choices selecting it and confirming that the KC_IDSelectionRequest is activated. 
-                I_KC_ChoicePresenter cp = (I_KC_ChoicePresenter)sender;
+                IChoicePresenter cp = (IChoicePresenter)sender;
                 for (uint i = 0; i < eventArgs.ChoicesToDisplay.Length; i++)
                 {
                     cp.SelectChoice(eventArgs.Choices, i);
