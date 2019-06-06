@@ -9,7 +9,7 @@ namespace CSA.KnowledgeSources
      * might mean expand (in the case of a grammar or search tree), execute (in the case of the ABL ABT or a behavior tree), or
      * other semantics. 
      */
-    public class KS_KC_ScheduledSelectTreeLeaves : KS_KC_ScheduledFilterSelector
+    public class KS_ScheduledSelectTreeLeaves : KS_ScheduledFilterSelector
     {
         /*
          * fixme: in general need a content pool specifier as their may be other leaf nodes on the blackboard not associated with the tree of interest.
@@ -32,13 +32,13 @@ namespace CSA.KnowledgeSources
          * fixme: figure out how to best handle multiple trees when this case comes up. 
          */
 
-        public KS_KC_ScheduledSelectTreeLeaves(IBlackboard blackboard, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
         {
             FilterConditionDel = SelectTreeLeaf;
         }
 
 
-        public KS_KC_ScheduledSelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
         {
             FilterConditionDel = (Unit unit) => SelectTreeLeaf(unit) && filter(unit);
         }

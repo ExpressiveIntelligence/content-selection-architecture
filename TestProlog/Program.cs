@@ -268,43 +268,43 @@ namespace TestScratchpad
             return new List<object[]>
             {
                 // No specific input pool (global), no queries with bindings, assertion that makes queries true. 
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit3, true) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), no queries with bindings, no assertion to make queries true.  
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[0],
                     new (Unit, bool)[] { (unit1, false), (unit3, false) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), query with binding, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit2, true) },
                     new (Unit, object)[] { (unit2, Symbol.Intern("character1")) } },
 
                 // No specific input pool (global), query with binding, no assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[0],
                     new (Unit, bool)[] { (unit2, false) },
                     new (Unit, object)[0] }, 
 
                 // No specific input pool (global), some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true), (unit3, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")), (unit3, new LogicVariable("V2")) } },
 
                 // No content units on blackboard
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
                     prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[0],
                     new (Unit, object)[0] },
 
                 // Specifying input pool, some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")) } },
@@ -318,7 +318,7 @@ namespace TestScratchpad
             foreach (var test in tests)
             {
                 IBlackboard blackboard = (IBlackboard)test[0];
-                KS_KC_ScheduledPrologEval pe = (KS_KC_ScheduledPrologEval)test[1];
+                KS_ScheduledPrologEval pe = (KS_ScheduledPrologEval)test[1];
                 Unit[] unitsToAdd = (Unit[])test[2];
                 Unit prologKB = (Unit)test[3];
                 Unit[] evaledUnits = (Unit[])test[4];
@@ -337,7 +337,7 @@ namespace TestScratchpad
             }
         }
 
-        public static void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_KC_ScheduledPrologEval prologEval, Unit[] unitsToAdd,
+        public static void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_ScheduledPrologEval prologEval, Unit[] unitsToAdd,
             Unit prologKB, Unit[] evaluatedUnits, string[] assertionsToAdd, (Unit u, bool result)[] evalResults,
             (Unit u, object binding)[] bindings)
         {
@@ -471,7 +471,7 @@ namespace TestScratchpad
             originalUnit.AddComponent(new KC_Text("Here is a node with choices", true));
 
             Unit selectedUnit = new Unit(originalUnit);
-            selectedUnit.AddComponent(new KC_ContentPool(KS_KC_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
+            selectedUnit.AddComponent(new KC_ContentPool(KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
 
             Unit choice1 = new Unit();
             choice1.AddComponent(new KC_IDSelectionRequest("bar", true));
@@ -495,7 +495,7 @@ namespace TestScratchpad
                 // new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit,  new Unit[] { } }, 
 
                 // Selected and original CU, one choice
-                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
 
                 //// Selected and original CU, two choices
                 //new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1, choice2} },
@@ -514,7 +514,7 @@ namespace TestScratchpad
             foreach(var test in tests)
             {
                 IBlackboard blackboard = (IBlackboard)test[0];
-                KS_KC_ScheduledChoicePresenter cp = (KS_KC_ScheduledChoicePresenter)test[1];
+                KS_ScheduledChoicePresenter cp = (KS_ScheduledChoicePresenter)test[1];
                 Unit selectedUnit = (Unit)test[2];
                 Unit originalUnit = (Unit)test[3];
                 Unit[] choices = (Unit[])test[4];
@@ -522,7 +522,7 @@ namespace TestScratchpad
             }
         }
 
-        public static void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_KC_ScheduledChoicePresenter ks, Unit selectedUnit,
+        public static void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, Unit selectedUnit,
             Unit originalUnit, Unit[] choices)
         {
             Debug.Assert((selectedUnit != null && originalUnit != null) || (selectedUnit == null));

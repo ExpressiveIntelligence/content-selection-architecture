@@ -11,9 +11,9 @@ namespace CSA.Demo
 
         public ScheduledSequenceController GenerateTree { get; }
 
-        public KS_KC_ScheduledCleanTree CleanTree { get; }
+        public KS_ScheduledCleanTree CleanTree { get; }
 
-        public KS_KC_ScheduledLinearizeTreeLeaves LinearizeTreeLeaves { get; }
+        public KS_ScheduledLinearizeTreeLeaves LinearizeTreeLeaves { get; }
 
         private const string grammarPool = "GrammarRulePool";
 
@@ -26,44 +26,44 @@ namespace CSA.Demo
             GenerateTree = new ScheduledSequenceController();
 
             // GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledPrintTree(Blackboard));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledSelectTreeLeaves(
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledSelectTreeLeaves(
                 Blackboard,
-                KS_KC_ScheduledContentPoolCollector.GenerateHasComponent<KC_IDSelectionRequest>()));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledHighestTierSelector<KC_Order>(
+                KS_ScheduledContentPoolCollector.GenerateHasComponent<KC_IDSelectionRequest>()));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledHighestTierSelector<KC_Order>(
                 Blackboard, 
-                KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
-                KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledProcessTreeNode(
+                KS_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
+                KS_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledProcessTreeNode(
                 Blackboard,
-                KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
-                KS_KC_ScheduledProcessTreeNode.ActivateIDRequest));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledIDSelector(
+                KS_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
+                KS_ScheduledProcessTreeNode.ActivateIDRequest));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledIDSelector(
                 Blackboard,
                 grammarPool,
-                KS_KC_ScheduledIDSelector.DefaultOutputPoolName));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledUniformDistributionSelector(
+                KS_ScheduledIDSelector.DefaultOutputPoolName));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledUniformDistributionSelector(
                 Blackboard,
-                KS_KC_ScheduledIDSelector.DefaultOutputPoolName,
-                KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName,
+                KS_ScheduledIDSelector.DefaultOutputPoolName,
+                KS_ScheduledUniformDistributionSelector.DefaultOutputPoolName,
                 1));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledDefaultGrammarNonterminalDecomposition(
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledDefaultGrammarNonterminalDecomposition(
                 Blackboard,
-                KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledExpandTreeNode(
+                KS_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledExpandTreeNode(
                 Blackboard,
-                KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
-            GenerateTree.AddKnowledgeSource(new KS_KC_ScheduledFilterPoolCleaner(
+                KS_ScheduledUniformDistributionSelector.DefaultOutputPoolName));
+            GenerateTree.AddKnowledgeSource(new KS_ScheduledFilterPoolCleaner(
                 Blackboard,
                 new string[] {
-                    KS_KC_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
-                    KS_KC_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
-                    KS_KC_ScheduledIDSelector.DefaultOutputPoolName,
-                    KS_KC_ScheduledUniformDistributionSelector.DefaultOutputPoolName
+                    KS_ScheduledSelectTreeLeaves.DefaultOutputPoolName, 
+                    KS_ScheduledTierSelector<KC_Order>.DefaultOutputPoolName,
+                    KS_ScheduledIDSelector.DefaultOutputPoolName,
+                    KS_ScheduledUniformDistributionSelector.DefaultOutputPoolName
                   }));
 
-            CleanTree = new KS_KC_ScheduledCleanTree(Blackboard);
+            CleanTree = new KS_ScheduledCleanTree(Blackboard);
 
-            LinearizeTreeLeaves = new KS_KC_ScheduledLinearizeTreeLeaves(Blackboard);
+            LinearizeTreeLeaves = new KS_ScheduledLinearizeTreeLeaves(Blackboard);
         }
     }
 }

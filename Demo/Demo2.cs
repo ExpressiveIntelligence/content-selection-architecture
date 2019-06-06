@@ -12,26 +12,26 @@ namespace CSA.Demo
     public class Demo2
     {
         // Pool for units that have been selected by ID
-        public const string IDSelectedPool = KS_KC_ScheduledIDSelector.DefaultOutputPoolName;
+        public const string IDSelectedPool = KS_ScheduledIDSelector.DefaultOutputPoolName;
 
         // Pool for units on which prolog expressions have been evaluated
-        public const string PrologEvaledPool = KS_KC_ScheduledPrologEval.DefaultOutputPoolName;
+        public const string PrologEvaledPool = KS_ScheduledPrologEval.DefaultOutputPoolName;
 
         // Pool for units for which their prolog expression evaluated to true
         public const string FilteredPrologResultPool = "FilteredPrologResultPool";
 
         // Pool for units uniformly selected from FilteredPrologResultPool
-        public const string UniformlySelectedOutputPool = KS_KC_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
+        public const string UniformlySelectedOutputPool = KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
  
         public IBlackboard Blackboard { get; }
         public ScheduledSequenceController Controller { get; }
 
-        private readonly KS_KC_ScheduledIDSelector m_IDSelector;
-        private readonly KS_KC_ScheduledPrologEval m_prologEval;
-        private readonly KS_KC_ScheduledFilterSelector m_filterByPrologResult;
-        private readonly KS_KC_ScheduledUniformDistributionSelector m_uniformRandomSelector;
-        private readonly KS_KC_ScheduledChoicePresenter m_choicePresenter;
-        private readonly KS_KC_ScheduledFilterPoolCleaner m_filterPoolCleaner;
+        private readonly KS_ScheduledIDSelector m_IDSelector;
+        private readonly KS_ScheduledPrologEval m_prologEval;
+        private readonly KS_ScheduledFilterSelector m_filterByPrologResult;
+        private readonly KS_ScheduledUniformDistributionSelector m_uniformRandomSelector;
+        private readonly KS_ScheduledChoicePresenter m_choicePresenter;
+        private readonly KS_ScheduledFilterPoolCleaner m_filterPoolCleaner;
 
         public void AddChoicePresenterHandler(EventHandler<KC_PresenterExecuteEventArgs> handler)
         {
@@ -48,9 +48,9 @@ namespace CSA.Demo
             Blackboard = new Blackboard();
             Demo2_DefineUnits(Blackboard);
 
-            m_IDSelector = new KS_KC_ScheduledIDSelector(Blackboard);
+            m_IDSelector = new KS_ScheduledIDSelector(Blackboard);
 
-            m_prologEval = new KS_KC_ScheduledPrologEval(Blackboard,
+            m_prologEval = new KS_ScheduledPrologEval(Blackboard,
                 IDSelectedPool,
                 PrologEvaledPool,
                 ApplTest_Prolog);
@@ -58,19 +58,19 @@ namespace CSA.Demo
             /*
              * fixme: consider creating a filtered by boolean result KS or a more general filter by KC_EvaluatedExpression (once I have more EvaluatedExpressions than Prolog). 
              */
-            m_filterByPrologResult = new KS_KC_ScheduledFilterSelector(Blackboard, 
+            m_filterByPrologResult = new KS_ScheduledFilterSelector(Blackboard, 
                 PrologEvaledPool,
                 FilteredPrologResultPool, 
-                KS_KC_ScheduledPrologEval.FilterByPrologResult(ApplTest_Prolog, true));
+                KS_ScheduledPrologEval.FilterByPrologResult(ApplTest_Prolog, true));
 
-            m_uniformRandomSelector = new KS_KC_ScheduledUniformDistributionSelector(Blackboard, 
+            m_uniformRandomSelector = new KS_ScheduledUniformDistributionSelector(Blackboard, 
                 FilteredPrologResultPool, 
                 UniformlySelectedOutputPool, 1);
 
-            m_choicePresenter = new KS_KC_ScheduledChoicePresenter(Blackboard, 
+            m_choicePresenter = new KS_ScheduledChoicePresenter(Blackboard, 
                 UniformlySelectedOutputPool);
 
-           m_filterPoolCleaner = new KS_KC_ScheduledFilterPoolCleaner(Blackboard,
+           m_filterPoolCleaner = new KS_ScheduledFilterPoolCleaner(Blackboard,
                 new string[]
                 {
                     IDSelectedPool, // Output pool for ID selector

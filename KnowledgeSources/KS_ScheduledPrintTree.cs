@@ -9,7 +9,7 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_ScheduledPrintTree : ScheduledKnowledgeSource
+    public class KS_ScheduledPrintTree : ScheduledKnowledgeSource
     {
         // Name for precondition variable binding
         // fixme: replace the whole dictionary structure thing with typed tuples to pass precondition bindings. 
@@ -77,7 +77,7 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_KC_ScheduledPrintTree(IBlackboard blackboard) : base(blackboard)
+        public KS_ScheduledPrintTree(IBlackboard blackboard) : base(blackboard)
         {
         }
     }

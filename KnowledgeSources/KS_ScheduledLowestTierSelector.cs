@@ -4,7 +4,7 @@ using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
-    public class KS_KC_ScheduledLowestTierSelector<T> : KS_KC_ScheduledTierSelector<T> where T : KnowledgeComponent, IComparable
+    public class KS_ScheduledLowestTierSelector<T> : KS_ScheduledTierSelector<T> where T : KnowledgeComponent, IComparable
     {
         protected override void Execute(IDictionary<string, object> boundVars)
         {
@@ -26,23 +26,23 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        public KS_KC_ScheduledLowestTierSelector(IBlackboard blackboard) : base(blackboard)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard) : base(blackboard)
         {
         }
 
-        public KS_KC_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
         {
         }
 
-        public KS_KC_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
         {
         }
 
-        public KS_KC_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
         {
         }
 
-        public KS_KC_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter)
             : base(blackboard, inputPool, outputPool, filter)
         {
         } 

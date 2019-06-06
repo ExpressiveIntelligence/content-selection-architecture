@@ -1,94 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
-#pragma warning disable CS0618 // Type or member is obsolete
-using static CSA.KnowledgeUnits.CUSlots;
-#pragma warning restore CS0618 // Type or member is obsolete
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    [Obsolete("Use KnowledgeComponent-based ScheduledFilterSelector.")]
-    public class KS_ScheduledFilterSelector : ScheduledKnowledgeSource
+    public class KS_ScheduledFilterSelector : KS_ScheduledContentPoolCollector
     {
-
-        // Name of the bound activation variable
-        protected const string FilteredContentUnits = "FilteredContentUnits";
-
-        // Input and output pools for this filter. 
-        public string InputPool { get; }
+        // Output pool for this filter. 
         public string OutputPool { get; }
 
-        // Define the type for the FilterCondition delegate
-        public delegate bool FilterCondition(ContentUnit cu);
-
-        // Define the field that stores a FilterCondition delegate
-        protected FilterCondition FilterConditionDel;
-
-        // The default filter condition does no filtering. 
-        public static bool DefaultFilterCondition(ContentUnit contentUnit)
+        /*
+         * Copy a Unit to the output pool.
+         */
+        protected Unit CopyUnitToOutputPool(Unit unit)
         {
-            return true;
-        }
+            Unit newUnit = new Unit(unit);
 
-        public static bool SelectFromPool(ContentUnit contentUnit, string inputPool)
-        {
-            return contentUnit.HasMetadataSlot(ContentPool) && contentUnit.Metadata[ContentPool].Equals(inputPool);
-        }
-
-        private bool SelectFromPool(ContentUnit contentUnit)
-        {
-            return SelectFromPool(contentUnit, InputPool);
-        }
-
-        public static FilterCondition GenerateHasMetadataSlotFilter(string slotName)
-        {
-            return (ContentUnit cu) => cu.HasMetadataSlot(slotName);
-        }
-
-        protected override IDictionary<string, object>[] Precondition()
-        {
-            var contentUnits = from contentUnit in m_blackboard.LookupUnits<ContentUnit>()
-                               where FilterConditionDel(contentUnit)
-                               select contentUnit;
-
-            if (contentUnits.Any())
+            /* 
+             * If there is an existing content pool component remove the componenet before adding a new one with the new pool. The case in which there won't be a content pool
+             * component is when copying from the global pool (no pool) into a pool.             
+             */
+            if (newUnit.HasComponent<KC_ContentPool>())
             {
-                // There is at least one CU passing the conditions 
-
-
-                // The binding contains the enumeration of all the CUs that pass the filter condition. 
-                // fixme: Execute will copy all the ContentUnits in the enumeration into the output pool. 
-                var bindings = new IDictionary<string, object>[1];
-
-                bindings[0] = new Dictionary<string, object>
-                {
-                    [FilteredContentUnits] = contentUnits
-                };
-  
-                return bindings;
+                newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
             }
-            else
-            {
-                // No CUs matching the conditions in the InputPool - return empty bindings (length 0). 
-                return m_emptyBindings;
-            }
-        }
+            newUnit.AddComponent(new KC_ContentPool(OutputPool, true));
 
-        protected ContentUnit CopyCUToOutputPool(ContentUnit contentUnit)
-        {
-            ContentUnit newUnit = new ContentUnit(contentUnit);
-            newUnit.Metadata[ContentPool] = OutputPool;
             m_blackboard.AddUnit(newUnit);
-            m_blackboard.AddLink(contentUnit, newUnit, LinkTypes.L_SelectedContentUnit, true); // fixme: need a more general link type for copies between pools
+            m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedUnit, true); // fixme: need a more general link type for copies between pools
             return newUnit;
-        }
-
-        protected IEnumerable<ContentUnit> ContentUnitsFilteredByPrecondition(IDictionary<string, object> boundVars)
-        {
-            return (IEnumerable<ContentUnit>)boundVars[FilteredContentUnits];
         }
 
         /*
@@ -96,46 +38,35 @@ namespace CSA.KnowledgeSources
          */
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            var contentUnits = ContentUnitsFilteredByPrecondition(boundVars);
-            foreach (ContentUnit contentUnit in contentUnits)
+            var units = UnitsFilteredByPrecondition(boundVars);
+            foreach (Unit unit in units)
             {
-                CopyCUToOutputPool(contentUnit);
+                CopyUnitToOutputPool(unit);
             }
         }
 
         public KS_ScheduledFilterSelector(IBlackboard blackboard, string outputPool) : base(blackboard)
         {
             OutputPool = outputPool;
-            FilterConditionDel = DefaultFilterCondition;
         }
 
-        public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard)
+        public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool)
         {
-            InputPool = inputPool;
             OutputPool = outputPool;
-            FilterConditionDel = SelectFromPool;
         }
 
-        public KS_ScheduledFilterSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard)
+        public KS_ScheduledFilterSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, filter)
         {
-            Debug.Assert(filter != null);
-
             OutputPool = outputPool;
-            FilterConditionDel = filter;
         }
 
-         /*
-         * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
-         * as the FilterConditionDel.         
-         */
-        public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter) : base(blackboard)
+        /*
+        * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
+        * as the FilterConditionDel.         
+        */
+        public KS_ScheduledFilterSelector(IBlackboard blackboard, string inputPool, string outputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
         {
-            Debug.Assert(filter != null);
-            Debug.Assert(inputPool != null);
-
-            InputPool = inputPool;
             OutputPool = outputPool;
-            FilterConditionDel = (ContentUnit cu) => SelectFromPool(cu) && filter(cu);
         }
     }
 }

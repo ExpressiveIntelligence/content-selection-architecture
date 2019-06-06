@@ -23,12 +23,12 @@ namespace CSA.Controllers
         private readonly IBlackboard blackboard;
 
         // fixme: currently hardcoding the knowledge sources
-        private readonly KS_KC_ScheduledExecute m_pickLeftmostNodeToExpand;
-        private readonly KS_KC_ScheduledIDSelector m_lookupGrammarRules;
-        private readonly KS_KC_ScheduledUniformDistributionSelector m_chooseGrammarRule;
-        private readonly KS_KC_ScheduledExecute m_treeExpander;
-        private readonly KS_KC_ScheduledFilterPoolCleaner m_cleanSelectionPools;
-        private readonly KS_KC_ScheduledExecute m_addGeneratedSequence;
+        private readonly KS_ScheduledExecute m_pickLeftmostNodeToExpand;
+        private readonly KS_ScheduledIDSelector m_lookupGrammarRules;
+        private readonly KS_ScheduledUniformDistributionSelector m_chooseGrammarRule;
+        private readonly KS_ScheduledExecute m_treeExpander;
+        private readonly KS_ScheduledFilterPoolCleaner m_cleanSelectionPools;
+        private readonly KS_ScheduledExecute m_addGeneratedSequence;
 
         // fixme: this is a hack just to keep the execute from adding more than one U_GeneratedSequence to the blackboard
         // private bool finished = false;
@@ -132,7 +132,7 @@ namespace CSA.Controllers
              * KS_ExponentialDistTierSelector.
              * This decoupling allows other logic to be used in the choice of leaf to expand (such as computing a heuristic for picking a node to expand).
              */
-            m_pickLeftmostNodeToExpand = new KS_KC_ScheduledExecute(
+            m_pickLeftmostNodeToExpand = new KS_ScheduledExecute(
                 () =>
                 {
                     var nonTerminalLeafNodes = from Unit node in blackboard.LookupUnits<Unit>()
@@ -156,18 +156,18 @@ namespace CSA.Controllers
 
             // string idOutputPool = "pool" + DateTime.Now.Ticks;
             string idOutputPool = "idOutputPool";
-            m_lookupGrammarRules = new KS_KC_ScheduledIDSelector(blackboard, grammarRulePool, idOutputPool);
+            m_lookupGrammarRules = new KS_ScheduledIDSelector(blackboard, grammarRulePool, idOutputPool);
 
             // string uniformDistOutputPool = "pool" + DateTime.Now.Ticks;
             string uniformDistOutputPool = "uniformDistOutputPool";
-            m_chooseGrammarRule = new KS_KC_ScheduledUniformDistributionSelector(blackboard, idOutputPool, uniformDistOutputPool, 1);
+            m_chooseGrammarRule = new KS_ScheduledUniformDistributionSelector(blackboard, idOutputPool, uniformDistOutputPool, 1);
 
             /*
              * Replace with KS_ExpandTreeNode. An instance of KS_ExpandTreeNode has:
              * 1) The name of a content pool a unit with a decomposition.
              * 2) The name of a KC_UnitReference containing a pointer to the node to expand. 
              */
-            m_treeExpander = new KS_KC_ScheduledExecute(
+            m_treeExpander = new KS_ScheduledExecute(
                 () =>
                 {
                     var rule = from unit in blackboard.LookupUnits<Unit>()
@@ -220,7 +220,7 @@ namespace CSA.Controllers
                 }
             );
 
-            m_cleanSelectionPools = new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { idOutputPool, uniformDistOutputPool });
+            m_cleanSelectionPools = new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { idOutputPool, uniformDistOutputPool });
 
             bool GenSequencePrecond()
             {
@@ -259,7 +259,7 @@ namespace CSA.Controllers
                 }
             }
 
-            m_addGeneratedSequence = new KS_KC_ScheduledExecute(GenSequenceExec, GenSequencePrecond);
+            m_addGeneratedSequence = new KS_ScheduledExecute(GenSequenceExec, GenSequencePrecond);
         }
     }
 }

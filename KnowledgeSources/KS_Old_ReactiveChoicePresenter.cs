@@ -13,7 +13,7 @@ using static CSA.KnowledgeUnits.KUProps;
 namespace CSA.KnowledgeSources
 {
     [Obsolete("Used ScheduledChoicePresenter until a reactive version of this has been implemented.")]
-    public class KS_ReactiveChoicePresenter : ReactiveKnowledgeSource, IChoicePresenter
+    public class KS_Old_ReactiveChoicePresenter : ReactiveKnowledgeSource, IChoicePresenter
     {
         // Name of the bound activation variable
         private const string SelectedContentUnit = "SelectedContentUnit";
@@ -159,7 +159,7 @@ namespace CSA.KnowledgeSources
             PresenterSelectChoice?.Invoke(this, eventArgs);
         }
 
-        public KS_ReactiveChoicePresenter(IBlackboard blackboard) : base(blackboard)
+        public KS_Old_ReactiveChoicePresenter(IBlackboard blackboard) : base(blackboard)
         {
 
         }

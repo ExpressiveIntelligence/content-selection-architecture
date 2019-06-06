@@ -1,43 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CSA.Core;
-#pragma warning disable CS0618 // Type or member is obsolete
-using static CSA.KnowledgeUnits.CUSlots;
-#pragma warning restore CS0618 // Type or member is obsolete
 
 namespace CSA.KnowledgeSources
 {
-    /* 
-     * KS_FilterPoolCleaner deletes ContentUnits from the specified pools. 
-     * fixme: Like ChoicePresenter, FilterPoolCleaner doesn't copy anything with an output pool. Consider a refactor where the logic for selecting
-     * a collection of content units based on filter condition is pushed up into a class above KS_ScheduledFilterSelector. 
-     */
-    [Obsolete("Use KnowledgeComponent-based version of ScheduledFilterPoolCleaner.")]
     public class KS_ScheduledFilterPoolCleaner : KS_ScheduledFilterSelector
     {
-        private static bool SelectFromInputPools(string[] inputPools, ContentUnit cu)
+        private static bool SelectFromInputPools(string[] inputPools, Unit unit)
         {
-            if (cu.HasMetadataSlot(ContentPool))
+            if (unit.HasComponent<KC_ContentPool>())
             {
-                foreach(string pool in inputPools)
+                foreach (string pool in inputPools)
                 {
-                    if (cu.Metadata[ContentPool].Equals(pool)) return true; 
+                    if (unit.ContentPoolEquals(pool))
+                    {
+                        return true;
+                    }
                 }
             }
-            return false; 
+            return false;
         }
 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            IEnumerable<ContentUnit> contentUnits = ContentUnitsFilteredByPrecondition(boundVars);
-            foreach (var cu in contentUnits)
+            IEnumerable<Unit> units = UnitsFilteredByPrecondition(boundVars);
+            foreach (var unit in units)
             {
-                m_blackboard.RemoveUnit(cu);
+                m_blackboard.RemoveUnit(unit);
             }
         }
 
         public KS_ScheduledFilterPoolCleaner(IBlackboard blackboard, string[] inputPools) :
-            base(blackboard, null, (cu) => SelectFromInputPools(inputPools, cu))
+            base(blackboard, null, (unit) => SelectFromInputPools(inputPools, unit))
         {
         }
     }

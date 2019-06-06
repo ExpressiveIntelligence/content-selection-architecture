@@ -47,21 +47,21 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // KS_IDSelector, empty blackboard
-                new object[] { blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[] { }, false, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[] { }, false, 0 }, 
 
                 // KS_IDSelector, non-matching unit
-                new object[] { blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
 
                 // KS_IDSelector, matching unit, previously matched
-                new object[] { blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") }, true, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") }, true, 0 }, 
 
                 // KS_IDSelector, matching unit, not previously matched
-                new object[] { blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") }, false, 1 }, 
+                new object[] { blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") }, false, 1 }, 
 
                 // KS_IDSelector, multiple matching units, not previously matched
                 new object[]
                 {
-                    blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[]
+                    blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[]
                     {
                         new U_IDSelectRequest("foo"),
                         new U_IDSelectRequest("bar"),
@@ -71,21 +71,21 @@ namespace CSA.Tests
                 },
 
                 // ChoicePresenter, empty blackboard
-                new object[] { blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[] { }, false, 0 }, 
 
                 // ConsoleChoiceSelector, non-matching unit
-                new object[] { blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[] { new TestUnit1("foo") }, false, 0 }, 
 
                 // ChoicePresenter, matching unit, previously matched
-                new object[] { blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
+                new object[] { blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, true, 0 }, 
 
                 // ChoicePresenter, matching unit, not previously matched
-                new object[] { blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
+                new object[] { blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) }, false, 1}, 
 
                 // ChoicePresenter, multiple matching units, not previously matched
                 new object[]
                 {
-                    blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -233,12 +233,12 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // KS_IDSelector, one matching unit
-                new object[] { blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") } }, 
+                new object[] { blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[] { new U_IDSelectRequest("foo") } }, 
 
                 // KS_IDSelector, multiple matching units
                 new object[]
                 {
-                    blackboard, new KS_ReactiveIDSelector(blackboard), new IUnit[]
+                    blackboard, new KS_Old_ReactiveIDSelector(blackboard), new IUnit[]
                     {
                         new U_IDSelectRequest("foo"),
                         new U_IDSelectRequest("bar"),
@@ -247,12 +247,12 @@ namespace CSA.Tests
                  },
 
                 // ChoicePresenter, one matching unit
-                new object[] { blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
+                new object[] { blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[] { new ContentUnit(selectedCU) } }, 
 
                 // ChoicePresenter, multiple matching units
                 new object[]
                 {
-                    blackboard, new KS_ReactiveChoicePresenter(blackboard), new IUnit[]
+                    blackboard, new KS_Old_ReactiveChoicePresenter(blackboard), new IUnit[]
                     {
                         new ContentUnit(selectedCU),
                         new ContentUnit(selectedCU),
@@ -305,7 +305,7 @@ namespace CSA.Tests
         public void TestExecute_KS_IDSelector_SelectedUnit()
         {
             IBlackboard blackboard = new Blackboard();
-            KS_ReactiveIDSelector ks = new KS_ReactiveIDSelector(blackboard);
+            KS_Old_ReactiveIDSelector ks = new KS_Old_ReactiveIDSelector(blackboard);
             List<U_IDSelectRequest> kuList = new List<U_IDSelectRequest>
             {
                 new U_IDSelectRequest("foo"),
@@ -363,7 +363,7 @@ namespace CSA.Tests
         public void TestExecute_KS_IDSelector_NoSelectedUnit()
         {
             IBlackboard blackboard = new Blackboard();
-            KS_ReactiveIDSelector ks = new KS_ReactiveIDSelector(blackboard);
+            KS_Old_ReactiveIDSelector ks = new KS_Old_ReactiveIDSelector(blackboard);
             List<U_IDSelectRequest> kuList = new List<U_IDSelectRequest>
             {
                 new U_IDSelectRequest("qux"),
@@ -501,7 +501,7 @@ namespace CSA.Tests
                 blackboard.AddLink(originalCU, choice, LinkTypes.L_Choice);
             }
 
-            KS_ReactiveChoicePresenter ks = new KS_ReactiveChoicePresenter(blackboard);
+            KS_Old_ReactiveChoicePresenter ks = new KS_Old_ReactiveChoicePresenter(blackboard);
             ks.PresenterExecute += GenerateEventHandler(selectedCU, choices, blackboard);
 
             var KSAs = ks.Precondition();

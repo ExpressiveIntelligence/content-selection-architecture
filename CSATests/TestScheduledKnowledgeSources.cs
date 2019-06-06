@@ -84,37 +84,37 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // Filter with default filter condition
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { unit1, unit2, unit3, unit4 } },
 
                 // Filter with input pool and output pool using input pool selection
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] {unit1, unit2} }, 
 
                 // Filter with output pool and specified filter
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { unit2, unit3 } },
 
                 // Filter with input and output pools and specified filter
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { unit2 } },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, outputPool), new Unit[0], new Unit[0] },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, outputPool), new Unit[0], new Unit[0] },
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
                     new Unit[0] },
 
                 // Nothing in the input pool and specified filter
-                new object[] { blackboard, new KS_KC_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledFilterSelector(blackboard, inputPool, outputPool, TestFilter), new Unit[] { unit3, unit4 },
                     new Unit[0] },
              };
         }
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledFilterSelector))]
-        public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_KC_ScheduledFilterSelector filterSelector, Unit[] unitsToAdd,
+        public void TestExecute_ScheduledFilterSelector(IBlackboard blackboard, KS_ScheduledFilterSelector filterSelector, Unit[] unitsToAdd,
             Unit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
@@ -192,31 +192,31 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // Filter with default filter condition
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { idReq1 }, new Unit[] { unit1, unit3, } }, 
 
                 // Filter with input pool and output pool using input pool selection
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { idReq1 }, new Unit[] {unit1 } }, 
 
                 // Filter with output pool and specified filter
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool, TestFilter), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] { idReq1 }, new Unit[] { unit3 } },
 
                 // Filter with input and output pools and specified filter
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
                     new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { idReq1 }, new Unit[0] },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, outputPool), new Unit[0], new Unit[0],
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, outputPool), new Unit[0], new Unit[0],
                     new Unit[0]},
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool), new Unit[] { unit3, unit4 },
                     new Unit[] { idReq1 }, new Unit[0] },
 
                 // Multiple U_IDRequests
-                new object[] { blackboard, new KS_KC_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
+                new object[] { blackboard, new KS_ScheduledIDSelector(blackboard, inputPool, outputPool, TestFilter),
                     new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { idReq1, idReq2, idReq3}, new Unit[] { unit2 } },
 
              };
@@ -224,7 +224,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledIDSelector))]
-        public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_KC_ScheduledIDSelector filterSelector, Unit[] unitsToAdd,
+        public void TestExecute_ScheduledIDSelector(IBlackboard blackboard, KS_ScheduledIDSelector filterSelector, Unit[] unitsToAdd,
             Unit[] reqsToAdd, Unit[] filteredUnits)
         {
             // Clear the blackboard of any previous testing state
@@ -307,27 +307,27 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // Filter with default filter condition and output pool using seed of 1
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, seed), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, seed), new Unit[] { unit1, unit2, unit3, unit4 },
                     new Unit[] {unit1, unit2, unit3, unit4 } }, 
 
                 // Filter with specified output pool, using seed of 1, requesting 1 CU
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, outputPool, seed),
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, outputPool, seed),
                     new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit1, unit2, unit3, unit4 } }, 
 
                 // Filter with specified input and output pools, specified number to select and seed of 1
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed),
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 2, seed),
                     new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit1, unit2, unit3 } },
 
                 // Filter with specified input and output pools, specified filter, specified number to select and seed of 1
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, TestFilter, 1, seed),
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, TestFilter, 1, seed),
                     new Unit[] { unit1, unit2, unit3, unit4 }, new Unit[] { unit2, unit3 } },
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, 5), new Unit[0],
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, 5), new Unit[0],
                     new Unit[0] },
 
                 // Nothing in the input pool and no filter
-                new object[] { blackboard, new KS_KC_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1),
+                new object[] { blackboard, new KS_ScheduledUniformDistributionSelector(blackboard, inputPool, outputPool, 1, 1),
                     new Unit[] { unit4 }, new Unit[0] },
 
              };
@@ -335,7 +335,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledUniformDistributionSelector))]
-        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_KC_ScheduledUniformDistributionSelector filterSelector,
+        public void TestExecute_ScheduledUniformDistributionSelector(IBlackboard blackboard, KS_ScheduledUniformDistributionSelector filterSelector,
             Unit[] unitsToAdd, Unit[] unitsToSelectFrom)
         {
             int seed = filterSelector.Seed;
@@ -401,27 +401,27 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // One pool to clean
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
                     new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit3, unit4, unit5 } }, 
 
                 // Two pools to clean
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2 }),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2 }),
                     new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit4, unit5 } }, 
 
                 // Three pools to clean
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
                     new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit5 } },
 
                 // Empty pool to clean
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1 }),
                     new Unit[] { unit3, unit4, unit5}, new Unit[] { unit3, unit4, unit5 } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[] { pool1, pool2, pool3 }),
                     new Unit[0], new Unit[0] },
 
                 // No filter pools specified in constructor
-                new object[] { blackboard, new KS_KC_ScheduledFilterPoolCleaner(blackboard, new string[0]),
+                new object[] { blackboard, new KS_ScheduledFilterPoolCleaner(blackboard, new string[0]),
                     new Unit[] { unit1, unit2, unit3, unit4, unit5}, new Unit[] { unit1, unit2, unit3, unit4, unit5 } },
 
              };
@@ -429,7 +429,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledPoolCleaner))]
-        public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_KC_ScheduledFilterPoolCleaner cleaner,
+        public void TestExecute_ScheduledPoolCleaner(IBlackboard blackboard, KS_ScheduledFilterPoolCleaner cleaner,
             Unit[] unitsToAdd, Unit[] unitsRemaining)
         {
             // Clear the blackboard of any previous testing state
@@ -464,7 +464,7 @@ namespace CSA.Tests
             originalUnit.AddComponent(new KC_Text("Here is a node with choices", true));
 
             Unit selectedUnit = new Unit(originalUnit);
-            selectedUnit.AddComponent(new KC_ContentPool(KS_KC_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
+            selectedUnit.AddComponent(new KC_ContentPool(KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool, true));
 
             Unit choice1 = new Unit();
             choice1.AddComponent(new KC_IDSelectionRequest("bar", true));
@@ -485,19 +485,19 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // Selected and original CU, no choices
-                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit,  new Unit[] { } }, 
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit,  new Unit[] { } }, 
 
                 // Selected and original CU, one choice
-                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1 } },
 
                 // Selected and original CU, two choices
-                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1, choice2} },
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), selectedUnit, originalUnit, new Unit[] { choice1, choice2} },
 
                 // empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, null, new Unit[0] },
+                new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, null, new Unit[0] },
 
                 // no selected CU
-                 new object[] { blackboard, new KS_KC_ScheduledChoicePresenter(blackboard), null, originalUnit, new Unit[] { choice1, choice2} },
+                 new object[] { blackboard, new KS_ScheduledChoicePresenter(blackboard), null, originalUnit, new Unit[] { choice1, choice2} },
              };
         }
 
@@ -535,7 +535,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledChoicePresenter))]
-        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_KC_ScheduledChoicePresenter ks, Unit selectedUnit,
+        public void TestExecute_ScheduledChoicePresenter(IBlackboard blackboard, KS_ScheduledChoicePresenter ks, Unit selectedUnit,
             Unit originalUnit, Unit[] choices)
         {
             System.Diagnostics.Debug.Assert((selectedUnit != null && originalUnit != null) || (selectedUnit == null));
@@ -643,49 +643,49 @@ namespace CSA.Tests
             return new List<object[]>
             {
                 // No specific input pool (global), no queries with bindings, assertion that makes queries true. 
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit3, true) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), no queries with bindings, no assertion to make queries true.  
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[0],
                     new (Unit, bool)[] { (unit1, false), (unit3, false) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), query with binding, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit2, true) },
                     new (Unit, object)[] { (unit2, Symbol.Intern("character1")) } },
 
                 // No specific input pool (global), query with binding, no assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[0],
                     new (Unit, bool)[] { (unit2, false) },
                     new (Unit, object)[0] }, 
 
                 // No specific input pool (global), some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true), (unit3, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")), (unit3, new LogicVariable("V2")) } },
                     
                 // No content units on blackboard
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
                     prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[0],
                     new (Unit, object)[0] },
 
                 // Specifying input pool, some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")) } },
 
                 // Global input pool, prolog expressions with different names (not ApplTest_Prolog), so no expressions should be evaluated. 
-                new object[] { blackboard, new KS_KC_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit5, unit6 }, 
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit5, unit6 }, 
                     prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[0],
                     new (Unit, object)[0] },
@@ -694,7 +694,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledPrologEval))]
-        public void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_KC_ScheduledPrologEval prologEval, Unit[] unitsToAdd,
+        public void TestExecute_ScheduledPrologEval(IBlackboard blackboard, KS_ScheduledPrologEval prologEval, Unit[] unitsToAdd,
             Unit prologKB, Unit[] evaluatedUnits, string[] assertionsToAdd, (Unit u, bool result)[] evalResults,
             (Unit u, object binding)[] bindings) 
         {
@@ -848,45 +848,45 @@ namespace CSA.Tests
                  */
                 #region HighestTierSelector test cases
                 // No input pool, default output pool, KC_Order as tier slot
-                new object[] { blackboard,  new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard),
+                new object[] { blackboard,  new KS_ScheduledHighestTierSelector<KC_Order>(blackboard),
                     units.Take(5), new Unit[] { units[4] } }, 
 
                 // No input pool, specified output pool, KC_Order as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1"),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1"),
                     units.Take(5), new Unit[] { units[4] } }, 
 
                 // Input pool, specified output pool, KC_Order as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
                     units.Take(5), new Unit[] { units[0], units[2] } },
 
                 // No input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() < 6),
+                    new KS_ScheduledHighestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() < 6),
                     units.Take(5), new Unit[] { units[0], units[2] } },
                               
                 // Input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() < 5),
+                    new KS_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() < 5),
                     units.Take(5), new Unit[] { units[1] } },
 
                 // No input pool, default output pool, KC_Text as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Text>(blackboard),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Text>(blackboard),
                     units.Skip(5).Take(5), new Unit[] { units[9] } }, 
 
                 // No input pool, default output pool, KC_Utility as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Utility>(blackboard),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Utility>(blackboard),
                     units.Skip(10), new Unit[] { units[14] } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Order>(blackboard),
                     new Unit[0], new Unit[0] }, 
 
                 // Empty pool
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_Order>(blackboard, pool1, "output1"),
                     units.Skip(3).Take(2), new Unit[0] },
 
                 // Non-existant KC_UnitID tier slot
-                new object[] { blackboard, new KS_KC_ScheduledHighestTierSelector<KC_UnitID>(blackboard),
+                new object[] { blackboard, new KS_ScheduledHighestTierSelector<KC_UnitID>(blackboard),
                     units.Skip(5).Take(5), new Unit[0] },
                 #endregion
 
@@ -895,45 +895,45 @@ namespace CSA.Tests
                  */
                 #region LowestTierSelector test cases
                 // No input pool, default output pool, KC_Order as tier slot
-                new object[] { blackboard,  new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard),
+                new object[] { blackboard,  new KS_ScheduledLowestTierSelector<KC_Order>(blackboard),
                     units.Take(5), new Unit[] { units[1], units[3] } }, 
 
                 // No input pool, specified output pool, KC_Order as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1"),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1"),
                     units.Take(5), new Unit[] { units[1], units[3] } }, 
 
                 // Input pool, specified output pool, KC_Order as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
                     units.Take(5), new Unit[] { units[1] } },
 
                 // No input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() > 5),
+                    new KS_ScheduledLowestTierSelector<KC_Order>(blackboard, "output1", (Unit unit) => unit.GetOrder() > 5),
                     units.Take(5), new Unit[] { units[4] } },
                               
                 // Input pool, specified output pool, filter condition, KC_Order as tier slot
                 new object[] { blackboard,
-                    new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() > 3),
+                    new KS_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1", (Unit unit) => unit.GetOrder() > 3),
                     units.Take(5), new Unit[] { units[0], units[2] } },
 
                 // No input pool, default output pool, KC_Text as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Text>(blackboard),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Text>(blackboard),
                     units.Skip(5).Take(5), new Unit[] { units[6], units[8] } }, 
 
                 // No input pool, default output pool, KC_Utility as tier slot
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Utility>(blackboard),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Utility>(blackboard),
                     units.Skip(10), new Unit[] { units[11], units[13] } }, 
 
                 // Empty blackboard
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Order>(blackboard),
                     new Unit[0], new Unit[0] }, 
 
                 // Empty pool
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_Order>(blackboard, pool1, "output1"),
                     units.Skip(3).Take(2), new Unit[0] },
 
                 // Non-existant KC_UnitID tier slot
-                new object[] { blackboard, new KS_KC_ScheduledLowestTierSelector<KC_UnitID>(blackboard),
+                new object[] { blackboard, new KS_ScheduledLowestTierSelector<KC_UnitID>(blackboard),
                     units.Skip(5).Take(5), new Unit[0] },
                 #endregion
 
@@ -942,7 +942,7 @@ namespace CSA.Tests
 
         [Theory]
         [MemberData(nameof(Data_TestExecute_ScheduledTierSelector))]
-        public void TestExecute_ScheduledTierSelector<T>(IBlackboard blackboard, KS_KC_ScheduledTierSelector<T> tierSelector,
+        public void TestExecute_ScheduledTierSelector<T>(IBlackboard blackboard, KS_ScheduledTierSelector<T> tierSelector,
             Unit[] unitsToAdd, Unit[] filteredUnits) where T : KnowledgeComponent, IComparable
         {
             // Clear the blackboard of any previous testing state

@@ -12,7 +12,7 @@ namespace CSA.KnowledgeSources
      * I will return to making ReactivePrologEval work when I have a general solution for reactive knowledge source activation. 
      */
     [Obsolete("Use ScheduledPrologEval until a reactive version of this has been implemented.")]
-    public class KS_ReactivePrologEval : ReactiveKnowledgeSource
+    public class KS_Old_ReactivePrologEval : ReactiveKnowledgeSource
     {
         // Name of the bound context variables
         private const string PrologEvalRequest = "PrologEvalRequest";
@@ -104,7 +104,7 @@ namespace CSA.KnowledgeSources
 
         }
 
-        public KS_ReactivePrologEval(IBlackboard blackboard) : base(blackboard)
+        public KS_Old_ReactivePrologEval(IBlackboard blackboard) : base(blackboard)
         {
         }
     }

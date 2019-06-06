@@ -6,83 +6,45 @@ using System.Diagnostics;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-using static CSA.KnowledgeUnits.CUSlots;
-#pragma warning restore CS0618 // Type or member is obsolete
-
 namespace CSA.KnowledgeSources
 {
-    /* fixme: currently making this a parent of KS_ScheduledFilterSelector. But this is just to inherit all the mechanism related to handling input 
-     * pools in the precondition. Better will be to have a hierarchy with two siblings: Filter (which copies some subset from input to output pools), 
-     * and Process (which does some manipulation of ContentUnits passing some filter criterion, including input pool). The PrologEval unit still copies
-     * CUs because it's modifying meta-data, while Display doesn't do meta-data modification. So not clear if the are both subclasses of Process or not. 
-     */
-    [Obsolete("Use KnowledgeComponent-based version of this controller.")]
-    public class KS_ScheduledChoicePresenter : KS_ScheduledFilterSelector, IChoicePresenter
+    public class KS_ScheduledChoicePresenter : KS_ScheduledContentPoolCollector, I_KC_ChoicePresenter
     {
         public const string DefaultChoicePresenterInputPool = "ContentUnitToDisplay";
 
         // The delegate for event handling within the Execute() method
-        public event EventHandler<PresenterExecuteEventArgs> PresenterExecute;
+        public event EventHandler<KC_PresenterExecuteEventArgs> PresenterExecute;
 
         // The delegate for event handling within the SelectChoice method
-        public event EventHandler<SelectChoiceEventArgs> PresenterSelectChoice;
+        public event EventHandler<KC_SelectChoiceEventArgs> PresenterSelectChoice;
 
-        /*
-         * Recursively searches back through L_SelectedContentUnit links until it finds the original content unit.
-         */
-         // fixme: remove this when this class is converted to KS_KC_ScheduledChoicePresenter - it will be inherited from ContentPoolCollector.
-        protected ContentUnit FindOriginalContentUnit(ContentUnit cu)
-        {
-            var linkToPreviousCUInFilterChain = from link in m_blackboard.LookupLinks(cu)
-                                                where link.LinkType.Equals(LinkTypes.L_SelectedContentUnit)
-                                                where link.Direction.Equals(LinkDirection.Start)
-                                                select link;
-
-            int count = linkToPreviousCUInFilterChain.Count();
-
-            // There should be 0 (if we've reached the original) or 1 (if we're still crawling back up the filter chain) links.
-            Debug.Assert(count == 0 || count == 1);
-
-            if (count == 0)
-            {
-                return cu; // The passed in CU was the parent of a chain.
-            }
-            else
-            {
-                // Recursively search back up the filter chain
-                (IUnit previousCUInChain, _, _) = linkToPreviousCUInFilterChain.ElementAt(0);
-                return FindOriginalContentUnit((ContentUnit)previousCUInChain);
-            }
-        }
-
-        // Returns an Enumerable of choices. Choices are ContentUnits linked to this ContentUnit by Choice links. 
+        // Returns an Enumerable of choices. Choices are Units linked to the filtered Unit by Choice links. 
         // fixme: add support for choices stored not as linked content, but as a query for selecting choices. 
-        protected ContentUnit[] GetChoices(ContentUnit selectedCU)
+        protected Unit[] GetChoices(Unit selectedUnit)
         {
-            ContentUnit originalCU = FindOriginalContentUnit(selectedCU);
+            Unit originalUnit = FindOriginalUnit(selectedUnit);
 
-            // Gather the choices connected to the originalCU.
-            IEnumerable<ContentUnit> choices = from link in m_blackboard.LookupLinks(originalCU)
-                                               where link.LinkType.Equals(LinkTypes.L_Choice)
-                                               select (ContentUnit)link.Node;
+            // Gather the choices connected to the originalUnit.
+            IEnumerable<Unit> choices = from link in m_blackboard.LookupLinks(originalUnit)
+                                        where link.LinkType.Equals(LinkTypes.L_Choice)
+                                        select (Unit)link.Node;
 
             return choices.ToArray();
         }
 
-        // Gathers the choices for the selected content unit and calls any registered event handlers. 
+        // Gathers the choices for the selected unit and calls any registered event handlers. 
         protected override void Execute(IDictionary<string, object> boundVars)
         {
-            var selectedCUs = ContentUnitsFilteredByPrecondition(boundVars);
+            var selectedUnits = UnitsFilteredByPrecondition(boundVars);
 
-            // fixme: now that we're passing choice info as params should be able to handle multiple selected CUs
-            Debug.Assert(selectedCUs.Count() == 1); 
+            // fixme: now that we're passing choice info as params should be able to handle multiple selected Units
+            Debug.Assert(selectedUnits.Count() == 1);
 
-            ContentUnit selectedCU = selectedCUs.First();
+            Unit selectedUnit = selectedUnits.First();
 
-            string textToDisplay = (string)selectedCU.Content[Text];
+            string textToDisplay = selectedUnit.GetText();
 
-            ContentUnit[] choices = GetChoices(selectedCU);
+            Unit[] choices = GetChoices(selectedUnit);
 
             string[] choicesToDisplay;
 
@@ -90,9 +52,9 @@ namespace CSA.KnowledgeSources
             {
                 int choiceCounter = 0;
                 choicesToDisplay = new string[choices.Count()];
-                foreach (ContentUnit choice in choices)
+                foreach (Unit choice in choices)
                 {
-                    choicesToDisplay[choiceCounter++] = (string)choice.Content[Text];
+                    choicesToDisplay[choiceCounter++] = choice.GetText();
                 }
             }
             else
@@ -101,26 +63,29 @@ namespace CSA.KnowledgeSources
                 choicesToDisplay = new string[0];
             }
 
-            PresenterExecuteEventArgs eventArgs = new PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
+            KC_PresenterExecuteEventArgs eventArgs = new KC_PresenterExecuteEventArgs(textToDisplay, choicesToDisplay, choices);
             OnExecute(eventArgs);
         }
 
-        protected virtual void OnExecute(PresenterExecuteEventArgs eventArgs)
+        protected virtual void OnExecute(KC_PresenterExecuteEventArgs eventArgs)
         {
             PresenterExecute?.Invoke(this, eventArgs);
         }
 
         /*
-         * Given an array of choices and a 0-indexed choice selection, adds the appropriate query to the blackboard. 
-         */        
-        public void SelectChoice(ContentUnit[] choices, uint choiceMade)
+         * Given an array of choices and a 0-indexed choice selection, activates the KC_IDSelectionRequest on the selected choice and
+         * call any actions registered on PresenterSelectChoice.         
+         */
+        public void SelectChoice(Unit[] choices, uint choiceMade)
         {
             if (choiceMade < choices.Length)
             {
-                // Add a U_IDQuery to blackboard for the target content unit associated with the choice. 
-                ContentUnit selectedChoice = choices[choiceMade];
-                m_blackboard.AddUnit(new U_IDSelectRequest((string)selectedChoice.Metadata[TargetContentUnitID]));
-                SelectChoiceEventArgs eventArgs = new SelectChoiceEventArgs(selectedChoice, m_blackboard);
+                // Activate the KC_IDSelectionRequest associated with the choice. 
+                Unit selectedChoice = choices[choiceMade];
+                selectedChoice.SetActiveRequest(true);
+
+                // Do any actions that have been registered on PresenterSelectChoice. 
+                KC_SelectChoiceEventArgs eventArgs = new KC_SelectChoiceEventArgs(selectedChoice, m_blackboard);
                 OnSelectChoice(eventArgs);
             }
             else
@@ -129,22 +94,22 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        protected virtual void OnSelectChoice(SelectChoiceEventArgs eventArgs)
+        protected virtual void OnSelectChoice(KC_SelectChoiceEventArgs eventArgs)
         {
             PresenterSelectChoice?.Invoke(this, eventArgs);
         }
 
         /*
-         * Constructor with no input pool specified, use the default input pool. The output pool is null since it won't be used by Execute().
+         * Constructor with no input pool specified, use the default input pool.
          */
-        public KS_ScheduledChoicePresenter(IBlackboard blackboard) : base(blackboard, DefaultChoicePresenterInputPool, (string)null)
+        public KS_ScheduledChoicePresenter(IBlackboard blackboard) : base(blackboard, DefaultChoicePresenterInputPool)
         {
         }
 
         /*
-         * If called with a specified inputPool, use the input pool. The output pool is null since it won't be used by Execute().
+         * Constructor with specified inputPool.
          */
-        public KS_ScheduledChoicePresenter(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool, (string)null)
+        public KS_ScheduledChoicePresenter(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
         {
         }
 

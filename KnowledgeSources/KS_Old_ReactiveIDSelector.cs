@@ -12,7 +12,7 @@ using static CSA.KnowledgeUnits.KUProps;
 namespace CSA.KnowledgeSources
 {
     [Obsolete("Use ScheduledIDSelector until a reactive version of this has been implemented.")]
-    public class KS_ReactiveIDSelector : ReactiveKnowledgeSource
+    public class KS_Old_ReactiveIDSelector : ReactiveKnowledgeSource
     {
         // Name of the bound context variable
         private const string IDSelectRequest = "IDSelectRequest";
@@ -97,7 +97,7 @@ namespace CSA.KnowledgeSources
             m_blackboard.RemoveUnit((IUnit)boundVars[IDSelectRequest]);
          }
          
-        public KS_ReactiveIDSelector(IBlackboard blackboard) : base(blackboard)
+        public KS_Old_ReactiveIDSelector(IBlackboard blackboard) : base(blackboard)
         {
 
         }

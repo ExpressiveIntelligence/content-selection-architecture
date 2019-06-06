@@ -13,7 +13,7 @@ namespace CSA.Demo
     {
         public IBlackboard Blackboard { get; }
         private readonly IReactiveKnowledgeSource m_IDSelector;
-        private readonly KS_ReactiveChoicePresenter m_KSChoicePresenter;
+        private readonly KS_Old_ReactiveChoicePresenter m_KSChoicePresenter;
         public IReactiveController Controller { get; }
 
         /*
@@ -35,10 +35,10 @@ namespace CSA.Demo
             Demo1_Slots_DefineCUs(Blackboard);
 
             // Set up the knowledge sources
-            m_IDSelector = new KS_ReactiveIDSelector(Blackboard);
+            m_IDSelector = new KS_Old_ReactiveIDSelector(Blackboard);
 
             // fixme: Need to come up with interfaces for presenters, but won't know what the general presenter framework looks like until I've written more of them. 
-            m_KSChoicePresenter = new KS_ReactiveChoicePresenter(Blackboard);
+            m_KSChoicePresenter = new KS_Old_ReactiveChoicePresenter(Blackboard);
             m_IDSelector.Properties[Priority] = 20;
             m_KSChoicePresenter.Properties[Priority] = 10;
 

@@ -10,7 +10,7 @@ namespace CSA.KnowledgeSources
     /* 
      * Given a tree, adds a Unit to the blackboard containing the left-to-right sequence of tree leaves. 
      */
-    public class KS_KC_ScheduledLinearizeTreeLeaves : KS_KC_ScheduledContentPoolCollector
+    public class KS_ScheduledLinearizeTreeLeaves : KS_ScheduledContentPoolCollector
     {
 
         /*
@@ -51,20 +51,20 @@ namespace CSA.KnowledgeSources
             return unit.HasComponent<KC_TreeNode>() && unit.IsTreeRoot();
         }
 
-        public KS_KC_ScheduledLinearizeTreeLeaves(IBlackboard blackboard) : base(blackboard, SelectTreeRoot)
+        public KS_ScheduledLinearizeTreeLeaves(IBlackboard blackboard) : base(blackboard, SelectTreeRoot)
         {
         }
 
-        public KS_KC_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool, SelectTreeRoot)
+        public KS_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool, SelectTreeRoot)
         {
         }
 
-        public KS_KC_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, FilterCondition filter) :
+        public KS_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, FilterCondition filter) :
             base(blackboard, (Unit unit) => SelectTreeRoot(unit) && filter(unit))
         {
         }
 
-        public KS_KC_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, string inputPool, FilterCondition filter) :
+        public KS_ScheduledLinearizeTreeLeaves(IBlackboard blackboard, string inputPool, FilterCondition filter) :
             base(blackboard, inputPool, (Unit unit) => SelectTreeRoot(unit) && filter(unit))
         {
         }
