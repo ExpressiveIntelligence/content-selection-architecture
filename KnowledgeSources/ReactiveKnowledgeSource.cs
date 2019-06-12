@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Need a new implemention of reactive knowledge sources. Use ScheduledKnowledgeSources for now.")]
     public abstract class ReactiveKnowledgeSource : IReactiveKnowledgeSource
     {
         public IDictionary<string, object> Properties { get; }

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Need a new implementation of reactive knowledge sources. Use ScheduledKnowledgeSources for now.")]
     public interface IReactiveKnowledgeSource
     {
 

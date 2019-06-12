@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Need a new implemention of reactive knowledge sources. Use ScheduledKnowledgeSources for now.")]
     public interface IKnowledgeSourceActivation
     {
         // Properties of the knowledge source associated with this knowledge source activation

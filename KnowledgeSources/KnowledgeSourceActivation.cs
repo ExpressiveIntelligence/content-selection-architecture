@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
+    [Obsolete("Need a new implemention of reactive knowledge sources. Use ScheduledKnowledgeSources for now.")]
     public class KnowledgeSourceActivation : IKnowledgeSourceActivation
     {
         // Variable bindings bound by the precondition for this activation 
