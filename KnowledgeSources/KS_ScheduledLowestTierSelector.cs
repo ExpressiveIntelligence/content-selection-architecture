@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
     public class KS_ScheduledLowestTierSelector<T> : KS_ScheduledTierSelector<T> where T : KnowledgeComponent, IComparable
     {
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
             // Returns array sorted lowest to highest value on KnowledgeComponent T
             Unit[] units = SortUnitsFilteredByPrecondition(boundVars);

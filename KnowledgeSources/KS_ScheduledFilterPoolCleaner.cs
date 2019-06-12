@@ -20,9 +20,10 @@ namespace CSA.KnowledgeSources
             return false;
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            IEnumerable<Unit> units = UnitsFilteredByPrecondition(boundVars);
+            var units = (IEnumerable<Unit>)boundVars[FilteredUnits];
+
             foreach (var unit in units)
             {
                 m_blackboard.RemoveUnit(unit);

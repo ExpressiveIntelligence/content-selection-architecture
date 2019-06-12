@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
@@ -31,9 +30,9 @@ namespace CSA.KnowledgeSources
             }
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            IEnumerable<Unit> treeRoots = UnitsFilteredByPrecondition(boundVars);
+            var treeRoots = (IEnumerable<Unit>)boundVars[FilteredUnits];
 
             // There should be one tree root that we're collecting the leaves for.
             Debug.Assert(treeRoots.Count() == 1);

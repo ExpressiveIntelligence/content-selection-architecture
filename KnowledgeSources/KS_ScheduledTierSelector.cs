@@ -17,9 +17,9 @@ namespace CSA.KnowledgeSources
         /*
          * Returns an array of the Units filtered by the precondition sorted from lowest to highest value on KnowledgeComponent T
          */
-        protected Unit[] SortUnitsFilteredByPrecondition(IDictionary<string, object> boundVars)
+        protected Unit[] SortUnitsFilteredByPrecondition(object[] boundVars)
         {
-            Unit[] units = UnitsFilteredByPrecondition(boundVars).ToArray();
+            Unit[] units = ((IEnumerable<Unit>)boundVars[FilteredUnits]).ToArray();
 
             // Sort the units by the KnowledgeComponent T, from smallest to largest
             Array.Sort(units, (x, y) => x.GetComponent<T>().CompareTo(y.GetComponent<T>()));

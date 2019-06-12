@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
@@ -9,9 +8,9 @@ namespace CSA.KnowledgeSources
 {
     public class KS_ScheduledDefaultGrammarNonterminalDecomposition : KS_ScheduledContentPoolCollector
     {
-        protected const string TargetIDForDefault = "TargetIDForDefault";
+        protected const int TargetIDForDefault = 0;
 
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             var decompBindings = base.Precondition();
             if (decompBindings == m_emptyBindings)
@@ -36,11 +35,9 @@ namespace CSA.KnowledgeSources
 
                     Debug.Assert(targetIDSet.Count() == 1); // There should be exactly one target ID.
 
-                    IDictionary<string, object>[] bindings = new IDictionary<string, object>[1];
-                    bindings[0] = new Dictionary<string, object>
-                    {
-                        [TargetIDForDefault] = targetIDSet.First()
-                    };
+                    object[][] bindings = new object[1][];
+
+                    bindings[0] = new object[] { targetIDSet.First() };
 
                     return bindings;
                 }
@@ -50,7 +47,7 @@ namespace CSA.KnowledgeSources
             return m_emptyBindings;
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
             string targetID = (string)boundVars[TargetIDForDefault];
             Unit pseudoRule = new Unit();

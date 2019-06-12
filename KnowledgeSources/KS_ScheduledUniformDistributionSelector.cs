@@ -40,9 +40,9 @@ namespace CSA.KnowledgeSources
             return shuffledUnits;
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            var units = UnitsFilteredByPrecondition(boundVars);
+            var units = (IEnumerable<Unit>)boundVars[FilteredUnits];
 
             // If the number of units is <= the number we're supposed to uniformly select, then select all of them
             if (units.Count() <= NumberToSelect)

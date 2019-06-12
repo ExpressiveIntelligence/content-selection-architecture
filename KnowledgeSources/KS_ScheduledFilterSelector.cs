@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 
@@ -36,9 +34,10 @@ namespace CSA.KnowledgeSources
         /*
          * On Execute(), the abstract FilterSelector copys the filtered CUs from the input pool to the output pool.  
          */
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            var units = UnitsFilteredByPrecondition(boundVars);
+            IEnumerable<Unit> units = (IEnumerable<Unit>)boundVars[FilteredUnits];
+
             foreach (Unit unit in units)
             {
                 CopyUnitToOutputPool(unit);

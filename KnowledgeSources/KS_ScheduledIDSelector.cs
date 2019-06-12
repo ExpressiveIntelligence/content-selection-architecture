@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 
@@ -13,7 +12,7 @@ namespace CSA.KnowledgeSources
     {
         public const string DefaultOutputPoolName = "SelectedByID";
 
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             // fixme: consider adding additional fields to request units to indicate additional filtering, so that filter logic is associated with the request rather than the KS.
             // Use LINQ to create a collection of the requested U_IDSelectRequests on the blackboard.
@@ -26,7 +25,7 @@ namespace CSA.KnowledgeSources
             {
                 // There are some requests - iterate through each of the requests creating bindings for the filtered content units
 
-                var bindings = new IDictionary<string, object>[requests.Count()];
+                var bindings = new object[requests.Count()][];
 
                 int i = 0;
                 foreach (Unit request in requests)
@@ -45,13 +44,9 @@ namespace CSA.KnowledgeSources
                                 where unit.UnitIDEquals(targetUnitID) // and the ID equals the target ID
                                 select unit;
 
-                    bindings[i++] = new Dictionary<string, object>
-                    {
-                        [FilteredUnits] = units
-                    };
+                    bindings[i++] = new object[] { units };
                     // Don't want to remove it from the blackboard as some IDSelectionRequests are part of trees (and will thus be the parent for the decomposition). 
                     // Instead mark the request as not active. Something else will have to clean up inactive reqeusts. 
-                    // m_blackboard.RemoveUnit(request); // Remove the U_IDSelectRequest from the blackboard
                     request.SetActiveRequest(false);
                 }
                 return bindings;
@@ -84,5 +79,4 @@ namespace CSA.KnowledgeSources
         {
         }
     }
-
 }

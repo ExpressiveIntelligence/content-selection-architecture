@@ -15,9 +15,10 @@ namespace CSA.KnowledgeSources
         // Field for storing instantiation of process tree node.
         public ProcessNode m_processNode; 
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            var units = UnitsFilteredByPrecondition(boundVars);
+            var units = (IEnumerable<Unit>)boundVars[FilteredUnits];
+
             if (units.Count() > 1)
             {
                 throw new InvalidOperationException("KS_ProcessTreeNode called with " + units.Count() + " selected tree nodes. There should only be 1.");

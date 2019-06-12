@@ -4,8 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <LangVersion>latest</LangVersion>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>latest</LangVersion>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'UnitTest|AnyCPU' ">
     <IntermediateOutputPath>obj\UnitTest</IntermediateOutputPath>
     <DebugSymbols>true</DebugSymbols>
@@ -14,7 +20,8 @@
     <OutputPath>bin\UnitTest</OutputPath>
     <DefineConstants>UNIT_TEST;TRACE;DEBUG;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
     <NoWarn></NoWarn>
-    <NoStdLib>false</NoStdLib>
+    <NoStdLib>true</NoStdLib>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CSACore\CSACore.csproj" />

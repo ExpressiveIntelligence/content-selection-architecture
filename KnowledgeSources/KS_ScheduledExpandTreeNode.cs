@@ -9,11 +9,11 @@ namespace CSA.KnowledgeSources
 {
     public class KS_ScheduledExpandTreeNode : KS_ScheduledContentPoolCollector
     {
-        protected const string Decomposition = "Decomposition";
-        protected const string NodeToExpandRef = "NodeToExpand";
-        protected const string OrderCounter = "OrderCounter";
+        protected const int Decomposition = 0;
+        protected const int NodeToExpandRef = 1;
+        protected const int OrderCounter = 2;
 
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             // First execute the base precondition to get the decomposition to use.
             var decompBinding = base.Precondition();
@@ -25,7 +25,7 @@ namespace CSA.KnowledgeSources
                 // There should be exactly one set of bindings. 
                 Debug.Assert(decompBinding.Length == 1);
 
-                var filteredDecomps = UnitsFilteredByPrecondition(decompBinding[0]);
+                IEnumerable<Unit> filteredDecomps = (IEnumerable<Unit>)decompBinding[0][FilteredUnits];
 
                 // There should be one decomposition in the binding
                 Debug.Assert(filteredDecomps.Count() == 1);
@@ -59,15 +59,9 @@ namespace CSA.KnowledgeSources
                     Unit orderCounterUnit = orderCounterQuery.FirstOrDefault();
 
                     // Create the new bindings with the decomposition and the node to expand.
-                    IDictionary<string, object>[] bindings = new Dictionary<string, object>[1];
+                    object[][] bindings = new object[1][];
 
-
-                    bindings[0] = new Dictionary<string, object>
-                    {
-                        [Decomposition] = filteredDecomps.First(),
-                        [NodeToExpandRef] = nodeToExpandQuery.First(),
-                        [OrderCounter] = orderCounterUnit
-                    };
+                    bindings[0] = new object[] { filteredDecomps.First(), nodeToExpandQuery.First(), orderCounterUnit }; 
 
                     return bindings;
                 }
@@ -76,7 +70,7 @@ namespace CSA.KnowledgeSources
             return m_emptyBindings;
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
             Unit nodeToExpandRef = (Unit)boundVars[NodeToExpandRef];
             Unit decomposition = (Unit)boundVars[Decomposition];

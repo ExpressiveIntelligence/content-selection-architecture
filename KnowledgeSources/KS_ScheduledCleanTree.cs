@@ -6,9 +6,9 @@ namespace CSA.KnowledgeSources
 {
     public class KS_ScheduledCleanTree : KS_ScheduledContentPoolCollector
     {
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            var treeNodes = UnitsFilteredByPrecondition(boundVars);
+            IEnumerable<Unit> treeNodes = (IEnumerable<Unit>)boundVars[FilteredUnits];
             foreach(Unit node in treeNodes)
             {
                 m_blackboard.RemoveUnit(node);

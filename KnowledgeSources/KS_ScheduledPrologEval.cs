@@ -9,8 +9,8 @@ namespace CSA.KnowledgeSources
 
     public class KS_ScheduledPrologEval : KS_ScheduledFilterSelector
     {
-        // Binding name for the prolog knowledge base. 
-        public const string PrologKB = "PrologKB";
+        // Binding index for the prolog knowledge base. 
+        public const int PrologKB = 1;
 
         public const string DefaultOutputPoolName = "PrologQueryEvaluted";
 
@@ -80,7 +80,7 @@ namespace CSA.KnowledgeSources
          * The precondition binds the units with an appropriately named prolog expression in the input pool and the 
          * global prolog knowledge base.         
          */
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             var prologExpBinding = base.Precondition();
             if (prologExpBinding.Any())
@@ -102,10 +102,12 @@ namespace CSA.KnowledgeSources
                     // There should be one prolog KB (currently only handling a global KB)
                     Debug.Assert(prologKBQuery.Count() == 1);
 
-                    // Add the prologKB to the prologExp binding
-                    prologExpBinding[0][PrologKB] = prologKBQuery.First();
+                    object[][] newBindings = new object[1][];
 
-                    return prologExpBinding;
+                    // Add the prologKB to the prologExp binding
+                    newBindings[0] = new object[] { prologExpBinding[0][FilteredUnits], prologKBQuery.First() }; 
+
+                    return newBindings;
                 }
             }
             // Either no Units with appropriately named prolog exp found or no prolog KB found
@@ -115,10 +117,10 @@ namespace CSA.KnowledgeSources
         /*
          * Copy all the units bound by the precondition into the OutputPool adding a KC_EvaluatablePrologExpression and evaluate the expression.
          */
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
             // Get the units and the prolog KB from the precondition bindings.
-            var units = UnitsFilteredByPrecondition(boundVars);
+            var units = (IEnumerable<Unit>)boundVars[FilteredUnits];
             Unit prologKB = (Unit)boundVars[PrologKB];
 
             // Copy each of the units to the output pool, adding a KC_EvaluatablePrologExpression and evaluating it. 

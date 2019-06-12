@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
@@ -12,10 +11,9 @@ namespace CSA.KnowledgeSources
     public class KS_ScheduledPrintTree : ScheduledKnowledgeSource
     {
         // Name for precondition variable binding
-        // fixme: replace the whole dictionary structure thing with typed tuples to pass precondition bindings. 
-        public const string TreeRoot = "TreeRoot";
+        public const int TreeRoot = 0; 
 
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             var treeRoot = from Unit node in m_blackboard.LookupUnits<Unit>()
                            where node.HasComponent<KC_TreeNode>() && node.IsTreeRoot()
@@ -26,17 +24,15 @@ namespace CSA.KnowledgeSources
             if (treeRoot.Any())
             {
                 Debug.Assert(treeRoot.Count() == 1);
-                IDictionary<string, object>[] bindings = new Dictionary<string, object>[1];
-                bindings[0] = new Dictionary<string, object>
-                {
-                    [TreeRoot] = treeRoot.First()
-                };
+                object[][] bindings = new object[1][];
+                bindings[TreeRoot][0] = new object[] { treeRoot.First() };
+
                 return bindings;
             }
             return m_emptyBindings; 
         }
 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
             Unit rootNode = (Unit)boundVars[TreeRoot];
             Console.WriteLine(rootNode);

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using CSA.Core;
@@ -15,8 +14,8 @@ namespace CSA.KnowledgeSources
      */
     public abstract class KS_ScheduledContentPoolCollector : ScheduledKnowledgeSource
     {
-        // Name of the bound activation variable
-        protected const string FilteredUnits = "FilteredUnits";
+        // Index for FilteredUnits binding.
+        protected const int FilteredUnits = 0;
 
         // Input pool for this filter 
         public string InputPool { get; }
@@ -48,7 +47,7 @@ namespace CSA.KnowledgeSources
             return (Unit unit) => unit.HasComponent<T>();
         }
 
-        protected override IDictionary<string, object>[] Precondition()
+        protected override object[][] Precondition()
         {
             var units = from unit in m_blackboard.LookupUnits<Unit>()
                         where FilterConditionDel(unit)
@@ -60,13 +59,8 @@ namespace CSA.KnowledgeSources
 
 
                 // The binding contains the enumeration of all the units that pass the filter condition. 
-                // fixme: Execute will copy all the units in the enumeration into the output pool. 
-                var bindings = new IDictionary<string, object>[1];
-
-                bindings[0] = new Dictionary<string, object>
-                {
-                    [FilteredUnits] = units
-                };
+                object[][] bindings = new object[1][];
+                bindings[0] = new object[] { units };
 
                 return bindings;
             }
@@ -75,13 +69,6 @@ namespace CSA.KnowledgeSources
                 // No units matching the conditions in the InputPool - return empty bindings (length 0). 
                 return m_emptyBindings;
             }
-        }
-
-        // Return an enumerable containing the units bound by the precondition.
-        // fixme: remove when the Dictionary has been replaced with an array. 
-        protected IEnumerable<Unit> UnitsFilteredByPrecondition(IDictionary<string, object> boundVars)
-        {
-            return (IEnumerable<Unit>)boundVars[FilteredUnits];
         }
 
         protected Unit FindOriginalUnit(Unit unit)

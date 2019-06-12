@@ -33,9 +33,9 @@ namespace CSA.KnowledgeSources
         }
 
         // Gathers the choices for the selected unit and calls any registered event handlers. 
-        protected override void Execute(IDictionary<string, object> boundVars)
+        protected override void Execute(object[] boundVars)
         {
-            var selectedUnits = UnitsFilteredByPrecondition(boundVars);
+            IEnumerable<Unit> selectedUnits = (IEnumerable<Unit>)boundVars[FilteredUnits];
 
             // fixme: now that we're passing choice info as params should be able to handle multiple selected Units
             Debug.Assert(selectedUnits.Count() == 1);
