@@ -53,7 +53,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().ReadOnly;
             }
-            throw new InvalidOperationException("GetReadOnly<T> called on unit that does not have a component with KC_ReadOnly parent.");
+            throw new InvalidOperationException($"GetReadOnly<{typeof(T).Name}> called on unit that does not have a component with KC_ReadOnly parent.");
         }
          
         public static void SetReadOnly<T>(this Unit unit, bool readOnly) where T : KC_ReadOnly
@@ -64,7 +64,7 @@ namespace CSA.Core
             }
             else
             {
-                throw new InvalidOperationException("SetReadOnly<T> called on unit that does not have a component with KC_ReadOnly parent.");
+                throw new InvalidOperationException($"SetReadOnly<{typeof(T).Name}> called on unit that does not have a component with KC_ReadOnly parent.");
             }
         }
     }

@@ -65,7 +65,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().DoubleValue;
             }
-            throw new InvalidOperationException("GetDoubleValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_Double parent.");
+            throw new InvalidOperationException($"GetDoubleValue<{typeof(T).Name}> called on unit that does not have a component with KC_Double parent.");
         }
 
         public static void SetDoubleValue<T>(this Unit unit, double doubleToStore) where T : KC_Double
@@ -76,7 +76,7 @@ namespace CSA.Core
             }
             else
             {
-                throw new InvalidOperationException("SetDoubleValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_Double parent.");
+                throw new InvalidOperationException($"SetDoubleValue<{typeof(T).Name}> called on unit that does not have a component with KC_Double parent.");
             }
         }
     }

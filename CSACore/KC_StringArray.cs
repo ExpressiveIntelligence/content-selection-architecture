@@ -87,7 +87,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().StringArray;
             }
-            throw new InvalidOperationException(string.Format("GetStringArray<{0}> called on unit that does not have a component with KC_ReadOnlyString parent.", typeof(T).Name));
+            throw new InvalidOperationException($"GetStringArray<{typeof(T).Name}> called on unit that does not have a component with KC_StringArray parent.");
         }
 
         public static void SetStringArray<T>(this Unit unit, string[] strings) where T : KC_StringArray
@@ -96,7 +96,7 @@ namespace CSA.Core
             {
                 unit.GetComponent<T>().StringArray = strings;
             }
-            throw new InvalidOperationException(string.Format("SetStringArray<{0}> called on unit that does not have a component with KC_ReadOnlyString parent.", typeof(T).Name));
+            throw new InvalidOperationException($"SetStringArray<{typeof(T).Name}> called on unit that does not have a component with KC_StringArray parent.");
         }
     }
 }

@@ -58,7 +58,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().UnitList;
             }
-            throw new InvalidOperationException("GetUnitList() called on Unit without a KC_UnitList componenent.");
+            throw new InvalidOperationException($"GetUnitList<{typeof(T).Name}> called on Unit without a KC_UnitList componenent.");
         }
 
         public static void SetUnitList<T>(this Unit unit, Unit[] unitList) where T : KC_UnitList
@@ -69,7 +69,7 @@ namespace CSA.Core
             }
             else
             {
-                throw new InvalidOperationException("SetUnitList() called on Unit without a KC_UnitList componenent.");
+                throw new InvalidOperationException($"SetUnitList<{typeof(T).Name}> called on Unit without a KC_UnitList componenent.");
             }
         }
     }

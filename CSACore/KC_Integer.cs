@@ -67,7 +67,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().IntValue;
             }
-            throw new InvalidOperationException("GetIntValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_Integer parent.");
+            throw new InvalidOperationException($"GetIntValue<{typeof(T).Name}> called on unit that does not have a component with KC_Integer parent.");
         }
 
         public static void SetIntValue<T>(this Unit unit, int intToStore) where T : KC_Integer
@@ -78,7 +78,7 @@ namespace CSA.Core
             }
             else
             {
-                throw new InvalidOperationException("SetIntValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_Integer parent.");
+                throw new InvalidOperationException($"SetIntValue<{typeof(T).Name}> called on unit that does not have a component with KC_Integer parent.");
             }
         }
     }

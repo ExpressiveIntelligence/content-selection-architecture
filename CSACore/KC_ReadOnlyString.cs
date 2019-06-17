@@ -65,7 +65,7 @@ namespace CSA.Core
             {
                 return unit.GetComponent<T>().StringValue;
             }
-            throw new InvalidOperationException("GetStringValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_ReadOnlyString parent.");
+            throw new InvalidOperationException($"GetStringValue<{typeof(T).Name}> called on unit that does not have a component with KC_ReadOnlyString parent.");
         }
 
         public static void SetStringValue<T>(this Unit unit, string stringToStore) where T : KC_ReadOnlyString
@@ -76,7 +76,7 @@ namespace CSA.Core
             }
             else
             {
-                throw new InvalidOperationException("SetStringValue<" + typeof(T).Name + "> called on unit that does not have a component with KC_ReadOnlyString parent.");
+                throw new InvalidOperationException($"SetStringValue<{typeof(T).Name}> called on unit that does not have a component with KC_ReadOnlyString parent.");
             }
         }
 

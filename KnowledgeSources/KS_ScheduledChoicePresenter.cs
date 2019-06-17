@@ -90,6 +90,7 @@ namespace CSA.KnowledgeSources
             }
             else
             {
+
                 throw new ArgumentOutOfRangeException(nameof(choiceMade), choiceMade, $"choiceMade must be between 0 and the number of choices - 1 {choices.Length - 1}");
             }
         }
