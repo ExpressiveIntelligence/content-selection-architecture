@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
@@ -11,12 +10,6 @@ namespace CSA.Demo
 {
     public class Demo2
     {
-        // Pool for units that have been selected by ID
-        public const string IDSelectedPool = KS_ScheduledIDSelector.DefaultOutputPoolName;
-
-        // Pool for units on which prolog expressions have been evaluated
-        public const string PrologEvaledPool = KS_ScheduledPrologEval.DefaultOutputPoolName;
-
         // Pool for units for which their prolog expression evaluated to true
         public const string FilteredPrologResultPool = "FilteredPrologResultPool";
 
@@ -51,21 +44,21 @@ namespace CSA.Demo
             m_IDSelector = new KS_ScheduledIDSelector(Blackboard);
 
             m_prologEval = new KS_ScheduledPrologEval(Blackboard,
-                IDSelectedPool,
-                PrologEvaledPool,
-                ApplTest_Prolog);
+                inputPool: m_IDSelector.OutputPool,
+                prologExpName: ApplTest_Prolog);
 
             /*
              * fixme: consider creating a filtered by boolean result KS or a more general filter by KC_EvaluatedExpression (once I have more EvaluatedExpressions than Prolog). 
              */
             m_filterByPrologResult = new KS_ScheduledFilterSelector(Blackboard, 
-                PrologEvaledPool,
-                FilteredPrologResultPool, 
-                KS_ScheduledPrologEval.FilterByPrologResult(ApplTest_Prolog, true));
+                inputPool: m_prologEval.OutputPool,
+                outputPool: FilteredPrologResultPool, 
+                filter: KS_ScheduledPrologEval.FilterByPrologResult(ApplTest_Prolog, true));
 
             m_uniformRandomSelector = new KS_ScheduledUniformDistributionSelector(Blackboard, 
-                FilteredPrologResultPool, 
-                UniformlySelectedOutputPool, 1);
+                inputPool: FilteredPrologResultPool, 
+                outputPool: UniformlySelectedOutputPool,
+                numberToSelect: 1);
 
             m_choicePresenter = new KS_ScheduledChoicePresenter(Blackboard, 
                 UniformlySelectedOutputPool);
@@ -73,10 +66,10 @@ namespace CSA.Demo
            m_filterPoolCleaner = new KS_ScheduledFilterPoolCleaner(Blackboard,
                 new string[]
                 {
-                    IDSelectedPool, // Output pool for ID selector
-                    PrologEvaledPool, // Output pool for prolog eval
-                    FilteredPrologResultPool, // Output pool for filter that filters by prolog result
-                    UniformlySelectedOutputPool // Final output pool (written into by UniformDistributionSelector)
+                    m_IDSelector.OutputPool, // Output pool for ID selector
+                    m_prologEval.OutputPool, // Output pool for prolog eval
+                    m_filterByPrologResult.OutputPool, // Output pool for filter that filters by prolog result
+                    m_uniformRandomSelector.OutputPool // Final output pool (written into by UniformDistributionSelector)
                 });
 
             Controller = new ScheduledSequenceController();

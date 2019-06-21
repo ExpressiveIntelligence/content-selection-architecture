@@ -9,8 +9,6 @@ namespace CSA.Demo
 {
     public class Demo1_Scheduled
     {
-        private const string FinalOutputPool = KS_ScheduledChoicePresenter.DefaultChoicePresenterInputPool;
-
         public IBlackboard Blackboard { get; }
         public ScheduledSequenceController Controller { get; }
 
@@ -30,10 +28,10 @@ namespace CSA.Demo
             Demo1_KC_DefineUnits(Blackboard);
 
             m_IDSelector = new KS_ScheduledIDSelector(Blackboard);
-            m_uniformRandomSelector = new KS_ScheduledUniformDistributionSelector(Blackboard, KS_ScheduledIDSelector.DefaultOutputPoolName, FinalOutputPool, 1);
-            m_choicePresenter = new KS_ScheduledChoicePresenter(Blackboard, FinalOutputPool);
+            m_uniformRandomSelector = new KS_ScheduledUniformDistributionSelector(Blackboard, inputPool: m_IDSelector.OutputPool, outputPool: null, numberToSelect: 1);
+            m_choicePresenter = new KS_ScheduledChoicePresenter(Blackboard, inputPool: m_uniformRandomSelector.OutputPool);
             m_filterPoolCleaner = new KS_ScheduledFilterPoolCleaner(Blackboard, 
-                new string[] { KS_ScheduledIDSelector.DefaultOutputPoolName, FinalOutputPool});
+                new string[] { m_IDSelector.OutputPool, m_uniformRandomSelector.OutputPool});
 
             Controller = new ScheduledSequenceController();
             Controller.AddKnowledgeSource(m_IDSelector);

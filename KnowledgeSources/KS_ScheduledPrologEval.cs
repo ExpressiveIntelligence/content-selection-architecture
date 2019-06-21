@@ -6,13 +6,18 @@ using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-
+    // fixme: consider making a KS_ScheduledExpressionEvaluator class that KS_ScheduledPrologEval is a subtype of.
     public class KS_ScheduledPrologEval : KS_ScheduledFilterSelector
     {
         // Binding index for the prolog knowledge base. 
         public const int PrologKB = 1;
 
-        public const string DefaultOutputPoolName = "PrologQueryEvaluted";
+        /*
+         * Initializing the enumerator of unique output pool names (static) and the initialization of the DefaultOutputPoolName (instance).
+         */
+        private static readonly IEnumerator<string> m_OutputPoolNameEnumerator = OutputPoolNameEnumerator("PrologQueryEvaluated");
+        public override string DefaultOutputPoolName { get; } = GenDefaultOutputPoolName(m_OutputPoolNameEnumerator);
+
 
         // Name of the prolog expression evaluated by this instance of KS_ScheduledPrologEval.
         public string PrologExpressionName { get; }
@@ -151,25 +156,25 @@ namespace CSA.KnowledgeSources
         }
 
         public KS_ScheduledPrologEval(IBlackboard blackboard, string prologExpName) : 
-            base(blackboard, DefaultOutputPoolName, GeneratePrologExpFilter(prologExpName, blackboard))
+            base(blackboard, GeneratePrologExpFilter(prologExpName, blackboard))
         {
             PrologExpressionName = prologExpName;
         }
 
-        public KS_ScheduledPrologEval(IBlackboard blackboard, string outputPool, string prologExpName) : 
-            base(blackboard, outputPool, GeneratePrologExpFilter(prologExpName, blackboard))
+        public KS_ScheduledPrologEval(IBlackboard blackboard, string inputPool, string prologExpName) : 
+            base(blackboard, inputPool, GeneratePrologExpFilter(prologExpName, blackboard))
         {
             PrologExpressionName = prologExpName;
         }
 
         public KS_ScheduledPrologEval(IBlackboard blackboard, string inputPool, string outputPool, string prologExpName) : 
-            base(blackboard, inputPool, outputPool, (Unit u) => SelectFromPool(u, inputPool) && GeneratePrologExpFilter(prologExpName, blackboard)(u))
+            base(blackboard, inputPool, outputPool, GeneratePrologExpFilter(prologExpName, blackboard))
         {
             PrologExpressionName = prologExpName;
         }
 
-        public KS_ScheduledPrologEval(IBlackboard blackboard, string outputPool, FilterCondition filter, string prologExpName) : 
-            base(blackboard, outputPool, (Unit u) => filter(u) && GeneratePrologExpFilter(prologExpName, blackboard)(u))
+        public KS_ScheduledPrologEval(IBlackboard blackboard, string inputPool, FilterCondition filter, string prologExpName) : 
+            base(blackboard, inputPool, GeneratePrologExpFilter(prologExpName, blackboard))
         {
             PrologExpressionName = prologExpName;
         }

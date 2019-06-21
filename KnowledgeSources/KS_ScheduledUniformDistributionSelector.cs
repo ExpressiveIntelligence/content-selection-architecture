@@ -7,7 +7,11 @@ namespace CSA.KnowledgeSources
 {
     public class KS_ScheduledUniformDistributionSelector : KS_ScheduledFilterSelector
     {
-        public const string DefaultOutputPoolName = "UniformlySelected";
+        /*
+         * Initializing the enumerator of unique output pool names (static) and the initialization of the DefaultOutputPoolName (instance).
+         */
+        private static readonly IEnumerator<string> m_OutputPoolNameEnumerator = OutputPoolNameEnumerator("UniformlySelected");
+        public override string DefaultOutputPoolName { get; } = GenDefaultOutputPoolName(m_OutputPoolNameEnumerator);
 
         // Number of items to uniformly select from the input set. 
         public uint NumberToSelect { get; }
@@ -66,15 +70,15 @@ namespace CSA.KnowledgeSources
             return seed == int.MinValue ? new Random() : new Random(seed);
         }
 
-        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, int seed = int.MinValue) : base(blackboard, DefaultOutputPoolName)
+        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, int seed = int.MinValue) : base(blackboard)
         {
             m_random = InitializeRandom(seed);
             Seed = seed;
             NumberToSelect = 1;
         }
 
-        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, string outputPool, int seed = int.MinValue) :
-            base(blackboard, outputPool)
+        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, string inputPool, int seed = int.MinValue) :
+            base(blackboard, inputPool)
         {
             m_random = InitializeRandom(seed);
             Seed = seed;
@@ -89,8 +93,8 @@ namespace CSA.KnowledgeSources
             NumberToSelect = numberToSelect;
         }
 
-        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, string outputPool, FilterCondition filter, uint numberToSelect,
-            int seed = int.MinValue) : base(blackboard, outputPool, filter)
+        public KS_ScheduledUniformDistributionSelector(IBlackboard blackboard, string inputPool, FilterCondition filter, uint numberToSelect,
+            int seed = int.MinValue) : base(blackboard, inputPool, filter)
         {
             m_random = InitializeRandom(seed);
             Seed = seed;

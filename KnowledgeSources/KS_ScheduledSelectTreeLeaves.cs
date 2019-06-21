@@ -1,5 +1,6 @@
 ﻿using CSA.Core;
 using CSA.KnowledgeUnits;
+using System.Collections.Generic;
 
 namespace CSA.KnowledgeSources
 {
@@ -12,11 +13,16 @@ namespace CSA.KnowledgeSources
     public class KS_ScheduledSelectTreeLeaves : KS_ScheduledFilterSelector
     {
         /*
-         * fixme: in general need a content pool specifier as their may be other leaf nodes on the blackboard not associated with the tree of interest.
+         * fixme: in general need a content pool specifier as there may be other leaf nodes on the blackboard not associated with the tree of interest.
          * Currently the constructors of this class don't support having trees live in content pools.         
          */
 
-        public const string DefaultOutputPoolName = "LeafNodes";
+        /*
+         * Initializing the enumerator of unique output pool names (static) and the initialization of the DefaultOutputPoolName (instance).
+         */
+        private static readonly IEnumerator<string> m_OutputPoolNameEnumerator = OutputPoolNameEnumerator("LeafNodes");
+        public override string DefaultOutputPoolName { get; } = GenDefaultOutputPoolName(m_OutputPoolNameEnumerator);
+
 
         /*
          * Given a Unit, returns true if the unit is the leaf of a tree, false otherwise. 
@@ -32,13 +38,34 @@ namespace CSA.KnowledgeSources
          * fixme: figure out how to best handle multiple trees when this case comes up. 
          */
 
-        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard) : base(blackboard)
         {
             FilterConditionDel = SelectTreeLeaf;
         }
 
+        /*
+         * fixme: This constructor breaks the rule for KS_ScheduledFilterSelectors that if there is one string parameter it is the inputPool.
+         * To make the constructor patterns match we also need to make sure that the KSs which add leaves are doing so in the right pool.
+         * This is, we could easily change this class to search for tree leaves in a specific input pool, but KSs down the line that modify the tree wouldn't know
+         * about it. 
+         */
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
+        {
+            FilterConditionDel = SelectTreeLeaf;
+        }
 
-        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool = DefaultOutputPoolName) : base(blackboard, outputPool)
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, FilterCondition filter) : base(blackboard)
+        {
+            FilterConditionDel = (Unit unit) => SelectTreeLeaf(unit) && filter(unit);
+        }
+
+        /*
+         * fixme: This constructor breaks the rule for KS_ScheduledFilterSelectors that if there is one string parameter it is the inputPool.
+         * To make the constructor patterns match we also need to make sure that the KSs which add leaves are doing so in the right pool.
+         * This is, we could easily change this class to search for tree leaves in a specific input pool, but KSs down the line that modify the tree wouldn't know
+         * about it. 
+         */
+        public KS_ScheduledSelectTreeLeaves(IBlackboard blackboard, FilterCondition filter, string outputPool) : base(blackboard, outputPool)
         {
             FilterConditionDel = (Unit unit) => SelectTreeLeaf(unit) && filter(unit);
         }

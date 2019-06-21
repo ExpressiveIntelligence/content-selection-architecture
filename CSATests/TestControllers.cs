@@ -172,9 +172,9 @@ namespace CSA.Tests
         public void TestAddKnowledgeSource_ScheduledSequenceController()
         {
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
-            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, inputPool: "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, inputPool: "pool1", outputPool: "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, inputPool: "pool2", outputPool: "pool3", numberToSelect: 1);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);
@@ -191,9 +191,9 @@ namespace CSA.Tests
         public void TestRemoveKnowledgeSource_ScheduledSequenceController()
         {
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, "pool1");
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, "pool1", "pool2");
-            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, "pool2", "pool3", 1);
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, inputPool: "pool1");
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, inputPool: "pool1", outputPool: "pool2");
+            IScheduledKnowledgeSource ks3 = new KS_ScheduledUniformDistributionSelector(blackboard, inputPool: "pool2", outputPool: "pool3", numberToSelect: 1);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);
@@ -230,8 +230,8 @@ namespace CSA.Tests
             string pool2 = "pool2";
 
             IBlackboard blackboard = new Blackboard();
-            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, pool1, (Unit u) => u.HasComponent<KC_UnitID>());
-            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, pool1, pool2);
+            IScheduledKnowledgeSource ks1 = new KS_ScheduledFilterSelector(blackboard, inputPool: null, outputPool: pool1, filter: (Unit u) => u.HasComponent<KC_UnitID>());
+            IScheduledKnowledgeSource ks2 = new KS_ScheduledIDSelector(blackboard, inputPool: pool1, outputPool: pool2);
             ScheduledSequenceController controller = new ScheduledSequenceController();
 
             controller.AddKnowledgeSource(ks1);

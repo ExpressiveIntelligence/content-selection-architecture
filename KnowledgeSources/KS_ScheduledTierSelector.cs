@@ -12,7 +12,13 @@ namespace CSA.KnowledgeSources
      */
     public abstract class KS_ScheduledTierSelector<T> : KS_ScheduledFilterSelector where T : KnowledgeComponent, IComparable
     {
-        public const string DefaultOutputPoolName = "SelectedByTier";
+
+        /*
+         * Initializing the enumerator of unique output pool names (static) and the initialization of the DefaultOutputPoolName (instance).
+         */
+        private static readonly IEnumerator<string> m_OutputPoolNameEnumerator = OutputPoolNameEnumerator("SelectedByTier");
+        public override string DefaultOutputPoolName { get; } = GenDefaultOutputPoolName(m_OutputPoolNameEnumerator);
+
 
         /*
          * Returns an array of the Units filtered by the precondition sorted from lowest to highest value on KnowledgeComponent T
@@ -27,11 +33,11 @@ namespace CSA.KnowledgeSources
             return units;
         }
 
-        protected KS_ScheduledTierSelector(IBlackboard blackboard) : base(blackboard, DefaultOutputPoolName, GenerateHasComponent<T>())
+        protected KS_ScheduledTierSelector(IBlackboard blackboard) : base(blackboard, GenerateHasComponent<T>())
         {
         }
 
-        protected KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool, GenerateHasComponent<T>())
+        protected KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool, GenerateHasComponent<T>())
         {
         }
 
@@ -39,9 +45,9 @@ namespace CSA.KnowledgeSources
             base(blackboard, inputPool, outputPool, GenerateHasComponent<T>())
         {
         }
-
-        protected KS_ScheduledTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) :
-            base(blackboard, outputPool, (Unit u) => filter(u) && GenerateHasComponent<T>() (u))
+        
+        protected KS_ScheduledTierSelector(IBlackboard blackboard, string inputPool, FilterCondition filter) :
+            base(blackboard, inputPool, (Unit u) => filter(u) && GenerateHasComponent<T>() (u))
         {
         }
 

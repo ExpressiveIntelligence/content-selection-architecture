@@ -29,15 +29,15 @@ namespace CSA.KnowledgeSources
         {
         }
 
-        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
         {
         }
 
         public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, string outputPool) : base(blackboard, inputPool, outputPool)
         {
         }
-
-        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
+        
+        public KS_ScheduledLowestTierSelector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
         {
         }
 

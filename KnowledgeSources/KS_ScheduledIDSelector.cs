@@ -1,16 +1,18 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
-    /*
-     * Version of ScheduledIDSelector using KnowledgeComponents instead of slots. 
-     * fixme: rename this to KS_ScheduledIDSelector when I switch all the code over to using KnowledgeComponents.    
-     */
+    // fixme: consider making a KS_ScheduledQuery class of which KS_ScheduledIDSelector is a subtype.
     public class KS_ScheduledIDSelector : KS_ScheduledFilterSelector
     {
-        public const string DefaultOutputPoolName = "SelectedByID";
+        /*
+         * Initializing the enumerator of unique output pool names (static) and the initialization of the DefaultOutputPoolName (instance).
+         */
+        private static readonly IEnumerator<string> m_OutputPoolNameEnumerator = OutputPoolNameEnumerator("SelectedByID");
+        public override string DefaultOutputPoolName { get; } = GenDefaultOutputPoolName(m_OutputPoolNameEnumerator);
 
         protected override object[][] Precondition()
         {
@@ -58,11 +60,11 @@ namespace CSA.KnowledgeSources
 
         }
 
-        public KS_ScheduledIDSelector(IBlackboard blackboard) : base(blackboard, DefaultOutputPoolName)
+        public KS_ScheduledIDSelector(IBlackboard blackboard) : base(blackboard)
         {
         }
 
-        public KS_ScheduledIDSelector(IBlackboard blackboard, string outputPool) : base(blackboard, outputPool)
+        public KS_ScheduledIDSelector(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
         {
         }
 
@@ -70,7 +72,7 @@ namespace CSA.KnowledgeSources
         {
         }
 
-        public KS_ScheduledIDSelector(IBlackboard blackboard, string outputPool, FilterCondition filter) : base(blackboard, outputPool, filter)
+        public KS_ScheduledIDSelector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
         {
         }
 

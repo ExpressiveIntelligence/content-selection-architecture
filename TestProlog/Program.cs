@@ -32,6 +32,7 @@ namespace TestScratchpad
             // TestContainingUnit();
             // ScheduledChoicePresenterTestHarness();
             ScheduledPrologEvalTestHarness();
+            // TestOutputPoolNameEnumerator();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -193,6 +194,38 @@ namespace TestScratchpad
         }
 
         /*
+         * Testing what KS_ScheduledFilterSelector.OutputPoolNameEmumerator() is returning
+         */
+
+        private static void TestOutputPoolNameEnumerator()
+        {
+            Blackboard blackboard = new Blackboard();
+
+            var fs1 = new KS_ScheduledHighestTierSelector<KC_Order>(blackboard);
+            var fs2 = new KS_ScheduledLowestTierSelector<KC_Order>(blackboard);
+            var fs3 = new KS_ScheduledFilterSelector(blackboard);
+            var fs4 = new KS_ScheduledUniformDistributionSelector(blackboard);
+            Console.WriteLine($"fs1.OutputPool = {fs1.OutputPool}");
+            Console.WriteLine($"fs1.DefaultOutputPoolName = {fs1.DefaultOutputPoolName}");
+
+            Console.WriteLine($"fs2.OutputPool = {fs2.OutputPool}");
+            Console.WriteLine($"fs2.DefaultOutputPoolName = {fs2.DefaultOutputPoolName}");
+
+            Console.WriteLine($"fs3.OutputPool = {fs3.OutputPool}");
+            Console.WriteLine($"fs3.DefaultOutputPoolName = {fs3.DefaultOutputPoolName}");
+
+            Console.WriteLine($"fs4.OutputPool = {fs4.OutputPool}");
+            Console.WriteLine($"fs4.DefaultOutputPoolName = {fs4.DefaultOutputPoolName}");
+
+            //IEnumerator<string> enumerator = fs.OutputPoolNameEnumerator();
+            //for(int i =0; i < 10; i++)
+            //{
+            //    enumerator.MoveNext();
+            //    Console.WriteLine(enumerator.Current);
+            //}
+        }
+
+        /*
          * Unit test code for KC_ScheduledPrologEval so that I can use the debugger
          */
         #region ScheduledPrologEval Unit Tests
@@ -245,6 +278,14 @@ namespace TestScratchpad
             unit3.AddComponent(new KC_PrologExpression(ApplTest_Prolog, "frustrated.", true));
             // unit4 doesn't have a prolog expression defined, so it shouldn't be filtered by KS_ScheduledPrologEval
 
+            // units5 and 6 have a differently named prolog expression
+            Unit unit5 = new Unit();
+            Unit unit6 = new Unit();
+            unit5.AddComponent(new KC_UnitID("ID5", true));
+            unit6.AddComponent(new KC_UnitID("ID6", true));
+            unit5.AddComponent(new KC_PrologExpression("PrologExpName1", "frustrated.", true));
+            unit6.AddComponent(new KC_PrologExpression("PrologExpName1", "Character:frustrated(Character).", true));
+
             Unit prologKB = new Unit();
             prologKB.AddComponent(new KC_PrologKB("Global", true));
 
@@ -252,7 +293,7 @@ namespace TestScratchpad
              * For some reason the unit testing infrastructure is making a folder way down in the bin directory the current folder. So using a relative 
              * file to the source folder for CATests.
              */
-            prologKB.GetComponent<KC_PrologKB>().Consult("../../../UnitTestProlog.prolog");
+            prologKB.GetComponent<KC_PrologKB>().Consult("../../../PrologTest.prolog");
 
             /* Structure of object[]: 
              * IBlackboard: blackboard, 
@@ -268,47 +309,60 @@ namespace TestScratchpad
             return new List<object[]>
             {
                 // No specific input pool (global), no queries with bindings, assertion that makes queries true. 
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit3, true) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), no queries with bindings, no assertion to make queries true.  
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit1, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit3 }, new string[0],
                     new (Unit, bool)[] { (unit1, false), (unit3, false) },
                     new (Unit, object)[0] },
 
                 // No specific input pool (global), query with binding, assertion to make queries true.
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit2, true) },
                     new (Unit, object)[] { (unit2, Symbol.Intern("character1")) } },
 
                 // No specific input pool (global), query with binding, no assertion to make queries true.
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit2 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit2 },
                     prologKB, new Unit[] { unit2 }, new string[0],
                     new (Unit, bool)[] { (unit2, false) },
                     new (Unit, object)[0] }, 
 
                 // No specific input pool (global), some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2, unit3 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true), (unit3, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")), (unit3, new LogicVariable("V2")) } },
-
+                    
                 // No content units on blackboard
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, outputPool, ApplTest_Prolog), new Unit[0],
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[0],
                     prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[0],
                     new (Unit, object)[0] },
 
                 // Specifying input pool, some queries with bindings, some without, assertion to make queries true.
-                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog), new Unit[] { unit1, unit2, unit3, unit4 },
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool, outputPool, ApplTest_Prolog),
+                    new Unit[] { unit1, unit2, unit3, unit4 },
                     prologKB, new Unit[] { unit1, unit2 }, new string[] { "dissed(character1, me)." },
                     new (Unit, bool)[] { (unit1, true), (unit2, true) },
                     new (Unit, object)[] { (unit1, new LogicVariable("V1")), (unit2, Symbol.Intern("character1")) } },
 
+                // Global input pool, prolog expressions with different names (not ApplTest_Prolog), so no expressions should be evaluated. 
+                new object[] { blackboard, new KS_ScheduledPrologEval(blackboard, inputPool: null, outputPool: outputPool, prologExpName: ApplTest_Prolog),
+                    new Unit[] { unit5, unit6 },
+                    prologKB, new Unit[0], new string[] { "dissed(character1, me)." },
+                    new (Unit, bool)[0],
+                    new (Unit, object)[0] },
             };
         }
 

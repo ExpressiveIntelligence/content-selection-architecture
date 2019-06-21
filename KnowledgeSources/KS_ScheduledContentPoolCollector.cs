@@ -27,11 +27,8 @@ namespace CSA.KnowledgeSources
         protected FilterCondition FilterConditionDel;
 
         // The default filter condition does no filtering. 
-        public static bool DefaultFilterCondition(Unit _)
-        {
-            return true;
-        }
-
+        public static bool DefaultFilterCondition(Unit _) => true;
+ 
         public static bool SelectFromPool(Unit unit, string inputPool)
         {
             return unit.HasComponent<KC_ContentPool>() && unit.ContentPoolEquals(inputPool);
@@ -107,24 +104,33 @@ namespace CSA.KnowledgeSources
 
         protected KS_ScheduledContentPoolCollector(IBlackboard blackboard, string inputPool) : base(blackboard)
         {
-            InputPool = inputPool ?? throw new ArgumentException("Null inputPool passed to constructor for KS_ContentPoolCollector");
-            FilterConditionDel = SelectFromPool;
+            if (inputPool != null)
+            {
+                InputPool = inputPool;
+                FilterConditionDel = SelectFromPool;
+            }
+            else
+            {
+                FilterConditionDel = DefaultFilterCondition;
+            }
         }
 
         protected KS_ScheduledContentPoolCollector(IBlackboard blackboard, FilterCondition filter) : base(blackboard)
         {
-            FilterConditionDel = filter ?? throw new ArgumentException("Null filter passed to constructor for KS_ContentPoolCollector");
+            FilterConditionDel = filter ?? DefaultFilterCondition;
         }
 
         protected KS_ScheduledContentPoolCollector(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard)
         {
-            if (filter == null)
+            if (inputPool != null)
             {
-                throw new ArgumentException("Null filter passed to constructor for KS_ContentPoolCollector");
+                InputPool = inputPool;
+                FilterConditionDel = filter != null ? ((Unit unit) => SelectFromPool(unit) && filter(unit)) : filter;
             }
-
-            InputPool = inputPool ?? throw new ArgumentException("Null inputPool passed to constructor for KS_ContentPoolCollector");
-            FilterConditionDel = (Unit unit) => SelectFromPool(unit) && filter(unit);
+            else
+            {
+                FilterConditionDel = filter ?? DefaultFilterCondition;
+            }
         }
     }
 }
