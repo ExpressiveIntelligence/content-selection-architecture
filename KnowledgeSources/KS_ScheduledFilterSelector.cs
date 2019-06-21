@@ -28,7 +28,7 @@ namespace CSA.KnowledgeSources
         /*
          * Given the class outputPoolNameEnumerator, returns the next unique DefaultOutputPoolName. 
          */
-        public static string GenDefaultOutputPoolName(IEnumerator<string> outputPoolNameEnumerator)
+        protected static string GenDefaultOutputPoolName(IEnumerator<string> outputPoolNameEnumerator)
         {
             outputPoolNameEnumerator.MoveNext();
             return outputPoolNameEnumerator.Current;
@@ -37,7 +37,7 @@ namespace CSA.KnowledgeSources
         /*
          * Returns an enumerator of unique OutputPool names based on a prefix.
          */
-        public static IEnumerator<string> OutputPoolNameEnumerator(string prefix)
+        protected static IEnumerator<string> OutputPoolNameEnumerator(string prefix)
         {
             uint gensymCounter = 0;
             while (true)
