@@ -75,6 +75,13 @@ namespace CSA.KnowledgeSources
                             Debug.Assert(evaledPrologExp.PrologExp.Equals(unit.GetPrologExp()));
                             return true;
                         }
+                        /* fixme
+                         * Consider making this recursively search links if the linked Unit has an EvaluatablePrologExpression with a matching name but it has
+                         * not been evaluated (though currently there's no KS in the system that does this) OR there's a PrologExpression with a matching name.
+                         * The latter is a likely use case. If we downselected in a pool with prolog expressions first, then evaluated those, that would result
+                         * in this case. 
+                         */
+
                     }
                 }
             }

@@ -4,6 +4,11 @@ using CSA.Core;
 
 namespace CSA.KnowledgeUnits
 {
+    /*
+     * fixme
+     * Consider whether we should just fold KC_EvaluatablePrologExpression functionality into KC_PrologExpression. Need to recapture the design rational for
+     * splitting it out in this way. 
+     */
     public class KC_EvaluatablePrologExpression : KC_PrologExpression
     {
         /*
@@ -19,7 +24,7 @@ namespace CSA.KnowledgeUnits
 
         /*
          * Any bindings resulting from evaluating the prolog expression. 
-         * fixme: currently storing UnitProlog style eval result (a Symbol or a LogicVariable). Eventually come up with an implementation-independent 
+         * fixme: currently storing UnityProlog style eval result (a Symbol or a LogicVariable). Eventually come up with an implementation-independent 
          * represention of bindings so that KC_PrologExpression doesn't care which prolog is used. 
          */
         public object EvalBindings { get; protected set; }

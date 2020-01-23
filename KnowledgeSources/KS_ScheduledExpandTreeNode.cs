@@ -39,7 +39,7 @@ namespace CSA.KnowledgeSources
 
                 /*
                  * Grab a reference to the order counter. Currently assume there's only one order counter. 
-                 * fixme: consider adding a name to the order counter so there can be multipe counters.                 
+                 * fixme: consider adding a name to the order counter so there can be multiple counters.                 
                  */ 
                 var orderCounterQuery = from unit in m_blackboard.LookupUnits<Unit>()
                                         where unit.HasComponent<KC_OrderCounter>()

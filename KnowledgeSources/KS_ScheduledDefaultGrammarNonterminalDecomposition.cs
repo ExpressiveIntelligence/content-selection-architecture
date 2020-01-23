@@ -67,17 +67,22 @@ namespace CSA.KnowledgeSources
             FilterConditionDel = DefaultFilterCondition;
         }
 
+        /*
+         * Is the inputPool used at all in DefaultGrammarNonterminalDecomposition?
+         */
         public KS_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool) : base(blackboard, inputPool)
         {
         }
 
+        /*
+         * fixme: is the filter used at all in DefaultGrammarNonterminalDecomposition?
+         */
         protected KS_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, FilterCondition filter) : base(blackboard, filter)
         {
         }
 
         /*
-         * ScheduledFilterSelector constructed with both an input pool and a filter specified using the conjunction of SelectFromPool and filter 
-         * as the FilterConditionDel.         
+         * fixme: Are the input pool and filter used at all in DefaultGrammarNonterminalDecomposition?
          */
         protected KS_ScheduledDefaultGrammarNonterminalDecomposition(IBlackboard blackboard, string inputPool, FilterCondition filter) : base(blackboard, inputPool, filter)
         {
