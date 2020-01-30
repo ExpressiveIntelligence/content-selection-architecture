@@ -382,6 +382,83 @@ namespace CSA.Demo
         }
 
 
+        public static void DemoEnsemble_DefineUnits(IBlackboard blackboard)
+        {
+            Unit rule = new Unit();
+            rule.AddComponent(new KC_UnitID("rule1", true));
+            rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool("rules", true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("rule1", true));
+            rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool("rules", true));
+            blackboard.AddUnit(rule);
+
+
+            Unit dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("greeting", true));
+            dialogue.AddComponent(new KC_Text("Hello there", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] {"saidHello"}, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("askDay", true));
+            dialogue.AddComponent(new KC_Text("How is your day going?", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "askDay" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("askDayReverse", true));
+            dialogue.AddComponent(new KC_Text("And you?", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "askDay" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("neutralResponse", true));
+            dialogue.AddComponent(new KC_Text("I'm okay.", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(neutral)" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("goodResponse", true));
+            dialogue.AddComponent(new KC_Text("I'm great.", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(good)" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("badResponse", true));
+            dialogue.AddComponent(new KC_Text("I've been tired.", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(bad)" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("console", true));
+            dialogue.AddComponent(new KC_Text("That's too bad", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "console" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+
+            dialogue = new Unit();
+            dialogue.AddComponent(new KC_UnitID("congratulate", true));
+            dialogue.AddComponent(new KC_Text("That's good, I'm glad.", true));
+            dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "congratulate" }, true));
+            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            blackboard.AddUnit(dialogue);
+        }
+
+
         private static Unit MakeRuleUnit(string ruleID, string pool, IBlackboard blackboard)
         {
             Unit u = new Unit();

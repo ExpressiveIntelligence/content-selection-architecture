@@ -105,6 +105,13 @@ namespace ConsoleDemo
             }
         }
 
+        private static void SimpleEnsemble()
+        {
+            Console.WriteLine("Starting demoBeth (simple ensemble).");
+
+            DemoEnsembleLite demo = new DemoEnsembleLite();
+        }
+
         public static void Main(string[] args)
         {
             if (args.Length == 0)
@@ -127,6 +134,9 @@ namespace ConsoleDemo
                     break;
                 case "demo3":
                     SimpleScheduledCFGExpansion(args);
+                    break;
+                case "demoBeth":
+                    SimpleEnsemble();
                     break;
                 default:
                     throw new ArgumentException("Unrecognized argument: " + args[0]);
