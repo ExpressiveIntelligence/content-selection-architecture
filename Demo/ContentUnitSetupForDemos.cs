@@ -385,18 +385,18 @@ namespace CSA.Demo
         public static void DemoEnsemble_DefineUnits(IBlackboard blackboard)
         {
             Unit rule = new Unit();
-            rule.AddComponent(new KC_UnitID("rule1", true));
+            rule.AddComponent(new KC_UnitID("If you haven't said hello, you're likely to say hello.", true));
             rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
-            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "\\+ saidHello.", true));
             rule.AddComponent(new KC_Utility(5, true));
             rule.AddComponent(new KC_ContentPool("rules", true));
             blackboard.AddUnit(rule);
 
             rule = new Unit();
-            rule.AddComponent(new KC_UnitID("rule1", true));
+            rule.AddComponent(new KC_UnitID("If you've already said hello, less likely to do it again.", true));
             rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
-            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "true.", true));
-            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "saidHello.", true));
+            rule.AddComponent(new KC_Utility(-5, true));
             rule.AddComponent(new KC_ContentPool("rules", true));
             blackboard.AddUnit(rule);
 
@@ -456,6 +456,19 @@ namespace CSA.Demo
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "congratulate" }, true));
             dialogue.AddComponent(new KC_ContentPool("dialogue", true));
             blackboard.AddUnit(dialogue);
+
+            Unit prologKBUnit = new Unit();
+            KC_PrologKB prologKB = new KC_PrologKB("Global", true);
+
+            prologKBUnit.AddComponent(prologKB);
+
+            /*
+             * fixme: is there a better way to define a predicate for prolog than asserting and retracting it?
+             */
+            prologKB.Assert("response(neutral).");
+            prologKB.Retract("response(neutral).");
+
+            blackboard.AddUnit(prologKBUnit);
         }
 
 
