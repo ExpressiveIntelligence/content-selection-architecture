@@ -29,11 +29,6 @@ namespace CSA.KnowledgeSources
         // The default filter condition does no filtering. 
         public static bool DefaultFilterCondition(Unit _) => true;
  
-        public static bool SelectFromPool(Unit unit, string inputPool)
-        {
-            return unit.HasComponent<KC_ContentPool>() && unit.ContentPoolEquals(inputPool);
-        }
-
         private bool SelectFromPool(Unit unit)
         {
             return SelectFromPool(unit, InputPool);

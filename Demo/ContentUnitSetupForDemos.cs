@@ -389,7 +389,7 @@ namespace CSA.Demo
             rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
             rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "\\+ saidHello.", true));
             rule.AddComponent(new KC_Utility(5, true));
-            rule.AddComponent(new KC_ContentPool("rules", true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
             blackboard.AddUnit(rule);
 
             rule = new Unit();
@@ -397,7 +397,7 @@ namespace CSA.Demo
             rule.AddComponent(new KC_IDSelectionRequest("greeting", true));
             rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "saidHello.", true));
             rule.AddComponent(new KC_Utility(-5, true));
-            rule.AddComponent(new KC_ContentPool("rules", true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
             blackboard.AddUnit(rule);
 
 
@@ -405,56 +405,56 @@ namespace CSA.Demo
             dialogue.AddComponent(new KC_UnitID("greeting", true));
             dialogue.AddComponent(new KC_Text("Hello there", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] {"saidHello"}, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("askDay", true));
             dialogue.AddComponent(new KC_Text("How is your day going?", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "askDay" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("askDayReverse", true));
             dialogue.AddComponent(new KC_Text("And you?", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "askDay" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("neutralResponse", true));
             dialogue.AddComponent(new KC_Text("I'm okay.", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(neutral)" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("goodResponse", true));
             dialogue.AddComponent(new KC_Text("I'm great.", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(good)" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("badResponse", true));
             dialogue.AddComponent(new KC_Text("I've been tired.", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "response(bad)" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("console", true));
             dialogue.AddComponent(new KC_Text("That's too bad", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "console" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("congratulate", true));
             dialogue.AddComponent(new KC_Text("That's good, I'm glad.", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "congratulate" }, true));
-            dialogue.AddComponent(new KC_ContentPool("dialogue", true));
+            dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
             Unit prologKBUnit = new Unit();
@@ -465,8 +465,16 @@ namespace CSA.Demo
             /*
              * fixme: is there a better way to define a predicate for prolog than asserting and retracting it?
              */
+            prologKB.Assert("saidHello.");
+            prologKB.Retract("saidHello.");
+            prologKB.Assert("askDay.");
+            prologKB.Retract("askDay.");
             prologKB.Assert("response(neutral).");
             prologKB.Retract("response(neutral).");
+            prologKB.Assert("console");
+            prologKB.Retract("console");
+            prologKB.Assert("congratulate");
+            prologKB.Retract("congratulate");
 
             blackboard.AddUnit(prologKBUnit);
         }

@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using CSA.Core;
+using CSA.KnowledgeUnits;
+using System.Collections.Generic;
 #if UNIT_TEST
 using Xunit.Abstractions;
 #endif
-using CSA.Core;
 
 namespace CSA.KnowledgeSources
 {
@@ -17,12 +18,43 @@ namespace CSA.KnowledgeSources
         protected readonly IBlackboard m_blackboard;
 
         /*
+         * Utility method for testing whether a unit is in a given pool.
+         * fixme: determine if this should be public or protected. 
+         */
+        public static bool SelectFromPool(Unit unit, string inputPool)
+        {
+            return unit.HasComponent<KC_ContentPool>() && unit.ContentPoolEquals(inputPool);
+        }
+
+        /*
+         * Utility method for copying a unit to a new content pool. 
+         */
+        protected Unit CopyUnitToPool(Unit unit, string pool)
+        {
+            Unit newUnit = new Unit(unit);
+
+            /* 
+             * If there is an existing content pool component remove the componenet before adding a new one with the new pool. The case in which there won't be a content pool
+             * component is when copying from the global pool (no pool) into a pool.             
+             */
+            if (newUnit.HasComponent<KC_ContentPool>())
+            {
+                newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
+            }
+            newUnit.AddComponent(new KC_ContentPool(pool, true));
+
+            m_blackboard.AddUnit(newUnit);
+            m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedUnit, true); // fixme: need a more general link type for copies between pools
+            return newUnit;
+        }
+
+        /*
          * On ScheduledKnowledgeSources, Precondition() is used to marshal data to operate on. It is called from 
          * the public Execute() method. It returns an array of object arrays, each of which stores the variable bindings 
          * for a paricular collection of arguments. The knowledge source then processes each of these bindings 
          * (collection of arguments). 
          */
-         // fixme: should be able to make this an ITuple array and use ValueTuples to represent bindings. But there's some kind of version issue.  
+        // fixme: should be able to make this an ITuple array and use ValueTuples to represent bindings. But there's some kind of version issue.  
         protected abstract object[][] Precondition();
 
         /*

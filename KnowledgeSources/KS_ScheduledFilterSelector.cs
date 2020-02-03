@@ -51,21 +51,7 @@ namespace CSA.KnowledgeSources
          */
         protected Unit CopyUnitToOutputPool(Unit unit)
         {
-            Unit newUnit = new Unit(unit);
-
-            /* 
-             * If there is an existing content pool component remove the componenet before adding a new one with the new pool. The case in which there won't be a content pool
-             * component is when copying from the global pool (no pool) into a pool.             
-             */
-            if (newUnit.HasComponent<KC_ContentPool>())
-            {
-                newUnit.RemoveComponent(newUnit.GetComponent<KC_ContentPool>());
-            }
-            newUnit.AddComponent(new KC_ContentPool(OutputPool, true));
-
-            m_blackboard.AddUnit(newUnit);
-            m_blackboard.AddLink(unit, newUnit, LinkTypes.L_SelectedUnit, true); // fixme: need a more general link type for copies between pools
-            return newUnit;
+            return CopyUnitToPool(unit, OutputPool);
         }
 
         /*

@@ -107,9 +107,12 @@ namespace ConsoleDemo
 
         private static void SimpleEnsemble()
         {
-            Console.WriteLine("Starting demoBeth (simple ensemble).");
+            Console.WriteLine("Starting simpleEnsemble.");
 
             DemoEnsembleLite demo = new DemoEnsembleLite();
+
+            // This does a one-shot execution of the KSs in DemoEnsembleLight.
+            demo.Controller.Execute();
         }
 
         public static void Main(string[] args)
@@ -135,7 +138,7 @@ namespace ConsoleDemo
                 case "demo3":
                     SimpleScheduledCFGExpansion(args);
                     break;
-                case "demoBeth":
+                case "simpleEnsemble":
                     SimpleEnsemble();
                     break;
                 default:
