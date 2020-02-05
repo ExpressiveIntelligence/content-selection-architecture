@@ -112,7 +112,11 @@ namespace ConsoleDemo
             DemoEnsembleLite demo = new DemoEnsembleLite();
 
             // This does a one-shot execution of the KSs in DemoEnsembleLight.
-            demo.Controller.Execute();
+            for(int i = 0; i<2; i++)
+            {
+                demo.Controller.Execute();
+            }
+            
         }
 
         public static void Main(string[] args)

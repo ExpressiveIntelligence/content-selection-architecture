@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleDemo": {
       "commandName": "Project",
-      "commandLineArgs": "demoBeth"
+      "commandLineArgs": "simpleEnsemble"
     }
   }
 }

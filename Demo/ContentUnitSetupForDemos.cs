@@ -400,6 +400,61 @@ namespace CSA.Demo
             rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
             blackboard.AddUnit(rule);
 
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If you've already said hello, you are more likely to ask how they have been doing.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("askDay", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "saidHello.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If you've have been asked how they have been doing, you should respond.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("neutralResponse", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "askDay.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If you've have been asked how they have been doing, you should respond.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("goodResponse", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "askDay.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If you've have been asked how they have been doing, you should respond.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("badResponse", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "askDay.", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If your friend is doing well or okay, congradulate them.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("congratulate", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "response(good); response(neutral).", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If your friend is doing bad, console them.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("console", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "response(bad).", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
+
+            rule = new Unit();
+            rule.AddComponent(new KC_UnitID("If you have told someone how your day has been, ask them in return.", true));
+            rule.AddComponent(new KC_IDSelectionRequest("console", true));
+            rule.AddComponent(new KC_PrologExpression(KCNames.ApplTest_Prolog, "askDay, (congratulate; console).", true));
+            rule.AddComponent(new KC_Utility(5, true));
+            rule.AddComponent(new KC_ContentPool(DemoEnsembleLite.RulesPool, true));
+            blackboard.AddUnit(rule);
 
             Unit dialogue = new Unit();
             dialogue.AddComponent(new KC_UnitID("greeting", true));
@@ -447,6 +502,7 @@ namespace CSA.Demo
             dialogue.AddComponent(new KC_UnitID("console", true));
             dialogue.AddComponent(new KC_Text("That's too bad", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "console" }, true));
+            dialogue.AddComponent(new KC_PrologFactDeleteList(new string[] { "response(X)" }, true));
             dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
@@ -454,6 +510,7 @@ namespace CSA.Demo
             dialogue.AddComponent(new KC_UnitID("congratulate", true));
             dialogue.AddComponent(new KC_Text("That's good, I'm glad.", true));
             dialogue.AddComponent(new KC_PrologFactAddList(new string[] { "congratulate" }, true));
+            dialogue.AddComponent(new KC_PrologFactDeleteList(new string[] { "response(X)" }, true));
             dialogue.AddComponent(new KC_ContentPool(DemoEnsembleLite.DialogPool, true));
             blackboard.AddUnit(dialogue);
 
