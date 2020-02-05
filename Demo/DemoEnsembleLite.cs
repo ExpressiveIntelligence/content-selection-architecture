@@ -4,6 +4,7 @@ using CSA.KnowledgeSources;
 using CSA.KnowledgeUnits;
 using static CSA.Demo.ContentUnitSetupForDemos;
 using static CSA.KnowledgeUnits.KCNames;
+using System.Linq;
 
 namespace CSA.Demo
 {
@@ -81,9 +82,47 @@ namespace CSA.Demo
             var printSelectedDialogLine = new KS_ScheduledPrintPool(Blackboard, SelectedDialogPool);
 
             /*
+             * This KS is updating the prolog KB based on the effects on the selected dialog line.
+             * fixme: for now I'm just using KS_ScheduledExecute to call the SelectChoice_PrologKBChanges. Need to refactor SelectChoice_PrologKBChanges because it's not just tied to SelectChoice and possibly move KB updates into
+             * a special purpose KS. 
+             */
+            var updatePrologKB = new KS_ScheduledExecute(
+                () =>
+                {
+                    var selectedDialodLines = from Unit node in Blackboard.LookupUnits<Unit>()
+                                              where node.HasComponent<KC_ContentPool>() && node.ContentPoolEquals(SelectedDialogPool)
+                                              select node;
+
+                    foreach(Unit unit in selectedDialodLines)
+                    {
+                        // fixme: inlining SelectChoice_PrologKBChanges() because it's an EventHandler but we're not calling it in an EventHandler context here (so who is the sender?). 
+
+                        var prologKBQuery = from kb in Blackboard.LookupUnits<Unit>()
+                                            where kb.HasComponent<KC_PrologKB>()
+                                            select kb;
+
+                        // fixme: not testing this prologKBQuery results in a singletone
+
+                        KC_PrologKB prologKB = prologKBQuery.First().GetComponent<KC_PrologKB>();
+
+                        // If there are any facts to retract, retract them
+                        if (unit.HasComponent<KC_PrologFactDeleteList>())
+                        {
+                            unit.GetComponent<KC_PrologFactDeleteList>().DeleteFacts(prologKB);
+                        }
+
+                        // If there are any facts to add, add them 
+                        if (unit.HasComponent<KC_PrologFactAddList>())
+                        {
+                            unit.GetComponent<KC_PrologFactAddList>().AddFacts(prologKB);
+                        }
+                    }
+                }
+            );
+
+            /*
              * This KS cleans up all the pools that were created during the selection process.
              */
-
             var poolCleaner = new KS_ScheduledFilterPoolCleaner(
                 Blackboard,
                 new string[]
@@ -102,6 +141,7 @@ namespace CSA.Demo
             Controller.AddKnowledgeSource(printWeightedDialog);
             Controller.AddKnowledgeSource(selectDialogLine);
             Controller.AddKnowledgeSource(printSelectedDialogLine);
+            Controller.AddKnowledgeSource(updatePrologKB);
             Controller.AddKnowledgeSource(poolCleaner);
         }
     }
