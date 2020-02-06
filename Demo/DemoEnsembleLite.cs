@@ -22,6 +22,8 @@ namespace CSA.Demo
         // Name of the dialog pool
         public const string DialogPool = "dialog";
 
+        private const string EvalRulesPool = "evalRules";
+
         // Name of the pool containing satisfied rules.
         private const string SatisfiedRulesPool = "satisfiedRules";
 
@@ -43,14 +45,14 @@ namespace CSA.Demo
              * * The input pool to look for ContentUnits with prolog expressions to evaluate.
              * * The name of the prolog expression to evaluate (in this case the prolog expression named ApplTest_Prolog, for which a string constant is defined in KCNames).
              */
-            var prologEval = new KS_ScheduledPrologEval(Blackboard, inputPool: RulesPool, ApplTest_Prolog);
+            var prologEval = new KS_ScheduledPrologEval(Blackboard, inputPool: RulesPool, outputPool: EvalRulesPool, ApplTest_Prolog);
 
             /*
              * fixme: consider creating a filtered by boolean result KS or a more general filter by KC_EvaluatedExpression (once I have more EvaluatedExpressions than Prolog). 
              * This filter selector selects all the rules whose prolog expression evaluated to true. 
              */
             var filterByPrologResult = new KS_ScheduledFilterSelector(Blackboard,
-                inputPool: prologEval.OutputPool,
+                inputPool: EvalRulesPool,
                 outputPool: SatisfiedRulesPool,
                 filter: KS_ScheduledPrologEval.FilterByPrologResult(ApplTest_Prolog, true));
 
@@ -127,6 +129,7 @@ namespace CSA.Demo
                 Blackboard,
                 new string[]
                 {
+                    EvalRulesPool,
                     SatisfiedRulesPool,
                     WeightedDialogPool,
                     SelectedDialogPool
