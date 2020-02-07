@@ -19,7 +19,10 @@ namespace CSA.KnowledgeSources
 
         /*
          * Utility method for testing whether a unit is in a given pool.
-         * fixme: determine if this should be public or protected. 
+         * fixme: determine if this should be public or protected.
+         * Currently I am wanting to call this in the context of a KS_ScheduledExecute which is not a KS_ScheduledKnowledgeSource,
+         * so either need to refactor KS_ScheduledExecute to make it conform to KS_ScheduledKnowledgeSource, leave this public, or create a new
+         * class containing static utility methods. 
          */
         public static bool SelectFromPool(Unit unit, string inputPool)
         {

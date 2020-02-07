@@ -106,32 +106,17 @@ namespace CSA.Demo
                 () =>
                 {
                     var selectedDialodLines = from Unit node in Blackboard.LookupUnits<Unit>()
-                                              where node.HasComponent<KC_ContentPool>() && node.ContentPoolEquals(SelectedDialogPool)
+                                              where ScheduledKnowledgeSource.SelectFromPool(node, SelectedDialogPool)
                                               select node;
 
-                    foreach(Unit unit in selectedDialodLines)
+                    foreach (Unit unit in selectedDialodLines)
                     {
-                        // fixme: inlining SelectChoice_PrologKBChanges() because it's an EventHandler but we're not calling it in an EventHandler context here (so who is the sender?). 
-
-                        var prologKBQuery = from kb in Blackboard.LookupUnits<Unit>()
-                                            where kb.HasComponent<KC_PrologKB>()
-                                            select kb;
-
-                        // fixme: not testing this prologKBQuery results in a singletone
-
-                        KC_PrologKB prologKB = prologKBQuery.First().GetComponent<KC_PrologKB>();
-
-                        // If there are any facts to retract, retract them
-                        if (unit.HasComponent<KC_PrologFactDeleteList>())
-                        {
-                            unit.GetComponent<KC_PrologFactDeleteList>().DeleteFacts(prologKB);
-                        }
-
-                        // If there are any facts to add, add them 
-                        if (unit.HasComponent<KC_PrologFactAddList>())
-                        {
-                            unit.GetComponent<KC_PrologFactAddList>().AddFacts(prologKB);
-                        }
+                        /*
+                         * SelectChoice_PrologKBChanges() is an event handler, so it expects a sender as well as for args to be wrapped in EventArgs.
+                         * So I'm using this as the sender (PrologKBChanges doesn't actually use the sender) wrapping in SelectChoiceEventArgs.
+                         */
+                        var eventArgs = new SelectChoiceEventArgs(unit, Blackboard);
+                        EventHandlers_ChoicePresenter.SelectChoice_PrologKBChanges(this, eventArgs);
                     }
                 }
             );
