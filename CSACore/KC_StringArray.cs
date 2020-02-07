@@ -34,7 +34,13 @@ namespace CSA.Core
         protected string ToString(string propName)
         {
             StringBuilder sb = new StringBuilder(100);
-            sb.AppendFormat("({0}: [{1}]", propName, StringArray);
+
+            sb.AppendFormat("({0}: [", propName);
+            foreach (string s in StringArray)
+            {
+                sb.AppendFormat(" {0}", s);
+            }
+            sb.Append(" ]");
             if (ReadOnly)
             {
                 sb.Append(", readonly)");
