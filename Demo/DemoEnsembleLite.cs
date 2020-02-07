@@ -31,7 +31,7 @@ namespace CSA.Demo
         public const string WeightedDialogPool = "weightedDialog";
 
         // Name of the pool containing the highest weighted (highest utility) dialog lines.
-        public const string HighestWeightedDialogPool = "highestedWeightedDialog";
+        public const string HighestWeightedDialogPool = "highestWeightedDialog";
 
         // Name of the pool containing the selected dialog line.
         public const string SelectedDialogPool = "selectedDialog";

@@ -58,16 +58,20 @@ namespace CSA.Core
 
                     var linksToRemove = LookupLinks(unit);
                     IUnit node1 = unit;
-                    foreach((IUnit node2, string linkType, LinkDirection direction) in linksToRemove)
+                    foreach ((IUnit node2, string linkType, LinkDirection direction) in linksToRemove)
                     {
-                        if (direction == LinkDirection.Undirected)
+                        switch (direction)
                         {
-                            RemoveLink(node1, node2, linkType, false);
-                        }
-                        else
-                        {
-                            RemoveLink(node1, node2, linkType, true);
-                        }
+                            case LinkDirection.Undirected:
+                                RemoveLink(node1, node2, linkType, false);
+                                break;
+                            case LinkDirection.Start:
+                                RemoveLink(node2, node1, linkType, true);
+                                break;
+                            case LinkDirection.End:
+                                RemoveLink(node1, node2, linkType, true);
+                                break;
+                        };
                     }
 
                     // Removing a unit changes the blackboard (but only if the unit was actually on the blackboard) 

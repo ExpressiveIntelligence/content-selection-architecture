@@ -52,6 +52,7 @@ namespace ConsoleDemo
 
              while (demo.Blackboard.Changed)
             {
+                Console.WriteLine("Number of units before execute: " + demo.Blackboard.NumberOfUnits());
                 demo.Blackboard.ResetChanged();
                 demo.Controller.Execute();
             }
@@ -116,9 +117,8 @@ namespace ConsoleDemo
             {
                 Console.WriteLine("Iteration " + i + " of EnsembleLight ##########################");
                 demo.Controller.Execute();
-                
             }
-            
+
         }
 
         public static void Main(string[] args)
