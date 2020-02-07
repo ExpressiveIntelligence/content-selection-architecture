@@ -7,7 +7,7 @@ namespace CSA.KnowledgeSources
 {
     /* 
      * KS_KC_ScheduledTierSelector is an abstract class which serves as the parents for all the varieties of selecting based on a sortable criterion, including
-     * KS_HighestTierSelector, KS_LowestTierSelector, KS_HighestNTierSelector, KS_LowestNTierSelector.   
+     * KS_HighestTierSelector, KS_LowestTierSelector.   
      * The type variable is used to specify the type of the KnowledgeComponent being used for selection.
      */
     public abstract class KS_ScheduledTierSelector<T> : KS_ScheduledFilterSelector where T : KnowledgeComponent, IComparable
