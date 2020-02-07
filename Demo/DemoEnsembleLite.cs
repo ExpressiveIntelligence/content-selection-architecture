@@ -30,6 +30,9 @@ namespace CSA.Demo
         // Name of the pool containing the weighted dialog
         public const string WeightedDialogPool = "weightedDialog";
 
+        // Name of the pool containing the highest weighted (highest utility) dialog lines.
+        public const string HighestWeightedDialogPool = "highestedWeightedDialog";
+
         // Name of the pool containing the selected dialog line.
         public const string SelectedDialogPool = "selectedDialog";
 
@@ -73,10 +76,21 @@ namespace CSA.Demo
             var printWeightedDialog = new KS_ScheduledPrintPool(Blackboard, WeightedDialogPool);
 
             /*
-             * This KS selects a dialog line from among the mostly highly weighted dialog lines (e.g. if the highest weighting is 10, and their are two dialog lines
-             * that share that weight, it will pick one of the two at random). 
+             * This KS selects the most highly weighted dialog lines into a pool (e.g. if the highest weighting is 10, and their are two dialog lines
+             * that share that weight, it will copy both of them into the output pool).  
              */
-            var selectDialogLine = new KS_ScheduledHighestTierSelector<KC_Utility>(Blackboard, WeightedDialogPool, SelectedDialogPool);
+            var selectHighestWeightedDialog = new KS_ScheduledHighestTierSelector<KC_Utility>(Blackboard, WeightedDialogPool, HighestWeightedDialogPool);
+
+            /*
+             * This KS prints out the units in the HighestWeightedDialogPool (for debugging).
+             */
+            var printHighestWeightedDialog = new KS_ScheduledPrintPool(Blackboard, HighestWeightedDialogPool);
+
+            /*
+             * This KS selects one line at random from the HighestWeightedDialogPool.
+             */
+            var selectDialogLine = new KS_ScheduledUniformDistributionSelector(Blackboard,
+                inputPool: HighestWeightedDialogPool, outputPool: SelectedDialogPool, numberToSelect: 1);
 
             /*
              * This KS prints out the units in the SelectedDialogPool (there will be only one dialog line in this pool). (for debugging)
@@ -132,6 +146,7 @@ namespace CSA.Demo
                     EvalRulesPool,
                     SatisfiedRulesPool,
                     WeightedDialogPool,
+                    HighestWeightedDialogPool,
                     SelectedDialogPool
                 }
             );
@@ -142,6 +157,8 @@ namespace CSA.Demo
             Controller.AddKnowledgeSource(printFilteredRules);
             Controller.AddKnowledgeSource(weightDialogWithRules);
             Controller.AddKnowledgeSource(printWeightedDialog);
+            Controller.AddKnowledgeSource(selectHighestWeightedDialog);
+            Controller.AddKnowledgeSource(printHighestWeightedDialog);
             Controller.AddKnowledgeSource(selectDialogLine);
             Controller.AddKnowledgeSource(printSelectedDialogLine);
             Controller.AddKnowledgeSource(updatePrologKB);

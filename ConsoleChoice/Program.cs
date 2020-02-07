@@ -111,10 +111,12 @@ namespace ConsoleDemo
 
             DemoEnsembleLite demo = new DemoEnsembleLite();
 
-            // This does a one-shot execution of the KSs in DemoEnsembleLight.
+            // Do fixed number of iterations of the KSs in DemoEnsembleLight.
             for(int i = 0; i<2; i++)
             {
+                Console.WriteLine("Iteration " + i + " of EnsembleLight ##########################");
                 demo.Controller.Execute();
+                
             }
             
         }
