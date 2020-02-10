@@ -8,5 +8,6 @@ namespace CSA.KnowledgeUnits
     {
         public const string CurrentTreeNodeExpansion = "CurrentTreeNodeExpansion";
         public const string ApplTest_Prolog = "ApplTest_Prolog";
+        public const string SalienceTest_Prolog = "SalienceTest_Prolog";
     }
 }

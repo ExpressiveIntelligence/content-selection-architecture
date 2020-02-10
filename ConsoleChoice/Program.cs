@@ -113,7 +113,7 @@ namespace ConsoleDemo
             DemoEnsembleLite demo = new DemoEnsembleLite();
 
             // Do fixed number of iterations of the KSs in DemoEnsembleLight.
-            for(int i = 0; i<2; i++)
+            for(int i = 0; i<10; i++)
             {
                 Console.WriteLine("Iteration " + i + " of EnsembleLight ##########################");
                 demo.Controller.Execute();
