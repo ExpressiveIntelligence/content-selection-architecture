@@ -16,18 +16,18 @@
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
+    <ProjectReference Include="..\Demo\Demo.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>..\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\KnowledgeSources\KnowledgeSources.csproj" />
-    <ProjectReference Include="..\Demo\Demo.csproj" />
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
