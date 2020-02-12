@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 using System.Collections.Generic;
 
@@ -11,6 +12,7 @@ namespace CSA.Core
     {
         private float[] m_floatArray;
 
+        [JsonIgnore]
         public IList<float> FloatArray
         {
             get

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace CSA.Core
 {
     public abstract class KC_Double : KC_ReadOnly, IComparable
     {
-        private double m_double; 
+        private double m_double;
 
+        [JsonIgnore]
         public double DoubleValue
         {
             get

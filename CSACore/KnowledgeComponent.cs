@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace CSA.Core
 {
@@ -8,6 +9,7 @@ namespace CSA.Core
      */
     public abstract class KnowledgeComponent : ICloneable
     {
+        [JsonIgnore]
         public Unit ContainingUnit { get; internal set; }
 
         /*

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+
 namespace CSA.Core
 {
     public abstract class KC_UnitList : KC_ReadOnly
     {
-        private Unit[] m_unitList; 
+        private Unit[] m_unitList;
 
+        [JsonIgnore]
         public Unit[] UnitList
         {
             get

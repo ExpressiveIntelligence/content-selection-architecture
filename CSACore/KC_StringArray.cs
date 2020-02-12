@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Text;
 
 namespace CSA.Core
@@ -8,8 +9,9 @@ namespace CSA.Core
      */
     public abstract class KC_StringArray : KC_ReadOnly
     {
-        private string[] m_stringArray; 
+        private string[] m_stringArray;
 
+        [JsonIgnore]
         public string[] StringArray
         {
             get

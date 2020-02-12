@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace CSA.Core
 {
@@ -6,6 +7,7 @@ namespace CSA.Core
     {
         private string m_storedString;
 
+        [JsonIgnore]
         public string StringValue
         {
             get
@@ -84,6 +86,6 @@ namespace CSA.Core
         {
             return unit.GetStringValue<T>().Equals(s);
         }
-    }
+    } 
 
 }

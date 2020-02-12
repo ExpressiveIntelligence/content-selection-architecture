@@ -52,7 +52,6 @@ namespace CSA.Core
          * Units are composed of components that define their behavior. Components are stored in a dictionary mapping 
          * from component type name to a set of components.         
          */
-
         protected IDictionary<string, ISet<KnowledgeComponent>> m_components;
 
         public bool AddComponent(KnowledgeComponent component)
@@ -113,25 +112,44 @@ namespace CSA.Core
             }
         }
 
+        /*
+         * Return the set of KnowledgeComponents of type T that have been added to this Unit. Creates a copy of the set associated
+         * with type T so that the caller can't change the set within the Unit. 
+         */
         public ISet<T> GetComponents<T>() where T : KnowledgeComponent
         {
             return m_components.TryGetValue(typeof(T).FullName, out ISet<KnowledgeComponent> components) ? new HashSet<T>(components.Cast<T>()) : new HashSet<T>();
         }
 
+        /*
+         * Returns true if the Unit contains a component of type T, false otherwise. 
+         */
         public bool HasComponent<T>() where T : KnowledgeComponent
         {
             return m_components.TryGetValue(typeof(T).FullName, out var _);
         }
 
+        /*
+         * Given a KnowledgeComponent, returns (in an out variable) the current set of components belonging to this Unit
+         * that share the same Knowledgecomponent type. 
+         */
         private bool LookupComponents(KnowledgeComponent component, out ISet<KnowledgeComponent> components)
         {
             return m_components.TryGetValue(GetUnitTypeName(component), out components);
         }
 
+        /*
+         * Returns the type name as a strong of a KnowledgeComponent. Used as a key in the Dictionary of components. 
+         */
         protected string GetUnitTypeName(KnowledgeComponent component)
         {
             return component.GetType().FullName;
         }
+
+        /*
+         * fixme: just for seeing what dumping the dictionary looks like, adding a public accessor for the dictionary.
+         */
+        public IDictionary<string, ISet<KnowledgeComponent>> GetDictionary() => m_components;
 
         public Unit()
         {

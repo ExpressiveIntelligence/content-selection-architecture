@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace CSA.Core
 {
@@ -6,6 +7,7 @@ namespace CSA.Core
     {
         private int m_int;
 
+        [JsonIgnore]
         public int IntValue
         {
             get

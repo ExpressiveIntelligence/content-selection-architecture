@@ -7,6 +7,9 @@ using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 #pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
 #pragma warning restore CS0618 // Type or member is obsolete
@@ -31,8 +34,9 @@ namespace TestScratchpad
             // TestBoolConstant();
             // TestContainingUnit();
             // ScheduledChoicePresenterTestHarness();
-            ScheduledPrologEvalTestHarness();
+            // ScheduledPrologEvalTestHarness();
             // TestOutputPoolNameEnumerator();
+            TestJsonOutput();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -223,6 +227,70 @@ namespace TestScratchpad
             //    enumerator.MoveNext();
             //    Console.WriteLine(enumerator.Current);
             //}
+        }
+
+        /*
+         *
+         */
+         private static void TestJsonOutput()
+        {
+            Unit u = new Unit();
+            var contentPool = new KC_ContentPool("test", true);
+            var utility = new KC_Utility(1.0);
+            var prologAddList = new KC_PrologFactAddList(new string[] { "one", "two", "three" }, false);
+            var idRequest = new KC_IDSelectionRequest("foo");
+            u.AddComponent(contentPool);
+            u.AddComponent(utility);
+            u.AddComponent(prologAddList);
+            u.AddComponent(idRequest);
+            //string output = JsonConvert.SerializeObject(u.GetDictionary(), Formatting.Indented,
+            //    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All } );
+            //Console.WriteLine(output);
+
+            string contentPoolOutput = JsonConvert.SerializeObject(contentPool, Formatting.Indented);
+            Console.WriteLine(contentPoolOutput);
+            JObject joContentPool = (JObject)JsonConvert.DeserializeObject(contentPoolOutput);
+            //foreach (JToken token in jo.Children())
+            //{
+            //    Console.WriteLine(token);
+            //}
+            Console.WriteLine(ConvertJObjectToKC(joContentPool));
+
+            string utilityOutput = JsonConvert.SerializeObject(utility, Formatting.Indented);
+            Console.WriteLine(utilityOutput);
+            JObject joUtility = (JObject)JsonConvert.DeserializeObject(utilityOutput);
+            Console.WriteLine(ConvertJObjectToKC(joUtility));
+
+            string prologAddListOutput = JsonConvert.SerializeObject(prologAddList, Formatting.Indented);
+            Console.WriteLine(prologAddListOutput);
+            JObject joPrologAddList = (JObject)JsonConvert.DeserializeObject(prologAddListOutput);
+            Console.WriteLine(ConvertJObjectToKC(joPrologAddList));
+
+            string idRequestOutput = JsonConvert.SerializeObject(idRequest, Formatting.Indented);
+            Console.WriteLine(idRequestOutput);
+            JObject joIdRequest = (JObject)JsonConvert.DeserializeObject(idRequestOutput);
+            Console.WriteLine(ConvertJObjectToKC(joIdRequest));
+         }
+
+        private static KnowledgeComponent ConvertJObjectToKC(JObject jo)
+        {
+            if (jo.ContainsKey("ContentPool"))
+            {
+                return jo.ToObject<KC_ContentPool>();
+            }
+            else if (jo.ContainsKey("Utility"))
+            {
+                return jo.ToObject<KC_Utility>();
+            }
+            else if (jo.ContainsKey("AddList"))
+            {
+                return jo.ToObject<KC_PrologFactAddList>();
+            }
+            else if (jo.ContainsKey("TargetUnitID"))
+            {
+                return jo.ToObject<KC_IDSelectionRequest>();
+            }
+            else return null;
         }
 
         /*
