@@ -22,6 +22,9 @@ namespace CSA.Core
             return Slots.ContainsKey(propName);
         }
 
+        /*
+         * Creates a readable string representation of the Unit. Implicitly calls ToString on each of the KnowledgeComponents. 
+         */
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(100);
@@ -54,9 +57,16 @@ namespace CSA.Core
          */
         protected IDictionary<string, ISet<KnowledgeComponent>> m_components;
 
+        /*
+         * Adds a KnowledgeComponent to the Unit. Returns true if this KnowledgeComponent is not already a member, and so
+         * is added, false otherwise. 
+         */
         public bool AddComponent(KnowledgeComponent component)
         {
-
+            /*
+             * If a KnowledgeComponent of this type has already been previously added, retrieve the HashSet associated
+             * with this type and add the KnoweldgeComponent to the HashSet. 
+             */
             if (LookupComponents(component, out ISet<KnowledgeComponent> components))
             {
                 if (components.Add(component))
@@ -64,6 +74,7 @@ namespace CSA.Core
                     component.ContainingUnit = this;
                     return true;
                 }
+                // The HashSet already contained this KnoweledgeComponent; return false. 
                 return false;
             }
 
@@ -77,8 +88,16 @@ namespace CSA.Core
             return true;
         }
 
+        /*
+         * Removes a KnowledgeComponent from the Unit. Returns true if the Unit contained the KnowledgeComponent, and
+         * thus it was successfully removed, false otherwise. 
+         */
         public bool RemoveComponent(KnowledgeComponent component)
         {
+            /*
+             * Look up the HashSet associated with the specific type of the KnowledgeComponent and remove the KnowledgeComponent
+             * from the HashSet. 
+             */
             if (LookupComponents(component, out ISet<KnowledgeComponent> components))
             {
                 if (components.Remove(component))
@@ -91,9 +110,20 @@ namespace CSA.Core
                     return true;
                 }
             }
+            /*
+             * If either no KnowledgeComponent of this type has been previously added, or the attempt to remove
+             * the KnowledgeComponent failed (so components.Remove() returns false), fall through to here and return false
+             * meaning that the Unit did not contain the KnowledgeComponent that was requested to be removed. 
+             */
             return false;
         } 
 
+        /*
+         * Returns the KnowledgeComponent of type T that has been registered with the Unit. This method assumes
+         * singleton components. It throws an InvalidOperationException if more than one Component of this type
+         * has been added. Returns the default value for T (which is null) if no KnowledgeComponent of type T has been
+         * added to the Unit.  
+         */
         public T GetComponent<T>() where T : KnowledgeComponent
         {
             if (m_components.TryGetValue(typeof(T).FullName, out ISet<KnowledgeComponent> components))
