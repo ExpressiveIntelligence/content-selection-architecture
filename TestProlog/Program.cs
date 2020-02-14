@@ -243,10 +243,11 @@ namespace TestScratchpad
             u.AddComponent(utility);
             u.AddComponent(prologAddList);
             u.AddComponent(idRequest);
-            //string output = JsonConvert.SerializeObject(u.GetDictionary(), Formatting.Indented,
-            //    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All } );
-            //Console.WriteLine(output);
-
+ 
+            /*
+             * This code serializes and deserializes individual KnoweldgeComponents, demonstrating figuring out the type
+             * based on looking at the properties in JObject. 
+             */
             string contentPoolOutput = JsonConvert.SerializeObject(contentPool, Formatting.Indented);
             Console.WriteLine(contentPoolOutput);
             JObject joContentPool = (JObject)JsonConvert.DeserializeObject(contentPoolOutput);
@@ -270,7 +271,32 @@ namespace TestScratchpad
             Console.WriteLine(idRequestOutput);
             JObject joIdRequest = (JObject)JsonConvert.DeserializeObject(idRequestOutput);
             Console.WriteLine(ConvertJObjectToKC(joIdRequest));
-         }
+
+            /*
+             * this code serializes and deserializes Units. 
+             */
+            string output = JsonConvert.SerializeObject(u.GetComponents(), Formatting.Indented);
+                // new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All } );
+            Console.WriteLine(output);
+
+            var joList = JsonConvert.DeserializeObject<IList<JObject>>(output);
+            Console.WriteLine("Writing list of knowledge components as JObjects");
+            foreach(JObject jo in joList)
+            {
+                Console.WriteLine(jo);
+            }
+            /*
+             * Creating Unit by iterating list of JObjects and calling ConvertJObjectToKC on each, then adding KnowledgeComponet to
+             * unit. 
+             */
+            Unit deserializedUnit = new Unit();
+            foreach(JObject jo in joList)
+            {
+                KnowledgeComponent kc = ConvertJObjectToKC(jo);
+                deserializedUnit.AddComponent(kc);
+            }
+            Console.WriteLine(deserializedUnit);
+        }
 
         private static KnowledgeComponent ConvertJObjectToKC(JObject jo)
         {

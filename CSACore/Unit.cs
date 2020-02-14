@@ -147,9 +147,19 @@ namespace CSA.Core
         }
 
         /*
-         * fixme: just for seeing what dumping the dictionary looks like, adding a public accessor for the dictionary.
+         * Returns an Enumerable of KnowledgeComponents that have been added to this unit. The Enumerable is made from the
+         * items in the dictionary, so modifyng the Enumerable doesn't change the underlying Unit. 
          */
-        public IDictionary<string, ISet<KnowledgeComponent>> GetDictionary() => m_components;
+        public IEnumerable<KnowledgeComponent> GetComponents()
+        {
+            List<KnowledgeComponent> knowledgeComponents = new List<KnowledgeComponent>();
+
+            foreach (HashSet<KnowledgeComponent> hs in m_components.Values)
+            {
+                knowledgeComponents.AddRange(hs);
+            }
+            return knowledgeComponents.AsReadOnly();
+        }
 
         public Unit()
         {
