@@ -1,8 +1,17 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Reflection;
+
+/*
+ * fixme: this reference to CSA.KnowledgeUnits should eventually be eliminated by folding all KCs into CSA.Core and
+ * renaming Core, perhaps by renaming it something like Data (indicating classes related to storing data on the blackboard).
+ */
+// using CSA.KnowledgeUnits;
 
 namespace CSA.Core
 {
@@ -21,6 +30,11 @@ namespace CSA.Core
         {
             return Slots.ContainsKey(propName);
         }
+
+        /*
+         * An emumerable collection of all the KnowledgeComponent types. Used in the process of deserializing from Json. 
+         */
+        private static IEnumerable<Type> KcTypes { get; }
 
         /*
          * Creates a readable string representation of the Unit. Implicitly calls ToString on each of the KnowledgeComponents. 
@@ -191,6 +205,38 @@ namespace CSA.Core
             return knowledgeComponents.AsReadOnly();
         }
 
+        /*
+         * Serializes a Unit to Json. Returns the Json serialization as a string. 
+         */
+        public string SerializeToJson()
+        {
+            return JsonConvert.SerializeObject(GetComponents(), Formatting.Indented);
+        }
+
+        /*
+         * Deserialize a Unit from Json.
+         */
+        public static Unit DeserializeFromJason(string jsonUnit)
+        {
+            return null;
+            /*
+            // Create a new Unit that the deserialized KnowledgeComponents will be added to. 
+            Unit deserializedUnit = new Unit();
+
+            // Get a list of JObjects from jsonUnit. 
+            var joList = JsonConvert.DeserializeObject<IList<JObject>>(jsonUnit);
+
+            // For each JObject in the list, convert it to a KnowledgeComponent and add it to the Unit.
+            foreach (JObject jo in joList)
+            {
+                KnowledgeComponent kc = ConvertJObjectToKC(jo);
+                deserializedUnit.AddComponent(kc);
+            }
+            Console.WriteLine(deserializedUnit);
+            */
+
+        }
+
         public Unit()
         {
             // fixme: remove when pre-KC-based code eliminated
@@ -218,6 +264,26 @@ namespace CSA.Core
                     AddComponent((KnowledgeComponent)component.Clone());
                 }
             }
+        }
+
+        /*
+         * The static constructor is used to initialize the static enumerable collection of subtypes (represented as types)
+         * of KnowledgeComponent. 
+         */
+        static Unit()
+        {
+            // fixme: need to do the class migration of KnowledgeComponent classes from CSA.KnowledgeUnits to CSA.Core now.
+            // We can't introduce circular dependencies, and with the move to a component-based architecture for units, it makes
+            // less sense to have a separate assembly for subtypes of Unit (since there aren't any now). 
+            /*Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KC_Utility));
+            Assembly kuAssembly = Assembly.GetAssembly(typeof(KC_ContentPool));
+
+            Type kcBaseType = typeof(KnowledgeComponent);
+
+            var allKCTypes = from Type t in csaCoreAssembly.GetTypes().Concat(kuAssembly.GetTypes())
+                             where t.IsSubclassOf(kcBaseType)
+                             select t;
+            */
         }
     }
 }

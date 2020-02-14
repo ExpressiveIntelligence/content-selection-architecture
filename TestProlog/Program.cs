@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
@@ -36,7 +37,8 @@ namespace TestScratchpad
             // ScheduledChoicePresenterTestHarness();
             // ScheduledPrologEvalTestHarness();
             // TestOutputPoolNameEnumerator();
-            TestJsonOutput();
+            // TestJson();
+            AssemblyExperiments();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -230,9 +232,9 @@ namespace TestScratchpad
         }
 
         /*
-         *
+         * Experimenting with approaches for serializing and deserializing Units and KnowledgeComponents. 
          */
-         private static void TestJsonOutput()
+         private static void TestJson()
         {
             Unit u = new Unit();
             var contentPool = new KC_ContentPool("test", true);
@@ -298,6 +300,10 @@ namespace TestScratchpad
             Console.WriteLine(deserializedUnit);
         }
 
+        /*
+         * Given a JObject returns the corresponding KnowledgeComponent. Uses property names in the JObject to figure
+         * out which type should be returned. 
+         */
         private static KnowledgeComponent ConvertJObjectToKC(JObject jo)
         {
             if (jo.ContainsKey("ContentPool"))
@@ -317,6 +323,34 @@ namespace TestScratchpad
                 return jo.ToObject<KC_IDSelectionRequest>();
             }
             else return null;
+        }
+
+        /*
+         * Experimenting with methods associated with the Assembly and Type classes. 
+         */
+        private static void AssemblyExperiments()
+        {
+            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KC_Utility));
+            Assembly kuAssembly = Assembly.GetAssembly(typeof(KC_ContentPool));
+
+            Console.WriteLine(csaCoreAssembly);
+            Console.WriteLine(kuAssembly);
+
+            Type kcBaseType = typeof(KnowledgeComponent);
+
+            var allKCTypes = from Type t in csaCoreAssembly.GetTypes().Concat(kuAssembly.GetTypes())
+                             where t.IsSubclassOf(kcBaseType)
+                             select t;
+
+            // Here is the method syntax for the LINQ above. 
+            // allKCTypes = csaCoreAssembly.GetTypes().Concat(kuAssembly.GetTypes()).Where(t => t.IsSubclassOf(kcBaseType));
+
+            foreach(Type t in allKCTypes)
+            {
+                
+                Console.WriteLine(t);
+            }
+            
         }
 
         /*

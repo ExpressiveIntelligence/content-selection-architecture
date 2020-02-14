@@ -17,7 +17,7 @@ namespace CSA.Core
          * Unit being cloned. It will be set to the correct unit by AddComponent (called in the copy constructor of Unit). 
          */
         public abstract object Clone();
- 
+
         protected KnowledgeComponent()
         {
             ContainingUnit = null;

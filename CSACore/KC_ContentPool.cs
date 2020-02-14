@@ -7,6 +7,7 @@ namespace CSA.Core
      */
     public class KC_ContentPool : KC_ReadOnlyString
     {
+        [DistinguishingProperty]
         public string ContentPool
         {
             get => StringValue;
