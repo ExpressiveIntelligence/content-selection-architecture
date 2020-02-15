@@ -7,6 +7,10 @@ namespace CSA.Core
      */
     public class KC_UnitID : KC_ReadOnlyString
     {
+        /*
+         * This is the property that uniquely distinguishes KC_UnitID for Json deserialization.
+         */
+        [DistinguishingProperty]
         public string UnitID
         {
             get => StringValue;

@@ -7,11 +7,16 @@ namespace CSA.Core
 {
     /*
      * Abstract KnowledgeComponent storing an array of floats.
+     *
+     * Abstract classes do not support JSON, so no distinguishing property. 
      */
     public abstract class KC_FloatArray : KC_ReadOnly
     {
         private float[] m_floatArray;
 
+        /*
+         * Don't want FloatArray to be output when serializing subclasses to Json. 
+         */
         [JsonIgnore]
         public IList<float> FloatArray
         {

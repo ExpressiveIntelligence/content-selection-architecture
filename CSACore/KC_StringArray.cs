@@ -5,12 +5,17 @@ using System.Text;
 namespace CSA.Core
 {
     /*
-     * Abstract KnowledgeComponent storing an array of strings. 
+     * Abstract KnowledgeComponent storing an array of strings.
+     *
+     * Abstract classes do not support JSON, so no distinguishing property. 
      */
     public abstract class KC_StringArray : KC_ReadOnly
     {
         private string[] m_stringArray;
 
+        /*
+         * Don't want StringArray to be output when serializing subclasses to Json.
+         */
         [JsonIgnore]
         public string[] StringArray
         {

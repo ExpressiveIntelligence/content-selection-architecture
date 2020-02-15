@@ -5,10 +5,17 @@ using System.Diagnostics;
 namespace CSA.Core
 {
     /*
-     * KnowledgeComponent for storing tree node properties. 
+     * KnowledgeComponent for storing tree node properties. Trees of units are created by by connecting KC_TreeNode
+     * components *within* Units rather than by directly connecting the Units themselves. From within a KC_TreeNode
+     * component you get at the enclosing unit via the ContainingUnit property on KnowledgeComponent. 
      */
     public class KC_TreeNode : KnowledgeComponent
     {
+        /*
+         * fixme: need to figure out how to serialize this class. Don't currently have examples of authors directly authoring trees, but totally
+         * seems reasonable that they will. 
+         */
+
         public KC_TreeNode Parent { get; protected set; }
         public IList<KC_TreeNode> Children { get; protected set; }
 

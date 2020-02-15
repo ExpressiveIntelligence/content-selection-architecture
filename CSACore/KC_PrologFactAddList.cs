@@ -7,6 +7,10 @@ namespace CSA.Core
      */
     public class KC_PrologFactAddList : KC_StringArray
     {
+        /*
+         * This is the property that uniquely distinguishes KC_PrologFactAddList for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public string[] AddList
         {
             get => StringArray;

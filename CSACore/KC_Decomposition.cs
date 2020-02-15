@@ -2,8 +2,17 @@
 
 namespace CSA.Core
 {
+    /*
+     * KnowledgeComponent for storing a decomposition of Units. Knowledge sources that reference KC_Decomposition use
+     * this to determine the list of units that the containing unit should be decomposed into, such as the list of
+     * decompositions in a grammar rule or the steps of a behavior.
+     */
     public class KC_Decomposition : KC_UnitList
     {
+        /*
+         * fixme: this is the distinguishing property, but still need to figure out how I'm going to
+         * serialize and deserialize Unit references.
+         */
         public Unit[] Decomposition
         {
             get => UnitList;

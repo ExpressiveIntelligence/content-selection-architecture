@@ -3,10 +3,18 @@ using System;
 
 namespace CSA.Core
 {
+    /*
+     * Abstract KnowledgeComponent for representing strings supporting the ReadOnly property.
+     * 
+     * Abstract classes do not support JSON, so no distinguishing property. 
+     */
     public abstract class KC_ReadOnlyString : KC_ReadOnly, IComparable
     {
         private string m_storedString;
 
+        /*
+         * Don't want StringValue to be output when serializing subclasses to Json. 
+         */
         [JsonIgnore]
         public string StringValue
         {

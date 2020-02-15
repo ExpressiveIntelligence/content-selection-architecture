@@ -3,10 +3,16 @@ using System;
 
 namespace CSA.Core
 {
+    /*
+     * Abstract KnowledgeComponent for storing lists of Units. Both KC_Decomposition and KC_Sequence are examples of subclasses of KC_UnitList.
+     */
     public abstract class KC_UnitList : KC_ReadOnly
     {
         private Unit[] m_unitList;
 
+        /*
+         * Don't want UnitList to be output when serializing subclasses to Json. 
+         */
         [JsonIgnore]
         public Unit[] UnitList
         {

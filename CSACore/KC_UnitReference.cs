@@ -6,9 +6,12 @@ namespace CSA.Core
     /*
      * KnowledgeComponent for storing an named reference to a knowledge unit. Used to create global variables on the blackboard. 
      */
-
     public class KC_UnitReference : KC_ReadOnlyString
     {
+        /*
+         * fixme: this is the distinguishing property, but still need to figure out how I'm going to
+         * serialize and deserialize Unit references.
+         */
         public Unit Reference { get; set; }
 
         // fixme: replace with Name slot on KnowledgeComponent

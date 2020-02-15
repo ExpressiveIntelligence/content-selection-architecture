@@ -7,6 +7,10 @@ namespace CSA.Core
      */
     public class KC_Order : KC_Integer
     {
+        /*
+         * This is the property that uniquely distinguishes KC_Order for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public int Order
         {
             get => IntValue;

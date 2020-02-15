@@ -2,8 +2,17 @@
 
 namespace CSA.Core
 {
+    /*
+     * KnoweldgeComponent for representing sequences of units.
+     *
+     * fixme: Currently only used by KS_ScheduledLiearizeTreeLeaves. Consider merging this with KC_Decomposition. 
+     */
     public class KC_Sequence : KC_UnitList
     {
+        /*
+         * fixme: this is the distinguishing property, but still need to figure out how I'm going to
+         * serialize and deserialize Unit references.
+         */
         public Unit[] Sequence
         {
             get => UnitList;

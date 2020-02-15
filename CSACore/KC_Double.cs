@@ -3,10 +3,18 @@ using System;
 
 namespace CSA.Core
 {
+    /*
+     * Abstract KnowledgeComponent storing a double.
+     *
+     * Abstract classes do not support JSON, so no distinguishing property. 
+     */
     public abstract class KC_Double : KC_ReadOnly, IComparable
     {
         private double m_double;
 
+        /*
+         * Don't want DoubleValue to be output when serializing subclasses to Json. 
+         */
         [JsonIgnore]
         public double DoubleValue
         {

@@ -10,6 +10,10 @@ namespace CSA.Core
     {
         public bool ActiveRequest { get; set; }
 
+        /*
+         * This is the property that uniquely distinguishes KC_IDSelectionRequest for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public string TargetUnitID
         {
             get => StringValue;

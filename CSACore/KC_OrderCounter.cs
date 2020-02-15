@@ -2,9 +2,17 @@
 
 namespace CSA.Core
 {
+    /*
+     * KnowledgeComponent for a counter. It is currently only used by KS_ScheduledExpandTreeNode to keep track of the order of children.
+     * fixme: this probably should be changed to Counter to generalize it. Also, revisit KS_ScheduledExpandTreeNode to see if there
+     * is another way to keep track of order besides using this counter.
+     */
     public class KC_OrderCounter : KC_Integer
     {
-
+        /*
+         * This is the property that uniquely distinguishes KC_OrderCounter for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public int OrderCounter
         {
             get => IntValue;

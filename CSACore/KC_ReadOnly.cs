@@ -3,7 +3,9 @@ namespace CSA.Core
 {
     /*
      * Abstract KnowledgeComponent for storing an readOnly property. Used as a base class by KnowledgeComponents that 
-     * want to have the option of making their contents readOnly.     
+     * want to have the option of making their contents readOnly.
+     *
+     * Abstract classes do not support JSON, so no distinguishing property. 
      */
     public abstract class KC_ReadOnly : KnowledgeComponent
     {

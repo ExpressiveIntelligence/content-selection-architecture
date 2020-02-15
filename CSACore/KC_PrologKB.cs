@@ -15,6 +15,10 @@ namespace CSA.Core
          */
         private KnowledgeBase m_KB;
 
+        /*
+         * This is the property that uniquely distinguishes KC_PrologKB for Json deserialization.
+         */
+        [DistinguishingProperty]
         public KnowledgeBase PrologKB
         {
             get

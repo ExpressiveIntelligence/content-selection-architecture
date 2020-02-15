@@ -7,6 +7,10 @@ namespace CSA.Core
      */
     public class KC_Utility : KC_Double
     {
+        /*
+         * This is the property that uniquely distinguishes KC_Utility for Json deserialization.
+         */
+        [DistinguishingProperty]
         public double Utility
         {
             get => DoubleValue;

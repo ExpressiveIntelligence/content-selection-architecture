@@ -6,7 +6,10 @@ namespace CSA.Core
     /*
      * fixme
      * Consider whether we should just fold KC_EvaluatablePrologExpression functionality into KC_PrologExpression. Need to recapture the design rational for
-     * splitting it out in this way. 
+     * splitting it out in this way.
+     *
+     * Not adding a distingushing property to EvaluabtablePrologExpression as there is no need for it to support Json
+     * serialization deserialization. 
      */
     public class KC_EvaluatablePrologExpression : KC_PrologExpression
     {

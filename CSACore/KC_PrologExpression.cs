@@ -9,8 +9,10 @@ namespace CSA.Core
     public class KC_PrologExpression : KC_ReadOnlyString
     {
         /*
-         * String representation of the prolog expression to evaluate. 
+         * String representation of the prolog expression to evaluate.
+         * This is the property that uniquely distinguishes KC_PrologExpression for Json deserialization. 
          */
+        [DistinguishingProperty]
         public string PrologExp
         {
             get => StringValue;

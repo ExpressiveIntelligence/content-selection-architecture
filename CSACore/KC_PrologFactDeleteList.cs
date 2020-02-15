@@ -7,6 +7,10 @@ namespace CSA.Core
      */
     public class KC_PrologFactDeleteList : KC_StringArray
     {
+        /*
+         * This is the property that uniquely distinguishes KC_PrologFactDeleteList for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public string[] DeleteList
         {
             get => StringArray;

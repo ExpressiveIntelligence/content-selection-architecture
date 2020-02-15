@@ -3,10 +3,18 @@ using System;
 
 namespace CSA.Core
 {
+    /*
+     * Abstract KnowledgeComponent storing an integer.
+     *
+     * Abstract classes do not support JSON, so no distinguishing property. 
+     */
     public abstract class KC_Integer : KC_ReadOnly, IComparable
     {
         private int m_int;
 
+        /*
+         * Don't want IntValue to be output when serializing subclasses to Json. 
+         */
         [JsonIgnore]
         public int IntValue
         {

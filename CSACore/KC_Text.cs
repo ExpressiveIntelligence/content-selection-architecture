@@ -8,6 +8,10 @@ namespace CSA.Core
     public class KC_Text : KC_ReadOnlyString
     {
 
+        /*
+         * This is the property that uniquely distinguishes KC_Text for Json deserialization.
+         */
+        [DistinguishingProperty]
         public string Text
         {
             get => StringValue;

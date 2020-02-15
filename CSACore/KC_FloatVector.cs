@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace CSA.Core
 {
+    /*
+     * KnowledgeComponent for storing a vector of floats. Differs from a KC_FloatArray in that it supports normalization,
+     * dot products and cosine similarity. 
+     */
     public class KC_FloatVector : KC_FloatArray
     {
         protected float[] m_normalizedVector;
@@ -12,6 +16,10 @@ namespace CSA.Core
 
         public bool IsNormalized => m_normalizedVector != null;
 
+        /*
+         * This is the property that uniquely distinguishes KC_FloatVector for Json deserialization. 
+         */
+        [DistinguishingProperty]
         public IList<float> FloatVector
         {
             get => FloatArray;
