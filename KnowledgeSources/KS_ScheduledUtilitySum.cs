@@ -1,6 +1,4 @@
 ﻿using CSA.Core;
-using CSA.KnowledgeUnits;
-using System;
 using System.Linq;
 using System.Collections.Generic;
 namespace CSA.KnowledgeSources
@@ -11,7 +9,7 @@ namespace CSA.KnowledgeSources
      * a pool of Units that we want to select from based on utility weightings. The OutputPool consists of copies of items from the SelectionPool with utilities
      * updated by the Units in the UtilitySourcePool. 
      */
-    public class KS_UtilitySum : ScheduledKnowledgeSource
+    public class KS_ScheduledUtilitySum : ScheduledKnowledgeSource
     {
         // Indices for unit and utility source bindings. 
         protected const int UnitToWeight = 0;
@@ -117,7 +115,7 @@ namespace CSA.KnowledgeSources
             unitCopy.SetUtility(unitCopy.GetUtility() + utilitySum);
         }
 
-        public KS_UtilitySum(IBlackboard blackboard, string utilitySourcePool, string selectionPool, string outputPool) : base(blackboard)
+        public KS_ScheduledUtilitySum(IBlackboard blackboard, string utilitySourcePool, string selectionPool, string outputPool) : base(blackboard)
         {
             UtilitySourcePool = utilitySourcePool;
             SelectionPool = selectionPool;

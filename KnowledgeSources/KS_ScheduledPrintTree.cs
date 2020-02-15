@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using CSA.Core;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {

@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using static CSA.Demo.ContentUnitSetupForDemos;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 using System.Linq;
-using CSA.KnowledgeUnits;
 
 namespace Demo
 {

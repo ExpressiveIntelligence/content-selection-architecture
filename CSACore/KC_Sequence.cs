@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     public class KC_Sequence : KC_UnitList
     {

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing an named reference to a knowledge unit. Used to create global variables on the blackboard. 

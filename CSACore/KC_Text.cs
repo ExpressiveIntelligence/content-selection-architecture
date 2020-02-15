@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing a string. Typically used as textual content.  

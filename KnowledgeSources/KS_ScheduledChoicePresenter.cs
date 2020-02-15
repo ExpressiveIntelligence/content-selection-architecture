@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 
 using CSA.Core;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {

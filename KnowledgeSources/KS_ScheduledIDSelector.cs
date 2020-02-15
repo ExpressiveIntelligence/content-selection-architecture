@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CSA.Core;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {

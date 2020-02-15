@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     public class KC_Decomposition : KC_UnitList
     {
@@ -24,7 +23,7 @@ namespace CSA.KnowledgeUnits
             {
                 sb.AppendLine("");
             }
-            foreach(var unit in Decomposition)
+            foreach (var unit in Decomposition)
             {
                 sb.AppendLine("   " + unit);
             }
@@ -45,7 +44,7 @@ namespace CSA.KnowledgeUnits
         {
         }
 
-        protected KC_Decomposition(KC_Decomposition toCopy) : base (toCopy)
+        protected KC_Decomposition(KC_Decomposition toCopy) : base(toCopy)
         {
         }
     }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     public class KC_FloatVector : KC_FloatArray
     {
@@ -139,7 +138,7 @@ namespace CSA.KnowledgeUnits
                 {
                     m_normalizedVector[i] = FloatVector[i] / len;
                 }
-             }
+            }
         }
 
         public double Length()
@@ -192,7 +191,7 @@ namespace CSA.KnowledgeUnits
         {
         }
 
-        public KC_FloatVector(float[] floats, bool readOnly) : base (floats, readOnly)
+        public KC_FloatVector(float[] floats, bool readOnly) : base(floats, readOnly)
         {
         }
 

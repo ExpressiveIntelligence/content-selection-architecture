@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using CSA.Core;
-using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.LinkTypes;
+using static CSA.Core.LinkTypes;
 using Xunit;
 
 namespace CSA.Tests

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CSA.KnowledgeUnits;
 using CSA.Core;
 
 namespace CSA.KnowledgeSources

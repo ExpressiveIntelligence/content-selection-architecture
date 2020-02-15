@@ -1,7 +1,6 @@
 ﻿using System;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * Knowledge component for storing a list of prolog facts to retract.

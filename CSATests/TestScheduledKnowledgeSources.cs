@@ -5,9 +5,8 @@ using Xunit;
 using Xunit.Abstractions;
 
 using CSA.KnowledgeSources;
-using CSA.KnowledgeUnits;
 using CSA.Core;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 using Prolog;
 
 namespace CSA.Tests

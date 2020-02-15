@@ -1,7 +1,6 @@
 ﻿using System.Text;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing a utility (or weight) for selecting a unit. 

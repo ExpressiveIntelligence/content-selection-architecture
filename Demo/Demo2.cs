@@ -1,10 +1,9 @@
 ﻿using System;
 using CSA.Core;
-using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
 using CSA.Controllers;
 using static CSA.Demo.ContentUnitSetupForDemos;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 
 namespace CSA.Demo
 {

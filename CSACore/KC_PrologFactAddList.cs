@@ -1,7 +1,6 @@
 ﻿using System;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing a list of prolog facts to assert. 
@@ -22,7 +21,7 @@ namespace CSA.KnowledgeUnits
 
         public void AddFacts(KC_PrologKB kb)
         {
-            foreach(string fact in AddList)
+            foreach (string fact in AddList)
             {
                 kb.Assert(fact);
             }
@@ -60,7 +59,7 @@ namespace CSA.KnowledgeUnits
             throw new InvalidOperationException("GetPrologFactAddList called on unit that does not have a KC_PrologFactAddList component.");
         }
 
-        public static void SetPrologFactAddList(this Unit unit, string[] strings) 
+        public static void SetPrologFactAddList(this Unit unit, string[] strings)
         {
             if (unit.HasComponent<KC_PrologFactAddList>())
             {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CSA.Core;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {
@@ -8,7 +7,7 @@ namespace CSA.KnowledgeSources
      * Computes the cosine similarity between a specified query vector and each Unit in the input pool that has a KC_FloatVector. Each of the units copied into the
      * output pool has a cosine similarity KC_Double.
      */
-     // fixme: conside making a KS_ScheduledQuery class of which KS_ScheduledCosineSimilarity is a subtype.
+    // fixme: conside making a KS_ScheduledQuery class of which KS_ScheduledCosineSimilarity is a subtype.
     public class KS_ScheduledCosineSimilarity : KS_ScheduledFilterSelector
     {
         /*

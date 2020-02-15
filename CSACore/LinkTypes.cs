@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     public static class LinkTypes
     {
@@ -9,7 +9,7 @@ namespace CSA.KnowledgeUnits
 
         // Link between a ContentUnit and the copy that is a SelectedContentUnit.
         [Obsolete("Replace with L_SeletedUnit")]
-        public const string L_SelectedContentUnit = "L_SelectedContentUnit"; 
+        public const string L_SelectedContentUnit = "L_SelectedContentUnit";
 
         // Link between a Unit and a copy of it that has been filtered by some KS_ScheduledFilterSelector
         public const string L_SelectedUnit = "L_SelectedUnit";

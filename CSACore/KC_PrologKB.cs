@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Text;
-using CSA.Core;
 using Prolog;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing a Unity Prolog knowledge base. 
@@ -147,7 +146,7 @@ namespace CSA.KnowledgeUnits
             throw new InvalidOperationException("GetPrologKB called on unit that does not have a KC_PrologKB component.");
         }
 
-        public static void SetPrologKB(this Unit unit, KnowledgeBase prologKB) 
+        public static void SetPrologKB(this Unit unit, KnowledgeBase prologKB)
         {
             if (unit.HasComponent<KC_PrologKB>())
             {

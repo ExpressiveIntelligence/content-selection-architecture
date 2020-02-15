@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CSA.KnowledgeUnits;
 using CSA.Core;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 
 namespace CSA.KnowledgeSources
 {

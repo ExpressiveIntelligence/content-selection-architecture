@@ -1,9 +1,8 @@
 ﻿using CSA.Controllers;
 using CSA.Core;
 using CSA.KnowledgeSources;
-using CSA.KnowledgeUnits;
 using static CSA.Demo.ContentUnitSetupForDemos;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 using System.Linq;
 
 namespace CSA.Demo
@@ -68,7 +67,7 @@ namespace CSA.Demo
              * This KS takes a pool of things to weight (in this case dialog) and a pool of utility sources (in this case satisfied rules) and sums the utility sources
              * applicable to each unit to weight to compute a new pool of weighted units. 
              */
-            var weightDialogWithRules = new KS_UtilitySum(Blackboard, SatisfiedRulesPool, DialogPool, WeightedDialogPool);
+            var weightDialogWithRules = new KS_ScheduledUtilitySum(Blackboard, SatisfiedRulesPool, DialogPool, WeightedDialogPool);
 
             /*
              * This KS prints out the pool of weighted dialog (for debugging).

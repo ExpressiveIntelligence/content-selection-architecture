@@ -5,8 +5,7 @@ using System.Text;
 using System.Linq;
 using System.Collections.Generic;
 using CSA.Core;
-using CSA.KnowledgeUnits;
-using static CSA.KnowledgeUnits.KCNames;
+using static CSA.Core.KCNames;
 using CSA.KnowledgeSources;
 
 namespace CSA.Controllers

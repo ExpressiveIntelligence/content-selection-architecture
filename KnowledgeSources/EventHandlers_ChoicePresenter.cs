@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using CSA.Core;
-using CSA.KnowledgeUnits;
 
 namespace CSA.KnowledgeSources
 {

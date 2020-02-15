@@ -1,5 +1,4 @@
-﻿using System;
-namespace CSA.KnowledgeUnits
+﻿namespace CSA.Core
 {
     /*
      * String constants for names for named KnowledgeComponents. 

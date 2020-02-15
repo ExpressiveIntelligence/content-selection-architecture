@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using CSA.Core;
 
-namespace CSA.KnowledgeUnits
+namespace CSA.Core
 {
     /*
      * KnowledgeComponent for storing tree node properties. 
@@ -113,9 +112,9 @@ namespace CSA.KnowledgeUnits
                 return unit.GetComponent<KC_TreeNode>().Parent;
             }
             throw new InvalidOperationException("GetTreeParent() called on Unit without a KC_TreeNode componenent.");
-        } 
+        }
 
-        public static void SetTreeParent(this Unit unit, KC_TreeNode parent) 
+        public static void SetTreeParent(this Unit unit, KC_TreeNode parent)
         {
             if (unit.HasComponent<KC_TreeNode>())
             {
