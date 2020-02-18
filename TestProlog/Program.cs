@@ -38,7 +38,9 @@ namespace TestScratchpad
             // ScheduledPrologEvalTestHarness();
             // TestOutputPoolNameEnumerator();
             // TestJson();
-            AssemblyExperiments();
+            // AssemblyExperiments();
+            // DistinguishingPropertyExperiments();
+            UnitDeserializationSupportExperiments();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -330,8 +332,8 @@ namespace TestScratchpad
          */
         private static void AssemblyExperiments()
         {
-            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KC_Utility));
-            Assembly kuAssembly = Assembly.GetAssembly(typeof(KC_ContentPool));
+            Assembly kuAssembly = Assembly.GetAssembly(typeof(KC_Utility));
+            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KC_ContentPool));
 
             Console.WriteLine(csaCoreAssembly);
             Console.WriteLine(kuAssembly);
@@ -347,10 +349,53 @@ namespace TestScratchpad
 
             foreach(Type t in allKCTypes)
             {
-                
                 Console.WriteLine(t);
             }
-            
+
+        }
+
+        /*
+         * Experimenting with DistingushingProperty
+         */
+        private static void DistinguishingPropertyExperiments()
+        {
+            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KnowledgeComponent));
+            Type kcBaseType = typeof(KnowledgeComponent);
+
+            var allKCTypes = from Type t in csaCoreAssembly.GetTypes()
+                             where t.IsSubclassOf(kcBaseType)
+                             select t;
+
+            foreach(Type kc in allKCTypes)
+            {
+                PropertyInfo prop = DistinguishingPropertyAttribute.GetDistinguishingProperty(kc);
+                if (prop != null)
+                {
+                    Console.WriteLine("Class {0}: Prop: {1}.", kc.Name, prop);
+                }
+            }
+        }
+
+        /*
+         * Experiment with Unit support for deserialization
+         */
+        private static void UnitDeserializationSupportExperiments()
+        {
+            Unit u = new Unit();
+            var contentPool = new KC_ContentPool("test", true);
+            var utility = new KC_Utility(1.0);
+            var prologAddList = new KC_PrologFactAddList(new string[] { "one", "two", "three" }, false);
+            var idRequest = new KC_IDSelectionRequest("foo");
+            u.AddComponent(contentPool);
+            u.AddComponent(utility);
+            u.AddComponent(prologAddList);
+            u.AddComponent(idRequest);
+
+            string output = u.SerializeToJson();
+            Console.WriteLine(output);
+
+            Unit deserializedUnit = Unit.DeserializeFromJason(output);
+            Console.WriteLine(deserializedUnit);
         }
 
         /*

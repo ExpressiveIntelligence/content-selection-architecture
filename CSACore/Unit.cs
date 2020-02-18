@@ -218,8 +218,6 @@ namespace CSA.Core
          */
         public static Unit DeserializeFromJason(string jsonUnit)
         {
-            return null;
-            /*
             // Create a new Unit that the deserialized KnowledgeComponents will be added to. 
             Unit deserializedUnit = new Unit();
 
@@ -232,8 +230,43 @@ namespace CSA.Core
                 KnowledgeComponent kc = ConvertJObjectToKC(jo);
                 deserializedUnit.AddComponent(kc);
             }
-            Console.WriteLine(deserializedUnit);
-            */
+
+            return deserializedUnit;
+        }
+
+        private static KnowledgeComponent ConvertJObjectToKC(JObject jo)
+        {
+            // Get the Assembly that contains KnoweldgeComponents.
+            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KnowledgeComponent));
+
+            // Get the Type object representing the base type for all KnowledgeComponents. 
+            Type kcBaseType = typeof(KnowledgeComponent);
+
+            // Create an enumerable of all Type objects that are subclasses of knowledgeComponent
+            var kcTypes = from Type t in csaCoreAssembly.GetTypes()
+                          where t.IsSubclassOf(kcBaseType)
+                          select t;
+
+            /*
+             * Iterate through all the KnowledgeComponent subtypes, examining the properties on each KnowledgeComponent
+             * type to see if one of them is a DistinguishingProperty. If a DistinguishingProperty is found, search
+             * for the property name in the JObject and deserialize if found. 
+             */
+            foreach (Type kcType in kcTypes)
+            {
+                // Get the PropertyInfo of the DistinguishingProperty of the kcType
+                PropertyInfo prop = DistinguishingPropertyAttribute.GetDistinguishingProperty(kcType);
+
+                // If a DistinguishingProperty was found, check to see if that property name is found in the JObject. 
+                if (prop != null)
+                {
+                    if (jo.ContainsKey(prop.Name))
+                    {
+                        return jo.ToObject(kcType) as KnowledgeComponent;
+                    }
+                }
+            }
+            throw new ArgumentException("JObject argument not recognized as a deserializable KnowledgeComponent. " + jo);
 
         }
 
