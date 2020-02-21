@@ -236,23 +236,12 @@ namespace CSA.Core
 
         private static KnowledgeComponent ConvertJObjectToKC(JObject jo)
         {
-            // Get the Assembly that contains KnoweldgeComponents.
-            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KnowledgeComponent));
-
-            // Get the Type object representing the base type for all KnowledgeComponents. 
-            Type kcBaseType = typeof(KnowledgeComponent);
-
-            // Create an enumerable of all Type objects that are subclasses of knowledgeComponent
-            var kcTypes = from Type t in csaCoreAssembly.GetTypes()
-                          where t.IsSubclassOf(kcBaseType)
-                          select t;
-
             /*
              * Iterate through all the KnowledgeComponent subtypes, examining the properties on each KnowledgeComponent
              * type to see if one of them is a DistinguishingProperty. If a DistinguishingProperty is found, search
              * for the property name in the JObject and deserialize if found. 
              */
-            foreach (Type kcType in kcTypes)
+            foreach (Type kcType in KcTypes)
             {
                 // Get the PropertyInfo of the DistinguishingProperty of the kcType
                 PropertyInfo prop = DistinguishingPropertyAttribute.GetDistinguishingProperty(kcType);
@@ -305,18 +294,16 @@ namespace CSA.Core
          */
         static Unit()
         {
-            // fixme: need to do the class migration of KnowledgeComponent classes from CSA.KnowledgeUnits to CSA.Core now.
-            // We can't introduce circular dependencies, and with the move to a component-based architecture for units, it makes
-            // less sense to have a separate assembly for subtypes of Unit (since there aren't any now). 
-            /*Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KC_Utility));
-            Assembly kuAssembly = Assembly.GetAssembly(typeof(KC_ContentPool));
+            // Get the Assembly that contains KnoweldgeComponents.
+            Assembly csaCoreAssembly = Assembly.GetAssembly(typeof(KnowledgeComponent));
 
+            // Get the Type object representing the base type for all KnowledgeComponents. 
             Type kcBaseType = typeof(KnowledgeComponent);
 
-            var allKCTypes = from Type t in csaCoreAssembly.GetTypes().Concat(kuAssembly.GetTypes())
-                             where t.IsSubclassOf(kcBaseType)
-                             select t;
-            */
+            // Create an enumerable of all Type objects that are subclasses of knowledgeComponent
+            KcTypes = from Type t in csaCoreAssembly.GetTypes()
+                      where t.IsSubclassOf(kcBaseType)
+                      select t;
         }
     }
 }
