@@ -214,15 +214,23 @@ namespace CSA.Core
         }
 
         /*
-         * Deserialize a Unit from Json.
+         * Deserialize a Unit from Json. Argument is the string serialization of the Unit. 
          */
-        public static Unit DeserializeFromJason(string jsonUnit)
+        public static Unit DeserializeFromJson(string jsonUnit)
+        {
+            // Get a list of JObjects from jsonUnit. 
+            var joList = JsonConvert.DeserializeObject<IList<JObject>>(jsonUnit);
+
+            return DeserializeFromJson(joList);
+        }
+
+        /*
+         * Deserialize a Unit from Json. Argument is an IList<JObject>. 
+         */
+        public static Unit DeserializeFromJson(IList<JObject> joList)
         {
             // Create a new Unit that the deserialized KnowledgeComponents will be added to. 
             Unit deserializedUnit = new Unit();
-
-            // Get a list of JObjects from jsonUnit. 
-            var joList = JsonConvert.DeserializeObject<IList<JObject>>(jsonUnit);
 
             // For each JObject in the list, convert it to a KnowledgeComponent and add it to the Unit.
             foreach (JObject jo in joList)

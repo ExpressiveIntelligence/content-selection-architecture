@@ -4,12 +4,14 @@ using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.IO;
 using Prolog;
 using CSA.Core;
 using CSA.KnowledgeUnits;
 using CSA.KnowledgeSources;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CSA.Demo;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 using static CSA.KnowledgeUnits.CUSlots;
@@ -40,7 +42,9 @@ namespace TestScratchpad
             // TestJson();
             // AssemblyExperiments();
             // DistinguishingPropertyExperiments();
-            UnitDeserializationSupportExperiments();
+            // UnitDeserializationSupportExperiments();
+            // DeserializeFromFileExperiments();
+            BlackboardJsonExperimens();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -394,9 +398,48 @@ namespace TestScratchpad
             string output = u.SerializeToJson();
             Console.WriteLine(output);
 
-            Unit deserializedUnit = Unit.DeserializeFromJason(output);
+            Unit deserializedUnit = Unit.DeserializeFromJson(output);
             Console.WriteLine(deserializedUnit);
         }
+
+        /*
+         * Experiment with Blackboard.SerializeUnits() and Blackboard.DeserializeUnits()
+         */
+        private static void BlackboardJsonExperimens()
+        {
+            Blackboard blackboard1 = new Blackboard();
+            ContentUnitSetupForDemos.Demo1_KC_DefineUnits(blackboard1);
+
+            blackboard1.SerializeUnits("Demo1Units.json");
+
+            Blackboard blackboard2 = new Blackboard();
+            blackboard2.DeserializeUnits("Demo1Units.json");
+
+            // Console.WriteLine("Number of units in blackboard1: {0}, Number of units in blackboard2: {1}", blackboard1.NumberOfUnits(), blackboard2.NumberOfUnits());
+
+            foreach(Unit u in blackboard2.LookupUnits<Unit>())
+            {
+                Console.WriteLine(u);
+            }
+        }
+
+        /*
+         * Experiment with seializig/deserializing from a file.
+         */
+        private static void DeserializeFromFileExperiments()
+        {
+            Blackboard blackboard = new Blackboard();
+            ContentUnitSetupForDemos.Demo1_KC_DefineUnits(blackboard);
+
+            IList<Unit> units = new List<Unit>();
+            foreach(Unit u in blackboard.LookupUnits<Unit>())
+            {
+                units.Add(u);
+            }
+
+            string serializedUnits = JsonConvert.SerializeObject(units, Formatting.Indented);
+            File.WriteAllText("SerializedUnits.json", serializedUnits);            
+         }
 
         /*
          * Unit test code for KC_ScheduledPrologEval so that I can use the debugger

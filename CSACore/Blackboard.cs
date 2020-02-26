@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CSA.Core
 {
@@ -332,6 +335,54 @@ namespace CSA.Core
 
             return totalCount / 2; 
         }
+
+        /*
+         * Serializes all blackboard units to  a file.
+         */
+        public void SerializeUnits(string fileName)
+        {
+            StreamWriter sw = new StreamWriter(fileName);
+
+            // Opening brace of top-level list (list of units).
+            sw.WriteLine("[");
+
+            foreach(Unit unit in LookupUnits<Unit>())
+            {
+                string serializedUnit = JsonConvert.SerializeObject(unit.GetComponents(), Formatting.Indented);
+                sw.Write(serializedUnit);
+                sw.WriteLine(",");
+            }
+
+            // Closing brace of top-level list (list of units).
+            sw.WriteLine("]");
+
+            sw.Close();
+        }
+
+        /*
+         * Deserializes blackboard units from a file.
+         * fixme: reading in the whole file into a string. For large content pools can cause gc to slow the application.
+         * May not matter in the end, even when embedded in Unity, if this is only done once at the beginning of the process. 
+         */
+        public void DeserializeUnits(string fileName)
+        {
+            string unitsString = File.ReadAllText(fileName);
+
+            /*
+             * A file containing serialized Units is repesented as a list of list of JObjects.
+             * The top level list is a list of Units.
+             * Each Unit is in turn a list of KnowledgeComponents.
+             * Each KnowledgeComponent is in turn a JObject.
+             */
+            var unitsJoList = JsonConvert.DeserializeObject<IList<IList<JObject>>>(unitsString);
+            // Console.WriteLine(unitsJoList);
+
+            foreach(IList<JObject> unitJo in unitsJoList)
+            {
+                AddUnit(Unit.DeserializeFromJson(unitJo));
+            } 
+        }
+
 
         // fixme: add support for hierarchical blackboards and spaces with special indexing (efficient lookup of units by properties rather than just class)
     }
