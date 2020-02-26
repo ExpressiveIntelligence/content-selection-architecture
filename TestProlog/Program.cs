@@ -44,7 +44,8 @@ namespace TestScratchpad
             // DistinguishingPropertyExperiments();
             // UnitDeserializationSupportExperiments();
             // DeserializeFromFileExperiments();
-            BlackboardJsonExperimens();
+            // BlackboardJsonExperiments();
+            TestCrossProduct();
         }
 
         // Testing whether KnowledgeComponent.ContainingUnit is refering to the correct ContiningUnit after a copy
@@ -405,7 +406,7 @@ namespace TestScratchpad
         /*
          * Experiment with Blackboard.SerializeUnits() and Blackboard.DeserializeUnits()
          */
-        private static void BlackboardJsonExperimens()
+        private static void BlackboardJsonExperiments()
         {
             Blackboard blackboard1 = new Blackboard();
             ContentUnitSetupForDemos.Demo1_KC_DefineUnits(blackboard1);
@@ -440,6 +441,41 @@ namespace TestScratchpad
             string serializedUnits = JsonConvert.SerializeObject(units, Formatting.Indented);
             File.WriteAllText("SerializedUnits.json", serializedUnits);            
          }
+
+        private static void TestCrossProduct()
+        {
+            Blackboard blackboard = new Blackboard();
+
+            Unit abstractMove1 = new Unit();
+            Unit abstractMove2 = new Unit();
+
+            abstractMove1.AddComponent(new KC_ContentPool("abstractMoves", true));
+            abstractMove1.AddComponent(new KC_UnitID("move1", true));
+            abstractMove2.AddComponent(new KC_ContentPool("abstractMoves", true));
+            abstractMove2.AddComponent(new KC_UnitID("move2", true));
+
+            blackboard.AddUnit(abstractMove1);
+            blackboard.AddUnit(abstractMove2);
+
+            Unit fact1 = new Unit();
+            Unit fact2 = new Unit();
+
+            fact1.AddComponent(new KC_ContentPool("facts", true));
+            fact1.AddComponent(new KC_UnitID("fact1", true));
+            fact2.AddComponent(new KC_ContentPool("facts", true));
+            fact2.AddComponent(new KC_UnitID("fact2", true));
+
+            blackboard.AddUnit(fact1);
+            blackboard.AddUnit(fact2);
+
+            KS_ScheduledCrossProduct cross = new KS_ScheduledCrossProduct(blackboard, "abstractMoves", "facts", "outputPool");
+            cross.Execute();
+
+            KS_ScheduledPrintPool printPool = new KS_ScheduledPrintPool(blackboard, "outputPool");
+            printPool.Execute();
+            
+
+        }
 
         /*
          * Unit test code for KC_ScheduledPrologEval so that I can use the debugger
